@@ -8,7 +8,6 @@ import type { SharedValue } from 'react-native-reanimated';
 import { SILK_SHADER } from './shader';
 import { useClock } from '../../hooks/useClock';
 import { colorToVec4, type ColorInput } from '../../utils/colors';
-import doTheTrick from '../../utils/doTheTrick';
 
 type CanvasProps = ViewProps & {
   transparent?: boolean;
@@ -179,7 +178,7 @@ export default function Silk({
   ]);
 
   useEffect(() => {
-    doTheTrick(drawSilk);
+    drawSilk();
 
     function listenToAnimatedValues() {
       clock.addListener(0, () => {

@@ -52,14 +52,6 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     image: require('../../assets/components/calico-swirl.png'),
   },
   {
-    id: 'desert',
-    title: 'Desert',
-    description: 'Raymarched desert with sand dunes and mist',
-    screen: 'DesertStatic',
-    color: '#d4a574',
-    image: require('../../assets/components/desert.png'),
-  },
-  {
     id: 'circular-gradient',
     title: 'Circular Gradient',
     description: 'Customizable circular gradients',
@@ -74,22 +66,6 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     screen: 'LinearGradientList',
     color: '#ec4899',
     image: require('../../assets/components/linear-gradient.png'),
-  },
-  {
-    id: 'holo',
-    title: 'Holographic Card',
-    description: 'Touch-interactive holographic effect with rainbow shimmer',
-    screen: 'HoloStatic',
-    color: '#ff00ff',
-    image: require('../../assets/components/holo.png'),
-  },
-  {
-    id: 'glitter',
-    title: 'Glitter',
-    description: 'Animated sparkle effect with scrolling noise',
-    screen: 'GlitterStatic',
-    color: '#ffffff',
-    image: require('../../assets/components/glitter.png'),
   },
 ];
 

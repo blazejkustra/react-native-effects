@@ -8,7 +8,6 @@ import type { SharedValue } from 'react-native-reanimated';
 import { LIQUID_CHROME_SHADER } from './shader';
 import { useClock } from '../../hooks/useClock';
 import { colorToVec4, type ColorInput } from '../../utils/colors';
-import doTheTrick from '../../utils/doTheTrick';
 
 type CanvasProps = ViewProps & {
   transparent?: boolean;
@@ -181,8 +180,6 @@ export default function LiquidChrome({
   ]);
 
   useEffect(() => {
-    doTheTrick(drawLiquidChrome);
-
     function listenToAnimatedValues() {
       clock.addListener(0, () => {
         drawLiquidChrome();

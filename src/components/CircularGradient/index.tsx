@@ -7,7 +7,6 @@ import { useCallback, useEffect } from 'react';
 import { runOnUI, useDerivedValue } from 'react-native-reanimated';
 import type { SharedValue } from 'react-native-reanimated';
 import { CIRCULAR_GRADIENT_SHADER } from './shader';
-import doTheTrick from '../../utils/doTheTrick';
 
 type CanvasProps = ViewProps & {
   transparent?: boolean;
@@ -180,8 +179,6 @@ export default function CircularGradient({
   ]);
 
   useEffect(() => {
-    doTheTrick(drawCircularGradient);
-
     function listenToAnimatedValues() {
       animatedCenterX.addListener(0, () => {
         drawCircularGradient();

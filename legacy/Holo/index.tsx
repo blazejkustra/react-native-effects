@@ -5,13 +5,12 @@ import {
   Image,
 } from 'react-native';
 import { Canvas } from 'react-native-wgpu';
-import { TRIANGLE_VERTEX_SHADER } from '../../shaders/TRIANGLE_VERTEX_SHADER';
-import { useWGPUSetup } from '../../hooks/useWGPUSetup';
+import { TRIANGLE_VERTEX_SHADER } from '../../src/shaders/TRIANGLE_VERTEX_SHADER';
+import { useWGPUSetup } from '../../src/hooks/useWGPUSetup';
 import { useCallback, useEffect, useState } from 'react';
 import type { SharedValue } from 'react-native-reanimated';
 import { runOnUI } from 'react-native-reanimated';
 import { HOLO_SHADER } from './shader';
-import doTheTrick from '../../utils/doTheTrick';
 
 type CanvasProps = ViewProps & {
   transparent?: boolean;
@@ -198,8 +197,6 @@ export default function Holo({
     if (!imageBitmap) {
       return;
     }
-
-    doTheTrick(drawHolo);
 
     if (!touchX || !touchY) {
       return;

@@ -7,7 +7,6 @@ import { useCallback, useEffect } from 'react';
 import { runOnUI, useDerivedValue } from 'react-native-reanimated';
 import type { SharedValue } from 'react-native-reanimated';
 import { LINEAR_GRADIENT_SHADER } from './shader';
-import doTheTrick from '../../utils/doTheTrick';
 
 type CanvasProps = ViewProps & {
   transparent?: boolean;
@@ -150,8 +149,6 @@ export default function LinearGradient({
   }, [sharedContext, animatedStartColor, animatedEndColor, angleInRadians]);
 
   useEffect(() => {
-    doTheTrick(drawLinearGradient);
-
     function listenToAnimatedValues() {
       angleInRadians.addListener(0, () => {
         drawLinearGradient();

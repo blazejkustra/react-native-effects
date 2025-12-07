@@ -1,14 +1,14 @@
 import { StyleSheet, type ViewProps } from 'react-native';
 import { Canvas } from 'react-native-wgpu';
-import { TRIANGLE_VERTEX_SHADER } from '../../shaders/TRIANGLE_VERTEX_SHADER';
-import { useWGPUSetup } from '../../hooks/useWGPUSetup';
+import { TRIANGLE_VERTEX_SHADER } from '../../src/shaders/TRIANGLE_VERTEX_SHADER';
+import { useWGPUSetup } from '../../src/hooks/useWGPUSetup';
 import { useCallback, useEffect } from 'react';
 import { runOnUI, useDerivedValue } from 'react-native-reanimated';
 import type { SharedValue } from 'react-native-reanimated';
 import { GLITTER_SHADER } from './shader';
-import { useClock } from '../../hooks/useClock';
-import doTheTrick from '../../utils/doTheTrick';
-import { colorToVec4, type ColorInput } from '../../utils/colors';
+import { useClock } from '../../src/hooks/useClock';
+
+import { colorToVec4, type ColorInput } from '../../src/utils/colors';
 
 type CanvasProps = ViewProps & {
   transparent?: boolean;
@@ -211,8 +211,6 @@ export default function Glitter({
   ]);
 
   useEffect(() => {
-    doTheTrick(drawGlitter);
-
     function listenToAnimatedValues() {
       clock.addListener(0, () => {
         drawGlitter();
