@@ -88,6 +88,7 @@
     "react-native": "0.83.1",
     "react-native-builder-bob": "^0.40.18",
     "react-native-gesture-handler": "2.30.0",
+    "react-native-reanimated": "4.2.2",
     "react-native-wgpu": "0.5.6",
     "react-native-worklets": "0.8.0-bundle-mode-preview-1",
     "release-it": "^19.0.4",

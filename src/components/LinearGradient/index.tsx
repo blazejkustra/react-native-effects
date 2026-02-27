@@ -1,11 +1,10 @@
 import { StyleSheet, type ViewProps } from 'react-native';
 import { Canvas } from 'react-native-wgpu';
-import { colorToVec4 } from '../../utils/colors';
+import { colorToVec4, type ColorInput } from '../../utils/colors';
 import { TRIANGLE_VERTEX_SHADER } from '../../shaders/TRIANGLE_VERTEX_SHADER';
 import { useWGPUSetup } from '../../hooks/useWGPUSetup';
-import { useCallback, useEffect } from 'react';
-import { runOnUI, useDerivedValue } from 'react-native-reanimated';
-import type { SharedValue } from 'react-native-reanimated';
+import { useEffect, useRef } from 'react';
+import { createSynchronizable, scheduleOnRuntime } from 'react-native-worklets';
 import { LINEAR_GRADIENT_SHADER } from './shader';
 
 type CanvasProps = ViewProps & {
@@ -16,15 +15,22 @@ type Props = CanvasProps & {
   /**
    * The color of the start of the gradient.
    */
-  startColor: string | number | SharedValue<string> | SharedValue<number>;
+  startColor: string | number;
   /**
    * The color of the end of the gradient.
    */
-  endColor: string | number | SharedValue<string> | SharedValue<number>;
+  endColor: string | number;
   /**
    * The angle of the gradient in degrees (0-360).
    */
-  angle: number | SharedValue<number>;
+  angle: number;
+};
+
+type GradientParams = {
+  startColor: ColorInput;
+  endColor: ColorInput;
+  angle: number;
+  alive: boolean;
 };
 
 export default function LinearGradient({
@@ -34,148 +40,130 @@ export default function LinearGradient({
   style,
   ...canvasProps
 }: Props) {
-  const { sharedContext, canvasRef } = useWGPUSetup();
+  const { canvasRef, runtime, resources } = useWGPUSetup();
 
-  // Convert angle to radians
-  const angleInRadians = useDerivedValue(() => {
-    const angleValue = typeof angle === 'number' ? angle : angle.get();
-    return (angleValue * Math.PI) / 180;
-  });
+  const propsSync = useRef(
+    createSynchronizable<GradientParams>({
+      startColor,
+      endColor,
+      angle,
+      alive: true,
+    })
+  ).current;
 
-  const animatedStartColor = useDerivedValue(() =>
-    typeof startColor === 'number' || typeof startColor === 'string'
-      ? startColor
-      : startColor.get()
-  );
+  // Update synchronizable when props change
+  useEffect(() => {
+    propsSync.setBlocking((prev) => ({
+      ...prev,
+      startColor,
+      endColor,
+      angle,
+    }));
+  }, [startColor, endColor, angle, propsSync]);
 
-  const animatedEndColor = useDerivedValue(() =>
-    typeof endColor === 'number' || typeof endColor === 'string'
-      ? endColor
-      : endColor.get()
-  );
+  // Signal cleanup on unmount
+  useEffect(() => {
+    return () => {
+      propsSync.setBlocking((prev) => ({ ...prev, alive: false }));
+    };
+  }, [propsSync]);
 
-  const drawLinearGradient = useCallback(() => {
-    'worklet';
-
-    const { device, context, presentationFormat } = sharedContext.get();
-    if (!device || !context || !presentationFormat) {
+  // Start render loop when GPU resources are ready
+  useEffect(() => {
+    if (!resources) {
       return;
     }
 
-    const uniformBuffer = device.createBuffer({
-      size: 48,
-      usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-    });
+    const { device, context, presentationFormat } = resources;
 
-    const startColorRGBA = colorToVec4(animatedStartColor.get());
-    const endColorRGBA = colorToVec4(animatedEndColor.get());
+    scheduleOnRuntime(runtime, () => {
+      'worklet';
 
-    const width = context.canvas.width ?? 1;
-    const height = context.canvas.height ?? 1;
-    const aspect = width / height;
-
-    const uniformData = new Float32Array([
-      startColorRGBA.r,
-      startColorRGBA.g,
-      startColorRGBA.b,
-      startColorRGBA.a,
-      endColorRGBA.r,
-      endColorRGBA.g,
-      endColorRGBA.b,
-      endColorRGBA.a,
-      angleInRadians.get(),
-      aspect,
-    ]);
-    device.queue.writeBuffer(uniformBuffer, 0, uniformData);
-
-    const pipeline = device.createRenderPipeline({
-      layout: 'auto',
-      vertex: {
-        module: device.createShaderModule({
-          code: TRIANGLE_VERTEX_SHADER,
-        }),
-        entryPoint: 'main',
-      },
-      fragment: {
-        module: device.createShaderModule({
-          code: LINEAR_GRADIENT_SHADER,
-        }),
-        entryPoint: 'main',
-        targets: [
-          {
-            format: presentationFormat,
-          },
-        ],
-      },
-      primitive: {
-        topology: 'triangle-list',
-      },
-    });
-
-    const bindGroup = device.createBindGroup({
-      layout: pipeline.getBindGroupLayout(0),
-      entries: [
-        {
-          binding: 0,
-          resource: {
-            buffer: uniformBuffer,
-          },
+      const pipeline = device.createRenderPipeline({
+        layout: 'auto',
+        vertex: {
+          module: device.createShaderModule({ code: TRIANGLE_VERTEX_SHADER }),
+          entryPoint: 'main',
         },
-      ],
-    });
-
-    const commandEncoder = device.createCommandEncoder();
-
-    const textureView = context.getCurrentTexture().createView();
-    const renderPassDescriptor: GPURenderPassDescriptor = {
-      colorAttachments: [
-        {
-          view: textureView,
-          clearValue: [0, 0, 0, 1],
-          loadOp: 'clear',
-          storeOp: 'store',
+        fragment: {
+          module: device.createShaderModule({
+            code: LINEAR_GRADIENT_SHADER,
+          }),
+          entryPoint: 'main',
+          targets: [{ format: presentationFormat }],
         },
-      ],
-    };
-
-    const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
-    passEncoder.setPipeline(pipeline);
-    passEncoder.setBindGroup(0, bindGroup);
-    passEncoder.draw(3);
-    passEncoder.end();
-
-    device.queue.submit([commandEncoder.finish()]);
-    context.present();
-  }, [sharedContext, animatedStartColor, animatedEndColor, angleInRadians]);
-
-  useEffect(() => {
-    function listenToAnimatedValues() {
-      angleInRadians.addListener(0, () => {
-        drawLinearGradient();
+        primitive: { topology: 'triangle-list' },
       });
-      animatedStartColor.addListener(0, () => {
-        drawLinearGradient();
-      });
-      animatedEndColor.addListener(0, () => {
-        drawLinearGradient();
-      });
-    }
 
-    function stopListeningToAnimatedValues() {
-      angleInRadians.removeListener(0);
-      animatedStartColor.removeListener(0);
-      animatedEndColor.removeListener(0);
-    }
+      function animate() {
+        const props = propsSync.getDirty();
+        if (!props.alive) {
+          return;
+        }
 
-    runOnUI(listenToAnimatedValues)();
-    return runOnUI(stopListeningToAnimatedValues);
-  }, [
-    angleInRadians,
-    animatedStartColor,
-    animatedEndColor,
-    drawLinearGradient,
-    sharedContext,
-  ]);
+        const startColorRGBA = colorToVec4(props.startColor);
+        const endColorRGBA = colorToVec4(props.endColor);
+        const angleInRadians = (props.angle * Math.PI) / 180;
+
+        const canvas = context.canvas as typeof context.canvas & {
+          width: number;
+          height: number;
+        };
+        const width = canvas.width || 1;
+        const height = canvas.height || 1;
+        const aspect = width / height;
+
+        const uniformBuffer = device.createBuffer({
+          size: 48,
+          usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+
+        const uniformData = new Float32Array([
+          startColorRGBA.r,
+          startColorRGBA.g,
+          startColorRGBA.b,
+          startColorRGBA.a,
+          endColorRGBA.r,
+          endColorRGBA.g,
+          endColorRGBA.b,
+          endColorRGBA.a,
+          angleInRadians,
+          aspect,
+        ]);
+        device.queue.writeBuffer(uniformBuffer, 0, uniformData);
+
+        const bindGroup = device.createBindGroup({
+          layout: pipeline.getBindGroupLayout(0),
+          entries: [{ binding: 0, resource: { buffer: uniformBuffer } }],
+        });
+
+        const commandEncoder = device.createCommandEncoder();
+        const textureView = context.getCurrentTexture().createView();
+        const passEncoder = commandEncoder.beginRenderPass({
+          colorAttachments: [
+            {
+              view: textureView,
+              clearValue: [0, 0, 0, 1],
+              loadOp: 'clear',
+              storeOp: 'store',
+            },
+          ],
+        });
+
+        passEncoder.setPipeline(pipeline);
+        passEncoder.setBindGroup(0, bindGroup);
+        passEncoder.draw(3);
+        passEncoder.end();
+
+        device.queue.submit([commandEncoder.finish()]);
+        context.present();
+
+        requestAnimationFrame(animate);
+      }
+
+      requestAnimationFrame(animate);
+    });
+  }, [resources, runtime, propsSync]);
 
   return (
     <Canvas ref={canvasRef} style={[styles.webgpu, style]} {...canvasProps} />
