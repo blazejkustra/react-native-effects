@@ -1,3 +1,3 @@
-# react-native-backgrounds
+# react-native-effects
 
 Currently cooking 👨🏻‍🍳

@@ -1,6 +1,11 @@
 {
-  "extends": "../tsconfig",
+  "extends": "@react-native/typescript-config",
   "compilerOptions": {
-    // Avoid expo-cli auto-generating a tsconfig
-  }
+    "paths": {
+      "react-native-effects": ["../src/index"]
+    },
+    "types": ["@webgpu/types"]
+  },
+  "include": ["**/*.ts", "**/*.tsx", "../src/**/*.ts", "../src/**/*.tsx"],
+  "exclude": ["**/node_modules", "**/Pods"]
 }
