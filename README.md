@@ -2,7 +2,7 @@
 
 > **Experimental** — APIs may change without notice. Relies on `react-native-worklets` bundle mode, which is not yet stable. Use with caution.
 
-WebGPU-powered backgrounds running on UI thread in React Native. Beautiful, animated shader effects as drop-in components.
+WebGPU-powered effects running on UI thread in React Native. Beautiful, animated shader effects as drop-in components.
 
 ## Features
 
