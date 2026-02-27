@@ -5,7 +5,7 @@ import { Header } from '../components/Header';
 export default function CalicoSwirlScreen() {
   return (
     <View style={styles.container}>
-      <CalicoSwirl style={StyleSheet.absoluteFillObject} />
+      <CalicoSwirl style={styles.calicoSwirl} />
 
       <StatusBar barStyle="light-content" backgroundColor="transparent" />
 
@@ -59,5 +59,8 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.8)',
     textAlign: 'center',
     fontWeight: '400',
+  },
+  calicoSwirl: {
+    width: '100%',
   },
 });

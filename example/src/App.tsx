@@ -11,6 +11,7 @@ import LiquidChromeScreen from './screens/LiquidChromeScreen';
 import SilkScreen from './screens/SilkScreen';
 import CampfireScreen from './screens/CampfireScreen';
 import CalicoSwirlScreen from './screens/CalicoSwirlScreen';
+import AuroraScreen from './screens/AuroraScreen';
 import CircularGradientScreen from './screens/CircularGradientScreen';
 import type { RootStackParamList } from './types';
 
@@ -48,6 +49,7 @@ export default function App() {
         <Stack.Screen name="SilkStatic" component={SilkScreen} />
         <Stack.Screen name="CampfireStatic" component={CampfireScreen} />
         <Stack.Screen name="CalicoSwirlStatic" component={CalicoSwirlScreen} />
+        <Stack.Screen name="AuroraStatic" component={AuroraScreen} />
         <Stack.Screen
           name="CircularGradientList"
           component={CircularGradientScreen}

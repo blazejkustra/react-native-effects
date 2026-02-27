@@ -1,24 +1,21 @@
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
-import { Campfire } from 'react-native-effects';
+import { Aurora } from 'react-native-effects';
 import { Header } from '../components/Header';
 
-export default function CampfireScreen() {
+export default function AuroraScreen() {
   return (
     <View style={styles.container}>
+      <Aurora style={StyleSheet.absoluteFillObject} />
+
       <StatusBar barStyle="light-content" backgroundColor="transparent" />
 
-      <Header
-        title="Campfire"
-        subtitle="Fire with drifting sparks"
-        transparent
-      />
+      <Header title="Aurora" subtitle="Northern lights curtains" transparent />
 
       <View style={styles.content}>
-        <Campfire style={styles.campfire} />
         <View style={styles.infoCard}>
-          <Text style={styles.title}>Campfire</Text>
+          <Text style={styles.title}>Aurora Borealis</Text>
           <Text style={styles.subtitle}>
-            Realistic fire effect with sparks and smoke
+            Flowing curtains of light with shimmering colors
           </Text>
         </View>
       </View>
@@ -36,7 +33,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 40,
-    position: 'relative',
   },
   infoCard: {
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
@@ -59,9 +55,5 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.8)',
     textAlign: 'center',
     fontWeight: '400',
-  },
-  campfire: {
-    height: 200,
-    width: '100%',
   },
 });

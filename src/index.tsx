@@ -6,6 +6,7 @@ import LiquidChrome from './components/LiquidChrome';
 import Silk from './components/Silk';
 import Campfire from './components/Campfire';
 import CalicoSwirl from './components/CalicoSwirl';
+import Aurora from './components/Aurora';
 
 export type { ShaderViewProps } from './components/ShaderView/types';
 
@@ -18,4 +19,5 @@ export {
   Silk,
   Campfire,
   CalicoSwirl,
+  Aurora,
 };

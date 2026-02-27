@@ -52,6 +52,14 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     image: require('../../assets/components/calico-swirl.png'),
   },
   {
+    id: 'aurora',
+    title: 'Aurora',
+    description: 'Northern lights with flowing curtains of light',
+    screen: 'AuroraStatic',
+    color: '#4ade80',
+    image: require('../../assets/components/calico-swirl.png'),
+  },
+  {
     id: 'circular-gradient',
     title: 'Circular Gradient',
     description: 'Customizable circular gradients',
