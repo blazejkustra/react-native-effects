@@ -57,7 +57,7 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     description: 'Northern lights with flowing curtains of light',
     screen: 'AuroraStatic',
     color: '#4ade80',
-    image: require('../../assets/components/calico-swirl.png'),
+    image: require('../../assets/components/aurora.png'),
   },
   {
     id: 'circular-gradient',
@@ -85,9 +85,9 @@ export default function HomeScreen() {
       <StatusBar barStyle="light-content" backgroundColor="#000" />
 
       <View style={styles.header}>
-        <Text style={styles.title}>React Native Backgrounds</Text>
+        <Text style={styles.title}>React Native Effects</Text>
         <Text style={styles.subtitle}>
-          WebGPU-powered backgrounds running on UI thread in React Native 🧑‍🍳
+          WebGPU-powered effects running on background thread in React Native 🧑‍🍳
         </Text>
       </View>
 
