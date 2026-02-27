@@ -7,7 +7,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'react-native-effects';
 import { BackButton } from '../../components/BackButton';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 type ColorScheme = {
   name: string;
@@ -25,21 +25,6 @@ const COLOR_SCHEMES: ColorScheme[] = [
 
 export default function LinearGradientAnimatedScreen() {
   const [currentSchemeIndex, setCurrentSchemeIndex] = useState(0);
-  const [angle, setAngle] = useState(0);
-  const startTimeRef = useRef(Date.now());
-
-  // Drive angle rotation via requestAnimationFrame
-  useEffect(() => {
-    let id: number;
-    function tick() {
-      const elapsed = Date.now() - startTimeRef.current;
-      // Full rotation every 3 seconds (matching original duration)
-      setAngle((elapsed / 3000) * 360);
-      id = requestAnimationFrame(tick);
-    }
-    id = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(id);
-  }, []);
 
   const currentScheme = COLOR_SCHEMES[currentSchemeIndex]!;
 
@@ -58,7 +43,8 @@ export default function LinearGradientAnimatedScreen() {
       <LinearGradient
         startColor={currentScheme.startColor}
         endColor={currentScheme.endColor}
-        angle={angle % 360}
+        angle={0}
+        speed={120}
         style={StyleSheet.absoluteFillObject}
       />
 
