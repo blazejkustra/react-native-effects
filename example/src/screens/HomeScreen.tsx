@@ -17,7 +17,7 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     description: 'Apple Weather UI clone',
     screen: 'WeatherExample',
     color: '#1a2a6c',
-    image: require('../../assets/components/aurora.png'),
+    image: require('../../assets/components/weather.png'),
   },
   {
     id: 'iridescence',
