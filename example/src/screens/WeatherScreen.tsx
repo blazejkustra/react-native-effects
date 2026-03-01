@@ -11,17 +11,18 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   interpolate,
+  interpolateColor,
   Extrapolation,
   clamp,
 } from 'react-native-reanimated';
 import type { LayoutChangeEvent } from 'react-native';
-import { LinearGradient } from 'react-native-effects';
 import { BackButton } from '../components/BackButton';
+import NightSky from '../components/NightSky';
 
 const RAIN_BLUE = '#64D2FF';
 const BG_COLOR = '#0F1B3D';
-const CARD_BG = '#1A2650';
-const CARD_BORDER = '#3D4768';
+const CARD_BG = 'rgba(26, 38, 80, 0.6)';
+const CARD_BORDER = 'rgba(61, 71, 104, 0.6)';
 
 type WeatherType =
   | 'clear-day'
@@ -270,6 +271,11 @@ export default function WeatherScreen() {
     return {
       transform: [{ translateY: clamp(offset, 0, maxOffset) }],
       zIndex: 1,
+      backgroundColor: interpolateColor(
+        clamp(offset, 0, 1),
+        [0, 1],
+        ['transparent', 'rgb(18, 30, 62)']
+      ),
     };
   });
 
@@ -279,6 +285,11 @@ export default function WeatherScreen() {
     return {
       transform: [{ translateY: clamp(offset, 0, maxOffset) }],
       zIndex: 1,
+      backgroundColor: interpolateColor(
+        clamp(offset, 0, 1),
+        [0, 1],
+        ['transparent', 'rgb(18, 30, 62)']
+      ),
     };
   });
 
@@ -318,11 +329,10 @@ export default function WeatherScreen() {
         backgroundColor="transparent"
         translucent
       />
-      <LinearGradient
-        startColor="#0F1B3D"
-        endColor="#1C2B5A"
-        angle={180}
+      <NightSky
         style={StyleSheet.absoluteFillObject}
+        endColor="#030417"
+        startColor="#2D3A59"
       />
 
       {/* ═══ Fixed header — outside scroll view ═══ */}
