@@ -12,6 +12,14 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'weather-example',
+    title: 'Weather App',
+    description: 'Apple Weather UI clone',
+    screen: 'WeatherExample',
+    color: '#1a2a6c',
+    image: require('../../assets/components/weather.png'),
+  },
+  {
     id: 'iridescence',
     title: 'Iridescence',
     description: 'Mesmerizing iridescent animated backgrounds',
@@ -52,6 +60,14 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     image: require('../../assets/components/calico-swirl.png'),
   },
   {
+    id: 'aurora',
+    title: 'Aurora',
+    description: 'Northern lights with flowing curtains of light',
+    screen: 'AuroraStatic',
+    color: '#4ade80',
+    image: require('../../assets/components/aurora.png'),
+  },
+  {
     id: 'circular-gradient',
     title: 'Circular Gradient',
     description: 'Customizable circular gradients',
@@ -59,6 +75,7 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     color: '#4f46e5',
     image: require('../../assets/components/circular-gradient.png'),
   },
+
   {
     id: 'linear-gradient',
     title: 'Linear Gradient',
@@ -77,9 +94,9 @@ export default function HomeScreen() {
       <StatusBar barStyle="light-content" backgroundColor="#000" />
 
       <View style={styles.header}>
-        <Text style={styles.title}>React Native Backgrounds</Text>
+        <Text style={styles.title}>React Native Effects</Text>
         <Text style={styles.subtitle}>
-          WebGPU-powered backgrounds running on UI thread in React Native 🧑‍🍳
+          WebGPU-powered effects running on background thread in React Native 🧑‍🍳
         </Text>
       </View>
 

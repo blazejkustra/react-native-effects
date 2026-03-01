@@ -6,7 +6,7 @@ import {
   StatusBar,
   Dimensions,
 } from 'react-native';
-import { LinearGradient } from 'react-native-backgrounds';
+import { LinearGradient } from 'react-native-effects';
 import { Header } from '../../components/Header';
 
 const { width } = Dimensions.get('window');

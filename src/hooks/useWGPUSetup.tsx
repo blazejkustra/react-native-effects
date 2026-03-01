@@ -1,59 +1,73 @@
-import '../utils/initGPUOnThreads';
 import { PixelRatio } from 'react-native';
 import {
+  useCanvasRef,
   type CanvasRef,
   type RNCanvasContext,
-  useCanvasEffect,
 } from 'react-native-wgpu';
-import { useSharedValue, type SharedValue } from 'react-native-reanimated';
+import { useEffect, useState } from 'react';
+import type { WorkletRuntime } from 'react-native-worklets';
+import { initWebGPU } from '../utils/initWebGPU';
+import { BackgroundRuntime } from '../utils/backgroundRuntime';
 
-type SharedContext = {
-  context?: RNCanvasContext;
-  presentationFormat?: GPUTextureFormat;
-  device?: GPUDevice;
+type GPUResources = {
+  device: GPUDevice;
+  context: RNCanvasContext;
+  presentationFormat: GPUTextureFormat;
 };
 
-type ReturnType = {
+type WGPUSetupResult = {
   canvasRef: React.RefObject<CanvasRef>;
-  sharedContext: SharedValue<SharedContext>;
+  runtime: WorkletRuntime;
+  resources: GPUResources | null;
 };
 
-export function useWGPUSetup(): ReturnType {
-  const sharedContext = useSharedValue<SharedContext>({});
+export function useWGPUSetup(): WGPUSetupResult {
+  const canvasRef = useCanvasRef();
+  const [resources, setResources] = useState<GPUResources | null>(null);
+  const runtime = BackgroundRuntime;
 
-  const canvasRef = useCanvasEffect(async () => {
-    const gpuAdapter = await navigator.gpu.requestAdapter();
-    if (!gpuAdapter) {
-      throw new Error('[react-native-backgrounds] No adapter found');
-    }
+  useEffect(() => {
+    let cancelled = false;
 
-    const device = await gpuAdapter.requestDevice();
+    (async () => {
+      const adapter = await navigator.gpu.requestAdapter();
+      if (!adapter || cancelled) {
+        return;
+      }
 
-    const context = canvasRef.current?.getContext('webgpu')!;
-    if (!context) {
-      throw new Error('[react-native-backgrounds] No context found');
-    }
+      const device = await adapter.requestDevice();
+      if (cancelled) {
+        return;
+      }
 
-    const canvas = canvasRef.current?.getNativeSurface();
-    canvas.width = canvas.clientWidth * PixelRatio.get();
-    canvas.height = canvas.clientHeight * PixelRatio.get();
+      const context = canvasRef.current!.getContext('webgpu')!;
+      const canvas = context.canvas as typeof context.canvas & {
+        width: number;
+        height: number;
+      };
+      const dpr = PixelRatio.get();
+      canvas.width = canvas.width * dpr;
+      canvas.height = canvas.height * dpr;
 
-    const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
-    context.configure({
-      device: device,
-      format: presentationFormat,
-      alphaMode: 'premultiplied',
-    });
+      const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
+      context.configure({
+        device,
+        format: presentationFormat,
+        alphaMode: 'premultiplied',
+      });
 
-    sharedContext.set({
-      context,
-      device,
-      presentationFormat,
-    });
-  });
+      initWebGPU(runtime);
 
-  return {
-    canvasRef,
-    sharedContext,
-  };
+      if (!cancelled) {
+        setResources({ device, context, presentationFormat });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return { canvasRef, runtime, resources };
 }

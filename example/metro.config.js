@@ -1,20 +1,43 @@
 const path = require('path');
-const { getDefaultConfig } = require('@expo/metro-config');
-const { withMetroConfig } = require('react-native-monorepo-config');
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const { bundleModeMetroConfig } = require('react-native-worklets/bundleMode');
 
 const root = path.resolve(__dirname, '..');
 
 /**
  * Metro configuration
- * https://facebook.github.io/metro/docs/configuration
+ * https://reactnative.dev/docs/metro
  *
- * @type {import('metro-config').MetroConfig}
+ * @type {import('@react-native/metro-config').MetroConfig}
  */
-const config = withMetroConfig(getDefaultConfig(__dirname), {
-  root,
-  dirname: __dirname,
-});
+const pak = require(path.join(root, 'package.json'));
 
-config.resolver.unstable_enablePackageExports = true;
+// Peer deps must only resolve from the example app where native modules are linked.
+// Block the library root's copies so Metro never picks them up.
+const peerDeps = Object.keys(pak.peerDependencies || {});
 
-module.exports = config;
+const blockPatterns = peerDeps.map(
+  (dep) =>
+    new RegExp(
+      '^' +
+        path.resolve(root, 'node_modules', dep).replace(/[/\\]/g, '[/\\\\]') +
+        '[/\\\\]'
+    )
+);
+
+const config = {
+  watchFolders: [root],
+  resolver: {
+    nodeModulesPaths: [
+      path.resolve(__dirname, 'node_modules'),
+      path.resolve(root, 'node_modules'),
+    ],
+    blockList: [/(\/__tests__\/.*)$/, ...blockPatterns],
+  },
+};
+
+module.exports = mergeConfig(
+  getDefaultConfig(__dirname),
+  bundleModeMetroConfig,
+  config
+);

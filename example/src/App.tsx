@@ -3,18 +3,17 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform } from 'react-native';
 import HomeScreen from './screens/HomeScreen';
-import CircularGradientListScreen from './screens/CircularGradient/CircularGradientListScreen';
-import CircularGradientAnimatedScreen from './screens/CircularGradient/CircularGradientAnimatedScreen';
-import CircularGradientStaticScreen from './screens/CircularGradient/CircularGradientStaticScreen';
-import CircularGradientInteractiveScreen from './screens/CircularGradient/CircularGradientInteractiveScreen';
 import LinearGradientListScreen from './screens/LinearGradient/LinearGradientListScreen';
 import LinearGradientAnimatedScreen from './screens/LinearGradient/LinearGradientAnimatedScreen';
 import LinearGradientStaticScreen from './screens/LinearGradient/LinearGradientStaticScreen';
-import IridescenceStaticScreen from './screens/Iridescence/IridescenceStaticScreen';
-import LiquidChromeStaticScreen from './screens/LiquidChrome/LiquidChromeStaticScreen';
-import SilkStaticScreen from './screens/Silk/SilkStaticScreen';
-import CampfireStaticScreen from './screens/Campfire/CampfireStaticScreen';
-import CalicoSwirlStaticScreen from './screens/CalicoSwirl/CalicoSwirlStaticScreen';
+import IridescenceScreen from './screens/IridescenceScreen';
+import LiquidChromeScreen from './screens/LiquidChromeScreen';
+import SilkScreen from './screens/SilkScreen';
+import CampfireScreen from './screens/CampfireScreen';
+import CalicoSwirlScreen from './screens/CalicoSwirlScreen';
+import AuroraScreen from './screens/AuroraScreen';
+import CircularGradientScreen from './screens/CircularGradientScreen';
+import WeatherScreen from './screens/WeatherScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -32,22 +31,6 @@ export default function App() {
       >
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen
-          name="CircularGradientList"
-          component={CircularGradientListScreen}
-        />
-        <Stack.Screen
-          name="CircularGradientAnimated"
-          component={CircularGradientAnimatedScreen}
-        />
-        <Stack.Screen
-          name="CircularGradientStatic"
-          component={CircularGradientStaticScreen}
-        />
-        <Stack.Screen
-          name="CircularGradientInteractive"
-          component={CircularGradientInteractiveScreen}
-        />
-        <Stack.Screen
           name="LinearGradientList"
           component={LinearGradientListScreen}
         />
@@ -59,20 +42,20 @@ export default function App() {
           name="LinearGradientStatic"
           component={LinearGradientStaticScreen}
         />
-        <Stack.Screen
-          name="IridescenceStatic"
-          component={IridescenceStaticScreen}
-        />
+        <Stack.Screen name="IridescenceStatic" component={IridescenceScreen} />
         <Stack.Screen
           name="LiquidChromeStatic"
-          component={LiquidChromeStaticScreen}
+          component={LiquidChromeScreen}
         />
-        <Stack.Screen name="SilkStatic" component={SilkStaticScreen} />
-        <Stack.Screen name="CampfireStatic" component={CampfireStaticScreen} />
+        <Stack.Screen name="SilkStatic" component={SilkScreen} />
+        <Stack.Screen name="CampfireStatic" component={CampfireScreen} />
+        <Stack.Screen name="CalicoSwirlStatic" component={CalicoSwirlScreen} />
+        <Stack.Screen name="AuroraStatic" component={AuroraScreen} />
         <Stack.Screen
-          name="CalicoSwirlStatic"
-          component={CalicoSwirlStaticScreen}
+          name="CircularGradientList"
+          component={CircularGradientScreen}
         />
+        <Stack.Screen name="WeatherExample" component={WeatherScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -44,7 +44,7 @@ export function colorToVec4(color: ColorInput): RGBA {
       );
       if (!rgbaMatch) {
         throw new Error(
-          `[react-native-backgrounds] Invalid RGBA format: ${color}. Expected rgba(r, g, b, a).`
+          `[react-native-effects] Invalid RGBA format: ${color}. Expected rgba(r, g, b, a).`
         );
       }
       return {
@@ -62,7 +62,7 @@ export function colorToVec4(color: ColorInput): RGBA {
       );
       if (!rgbMatch) {
         throw new Error(
-          `[react-native-backgrounds] Invalid RGB format: ${color}. Expected rgb(r, g, b).`
+          `[react-native-effects] Invalid RGB format: ${color}. Expected rgb(r, g, b).`
         );
       }
       return {
@@ -92,14 +92,14 @@ export function colorToVec4(color: ColorInput): RGBA {
     const hex = trimmed.replace('#', '');
     if (hex.length !== 6) {
       throw new Error(
-        `[react-native-backgrounds] Invalid hex color: ${color}. Must be 6 characters.`
+        `[react-native-effects] Invalid hex color: ${color}. Must be 6 characters.`
       );
     }
 
     const num = parseInt(hex, 16);
     if (isNaN(num)) {
       throw new Error(
-        `[react-native-backgrounds] Invalid hex color: ${color}. Must be valid hexadecimal.`
+        `[react-native-effects] Invalid hex color: ${color}. Must be valid hexadecimal.`
       );
     }
 
@@ -112,6 +112,6 @@ export function colorToVec4(color: ColorInput): RGBA {
   }
 
   throw new Error(
-    `[react-native-backgrounds] Invalid color format: ${color}. Expected hex number, hex string, rgb() string, or named color.`
+    `[react-native-effects] Invalid color format: ${color}. Expected hex number, hex string, rgb() string, or named color.`
   );
 }
