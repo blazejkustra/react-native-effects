@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -5,6 +6,7 @@ import {
   StyleSheet,
   ScrollView as RNScrollView,
   StatusBar,
+  Pressable,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -17,12 +19,16 @@ import Animated, {
 } from 'react-native-reanimated';
 import type { LayoutChangeEvent } from 'react-native';
 import { BackButton } from '../components/BackButton';
-import NightSky from '../components/NightSky';
+import RainSplash from '../components/RainSplash';
+import { WEATHER_THEMES, type WeatherScenario } from '../config/weatherThemes';
 
-const RAIN_BLUE = '#64D2FF';
-const BG_COLOR = '#0F1B3D';
-const CARD_BG = 'rgba(26, 38, 80, 0.6)';
-const CARD_BORDER = 'rgba(61, 71, 104, 0.6)';
+const SCENARIOS: WeatherScenario[] = ['night', 'sunny', 'cloudy', 'rainy'];
+const SCENARIO_LABELS: Record<WeatherScenario, string> = {
+  night: 'Night',
+  sunny: 'Sunny',
+  cloudy: 'Cloudy',
+  rainy: 'Rainy',
+};
 
 type WeatherType =
   | 'clear-day'
@@ -107,23 +113,6 @@ function CalendarIcon({ size = 13 }: { size?: number }) {
 
 type HourlyItem = { time: string; icon: WeatherType; temp: string };
 
-const HOURLY_FORECAST: HourlyItem[] = [
-  { time: 'Now', icon: 'partly-cloudy-night', temp: '4°' },
-  { time: '22', icon: 'partly-cloudy-night', temp: '4°' },
-  { time: '23', icon: 'partly-cloudy-night', temp: '3°' },
-  { time: '00', icon: 'partly-cloudy-night', temp: '3°' },
-  { time: '01', icon: 'partly-cloudy-night', temp: '2°' },
-  { time: '02', icon: 'clear-night', temp: '2°' },
-  { time: '03', icon: 'clear-night', temp: '2°' },
-  { time: '04', icon: 'clear-night', temp: '1°' },
-  { time: '05', icon: 'partly-cloudy-night', temp: '1°' },
-  { time: '06', icon: 'cloudy', temp: '2°' },
-  { time: '07', icon: 'partly-cloudy-day', temp: '3°' },
-  { time: '08', icon: 'partly-cloudy-day', temp: '5°' },
-  { time: '09', icon: 'clear-day', temp: '7°' },
-  { time: '10', icon: 'clear-day', temp: '9°' },
-];
-
 type DailyItem = {
   day: string;
   icon: WeatherType;
@@ -132,29 +121,168 @@ type DailyItem = {
   precip?: string;
 };
 
-const DAILY_FORECAST: DailyItem[] = [
-  { day: 'Today', icon: 'partly-cloudy-night', low: 0, high: 15 },
-  { day: 'Sun', icon: 'partly-cloudy-day', low: -2, high: 8 },
-  { day: 'Mon', icon: 'rain', low: 3, high: 11, precip: '60%' },
-  { day: 'Tue', icon: 'heavy-rain', low: 5, high: 9, precip: '80%' },
-  { day: 'Wed', icon: 'cloudy', low: 1, high: 14 },
-  { day: 'Thu', icon: 'clear-day', low: -3, high: 7 },
-  { day: 'Fri', icon: 'snow', low: -6, high: 1, precip: '40%' },
-  { day: 'Sat', icon: 'partly-cloudy-day', low: -4, high: 5 },
-  { day: 'Sun', icon: 'clear-day', low: 2, high: 18 },
-  { day: 'Mon', icon: 'clear-day', low: 6, high: 22 },
-  { day: 'Tue', icon: 'partly-cloudy-day', low: 8, high: 24 },
-  { day: 'Wed', icon: 'thunderstorm', low: 10, high: 21, precip: '70%' },
-  { day: 'Thu', icon: 'rain', low: 4, high: 13, precip: '50%' },
-  { day: 'Fri', icon: 'cloudy', low: 1, high: 10 },
-  { day: 'Sat', icon: 'clear-day', low: -1, high: 16 },
-  { day: 'Sun', icon: 'clear-day', low: 3, high: 19 },
-  { day: 'Mon', icon: 'partly-cloudy-day', low: 5, high: 17 },
-];
+type ScenarioForecast = {
+  currentTemp: string;
+  condition: string;
+  description: string;
+  high: string;
+  low: string;
+  hourly: HourlyItem[];
+  daily: DailyItem[];
+};
 
-const OVERALL_LOW = Math.min(...DAILY_FORECAST.map((d) => d.low));
-const OVERALL_HIGH = Math.max(...DAILY_FORECAST.map((d) => d.high));
-const TEMP_RANGE = OVERALL_HIGH - OVERALL_LOW;
+const SCENARIO_FORECASTS: Record<WeatherScenario, ScenarioForecast> = {
+  night: {
+    currentTemp: '4',
+    condition: 'Clear',
+    description:
+      'Clear skies tonight with temperatures dropping to 0°. Light winds from the northwest.',
+    high: '15',
+    low: '0',
+    hourly: [
+      { time: 'Now', icon: 'partly-cloudy-night', temp: '4°' },
+      { time: '22', icon: 'partly-cloudy-night', temp: '4°' },
+      { time: '23', icon: 'partly-cloudy-night', temp: '3°' },
+      { time: '00', icon: 'partly-cloudy-night', temp: '3°' },
+      { time: '01', icon: 'partly-cloudy-night', temp: '2°' },
+      { time: '02', icon: 'clear-night', temp: '2°' },
+      { time: '03', icon: 'clear-night', temp: '2°' },
+      { time: '04', icon: 'clear-night', temp: '1°' },
+      { time: '05', icon: 'partly-cloudy-night', temp: '1°' },
+      { time: '06', icon: 'cloudy', temp: '2°' },
+      { time: '07', icon: 'partly-cloudy-day', temp: '3°' },
+      { time: '08', icon: 'partly-cloudy-day', temp: '5°' },
+      { time: '09', icon: 'clear-day', temp: '7°' },
+      { time: '10', icon: 'clear-day', temp: '9°' },
+    ],
+    daily: [
+      { day: 'Today', icon: 'partly-cloudy-night', low: 0, high: 15 },
+      { day: 'Sun', icon: 'partly-cloudy-day', low: -2, high: 8 },
+      { day: 'Mon', icon: 'rain', low: 3, high: 11, precip: '60%' },
+      { day: 'Tue', icon: 'heavy-rain', low: 5, high: 9, precip: '80%' },
+      { day: 'Wed', icon: 'cloudy', low: 1, high: 14 },
+      { day: 'Thu', icon: 'clear-day', low: -3, high: 7 },
+      { day: 'Fri', icon: 'snow', low: -6, high: 1, precip: '40%' },
+      { day: 'Sat', icon: 'partly-cloudy-day', low: -4, high: 5 },
+      { day: 'Sun', icon: 'clear-day', low: 2, high: 18 },
+      { day: 'Mon', icon: 'clear-day', low: 6, high: 22 },
+    ],
+  },
+  sunny: {
+    currentTemp: '28',
+    condition: 'Mostly Sunny',
+    description:
+      'Sunny skies throughout the day. UV index is high, reaching 8 around midday.',
+    high: '31',
+    low: '19',
+    hourly: [
+      { time: 'Now', icon: 'clear-day', temp: '28°' },
+      { time: '14', icon: 'clear-day', temp: '30°' },
+      { time: '15', icon: 'clear-day', temp: '31°' },
+      { time: '16', icon: 'clear-day', temp: '30°' },
+      { time: '17', icon: 'partly-cloudy-day', temp: '28°' },
+      { time: '18', icon: 'partly-cloudy-day', temp: '26°' },
+      { time: '19', icon: 'sunset', temp: '24°' },
+      { time: '20', icon: 'clear-night', temp: '22°' },
+      { time: '21', icon: 'clear-night', temp: '21°' },
+      { time: '22', icon: 'clear-night', temp: '20°' },
+      { time: '23', icon: 'clear-night', temp: '19°' },
+      { time: '00', icon: 'clear-night', temp: '19°' },
+      { time: '01', icon: 'clear-night', temp: '18°' },
+      { time: '02', icon: 'clear-night', temp: '18°' },
+    ],
+    daily: [
+      { day: 'Today', icon: 'clear-day', low: 19, high: 31 },
+      { day: 'Sun', icon: 'clear-day', low: 20, high: 33 },
+      { day: 'Mon', icon: 'clear-day', low: 21, high: 34 },
+      { day: 'Tue', icon: 'partly-cloudy-day', low: 20, high: 30 },
+      { day: 'Wed', icon: 'partly-cloudy-day', low: 19, high: 28 },
+      { day: 'Thu', icon: 'clear-day', low: 18, high: 29 },
+      { day: 'Fri', icon: 'clear-day', low: 20, high: 32 },
+      { day: 'Sat', icon: 'partly-cloudy-day', low: 21, high: 30 },
+      { day: 'Sun', icon: 'clear-day', low: 19, high: 31 },
+      { day: 'Mon', icon: 'thunderstorm', low: 18, high: 27, precip: '40%' },
+    ],
+  },
+  cloudy: {
+    currentTemp: '12',
+    condition: 'Overcast',
+    description:
+      'Partly cloudy conditions expected around 08:00. Wind gusts are up to 2 m/s.',
+    high: '14',
+    low: '6',
+    hourly: [
+      { time: 'Now', icon: 'cloudy', temp: '12°' },
+      { time: '14', icon: 'cloudy', temp: '13°' },
+      { time: '15', icon: 'cloudy', temp: '14°' },
+      { time: '16', icon: 'cloudy', temp: '13°' },
+      { time: '17', icon: 'cloudy', temp: '12°' },
+      { time: '18', icon: 'cloudy', temp: '11°' },
+      { time: '19', icon: 'cloudy', temp: '10°' },
+      { time: '20', icon: 'cloudy', temp: '9°' },
+      { time: '21', icon: 'cloudy', temp: '8°' },
+      { time: '22', icon: 'partly-cloudy-night', temp: '7°' },
+      { time: '23', icon: 'partly-cloudy-night', temp: '7°' },
+      { time: '00', icon: 'cloudy', temp: '6°' },
+      { time: '01', icon: 'cloudy', temp: '6°' },
+      { time: '02', icon: 'cloudy', temp: '6°' },
+    ],
+    daily: [
+      { day: 'Today', icon: 'cloudy', low: 6, high: 14 },
+      { day: 'Sun', icon: 'cloudy', low: 5, high: 12 },
+      { day: 'Mon', icon: 'drizzle', low: 7, high: 13, precip: '30%' },
+      { day: 'Tue', icon: 'rain', low: 8, high: 14, precip: '60%' },
+      { day: 'Wed', icon: 'cloudy', low: 4, high: 11 },
+      { day: 'Thu', icon: 'partly-cloudy-day', low: 3, high: 13 },
+      { day: 'Fri', icon: 'cloudy', low: 5, high: 10 },
+      { day: 'Sat', icon: 'fog', low: 2, high: 9 },
+      { day: 'Sun', icon: 'partly-cloudy-day', low: 4, high: 15 },
+      { day: 'Mon', icon: 'cloudy', low: 6, high: 12 },
+    ],
+  },
+  rainy: {
+    currentTemp: '9',
+    condition: 'Heavy Rain',
+    description:
+      'Heavy rain expected until 18:00 with possible thunderstorms. Carry an umbrella.',
+    high: '11',
+    low: '5',
+    hourly: [
+      { time: 'Now', icon: 'heavy-rain', temp: '9°' },
+      { time: '14', icon: 'heavy-rain', temp: '9°' },
+      { time: '15', icon: 'rain', temp: '10°' },
+      { time: '16', icon: 'rain', temp: '10°' },
+      { time: '17', icon: 'thunderstorm', temp: '9°' },
+      { time: '18', icon: 'thunderstorm', temp: '8°' },
+      { time: '19', icon: 'rain', temp: '7°' },
+      { time: '20', icon: 'drizzle', temp: '7°' },
+      { time: '21', icon: 'drizzle-night', temp: '6°' },
+      { time: '22', icon: 'cloudy', temp: '6°' },
+      { time: '23', icon: 'cloudy', temp: '5°' },
+      { time: '00', icon: 'partly-cloudy-night', temp: '5°' },
+      { time: '01', icon: 'drizzle-night', temp: '5°' },
+      { time: '02', icon: 'cloudy', temp: '5°' },
+    ],
+    daily: [
+      { day: 'Today', icon: 'heavy-rain', low: 5, high: 11, precip: '90%' },
+      { day: 'Sun', icon: 'rain', low: 4, high: 10, precip: '70%' },
+      { day: 'Mon', icon: 'thunderstorm', low: 6, high: 12, precip: '80%' },
+      { day: 'Tue', icon: 'drizzle', low: 5, high: 11, precip: '50%' },
+      { day: 'Wed', icon: 'cloudy', low: 3, high: 10 },
+      { day: 'Thu', icon: 'rain', low: 4, high: 9, precip: '60%' },
+      { day: 'Fri', icon: 'partly-cloudy-day', low: 2, high: 12 },
+      { day: 'Sat', icon: 'rain', low: 5, high: 10, precip: '55%' },
+      { day: 'Sun', icon: 'cloudy', low: 3, high: 11 },
+      { day: 'Mon', icon: 'partly-cloudy-day', low: 4, high: 14 },
+    ],
+  },
+};
+
+function getTempRange(daily: DailyItem[]) {
+  const low = Math.min(...daily.map((d) => d.low));
+  const high = Math.max(...daily.map((d) => d.high));
+  return { overallLow: low, overallHigh: high, tempRange: high - low };
+}
 
 // Full temperature color stops (cold → hot)
 const TEMP_COLORS = [
@@ -179,15 +307,27 @@ function lerpColor(t: number): string {
   return `rgb(${r}, ${g}, ${bl})`;
 }
 
-function barGradient(low: number, high: number): string {
-  const tLow = (low - OVERALL_LOW) / TEMP_RANGE;
-  const tHigh = (high - OVERALL_LOW) / TEMP_RANGE;
+function barGradient(
+  low: number,
+  high: number,
+  overallLow: number,
+  tempRange: number
+): string {
+  const tLow = (low - overallLow) / tempRange;
+  const tHigh = (high - overallLow) / tempRange;
   return `linear-gradient(to right, ${lerpColor(tLow)}, ${lerpColor(
     (tLow + tHigh) / 2
   )}, ${lerpColor(tHigh)})`;
 }
 
 export default function WeatherScreen() {
+  const [scenario, setScenario] = useState<WeatherScenario>('night');
+  const theme = WEATHER_THEMES[scenario];
+  const { colors } = theme;
+  const BackgroundComponent = theme.BackgroundComponent;
+  const forecast = SCENARIO_FORECASTS[scenario];
+  const { overallLow, tempRange } = getTempRange(forecast.daily);
+
   const scrollY = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler({
@@ -265,6 +405,8 @@ export default function WeatherScreen() {
     dailyHeaderH.value = e.nativeEvent.layout.height;
   };
 
+  const stickyHeaderBg = colors.stickyHeaderBg;
+
   const hourlyStickyAnim = useAnimatedStyle(() => {
     const offset = scrollY.value - hourlySectionY.value;
     const maxOffset = hourlySectionH.value - hourlyHeaderH.value;
@@ -274,7 +416,7 @@ export default function WeatherScreen() {
       backgroundColor: interpolateColor(
         clamp(offset, 0, 1),
         [0, 1],
-        ['transparent', 'rgb(18, 30, 62)']
+        ['transparent', stickyHeaderBg]
       ),
     };
   });
@@ -288,7 +430,7 @@ export default function WeatherScreen() {
       backgroundColor: interpolateColor(
         clamp(offset, 0, 1),
         [0, 1],
-        ['transparent', 'rgb(18, 30, 62)']
+        ['transparent', stickyHeaderBg]
       ),
     };
   });
@@ -322,17 +464,88 @@ export default function WeatherScreen() {
     ),
   }));
 
+  const rainSplashAnim = useAnimatedStyle(() => {
+    // Clamp so it doesn't float above the scroll area top
+    return {
+      transform: [
+        { translateY: Math.max(hourlySectionY.value - scrollY.value, 0) - 200 },
+      ],
+    };
+  });
+
+  const dynamicStyles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          flex: 1,
+          backgroundColor: colors.bgColor,
+        },
+        section: {
+          borderRadius: 15,
+          borderWidth: 1,
+          borderColor: colors.cardBorder,
+          backgroundColor: colors.cardBg,
+          overflow: 'hidden',
+          marginBottom: 14,
+        },
+        stickyHeader: {
+          margin: -1,
+          marginBottom: 0,
+          borderRadius: 15,
+          borderColor: colors.cardBorder,
+          borderTopWidth: 1,
+          borderRightWidth: 1,
+          borderLeftWidth: 1,
+          borderBottomLeftRadius: 0,
+          borderBottomRightRadius: 0,
+          backgroundColor: colors.cardBg,
+          paddingHorizontal: 16,
+          paddingTop: 16,
+          paddingBottom: 12,
+        },
+        precipText: {
+          fontSize: 11,
+          fontWeight: '700',
+          color: colors.accentColor,
+          marginTop: 1,
+        },
+      }),
+    [colors]
+  );
+
   return (
-    <View style={styles.container}>
+    <View style={dynamicStyles.container}>
       <StatusBar
-        barStyle="light-content"
+        barStyle={colors.statusBarStyle}
         backgroundColor="transparent"
         translucent
       />
-      <NightSky
+
+      <View style={styles.scenarioRow}>
+        {SCENARIOS.map((s) => (
+          <Pressable
+            key={s}
+            onPress={() => setScenario(s)}
+            style={[
+              styles.scenarioChip,
+              s === scenario && styles.scenarioChipActive,
+            ]}
+          >
+            <Text
+              style={[
+                styles.scenarioChipText,
+                s === scenario && styles.scenarioChipTextActive,
+              ]}
+            >
+              {SCENARIO_LABELS[s]}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <BackgroundComponent
         style={StyleSheet.absoluteFillObject}
-        endColor="#030417"
-        startColor="#2D3A59"
+        {...theme.backgroundProps}
       />
 
       {/* ═══ Fixed header — outside scroll view ═══ */}
@@ -340,10 +553,13 @@ export default function WeatherScreen() {
         <View style={styles.backButtonRow}>
           <BackButton />
         </View>
+
         <Animated.View style={cityAnim}>
           <Text style={styles.cityName}>Kraków</Text>
           <Animated.View style={[styles.compactInfoWrap, compactInfoAnim]}>
-            <Text style={styles.compactInfo}>4° | Clear</Text>
+            <Text style={styles.compactInfo}>
+              {forecast.currentTemp}° | {forecast.condition}
+            </Text>
           </Animated.View>
         </Animated.View>
       </View>
@@ -361,28 +577,28 @@ export default function WeatherScreen() {
           <Animated.View style={[styles.expandedHeader, expandedAnim]}>
             <Animated.View style={[styles.tempWrap, tempAnim]}>
               <Text style={styles.temperature}>
-                4<Text style={styles.degreeSymbol}>°</Text>
+                {forecast.currentTemp}
+                <Text style={styles.degreeSymbol}>°</Text>
               </Text>
             </Animated.View>
             <Animated.Text style={[styles.condition, condAnim]}>
-              Clear
+              {forecast.condition}
             </Animated.Text>
             <Animated.Text style={[styles.highLow, hlAnim]}>
-              H:15° L:0°
+              H:{forecast.high}° L:{forecast.low}°
             </Animated.Text>
           </Animated.View>
 
           {/* ─── Hourly Forecast Section ─── */}
-          <View style={styles.section} onLayout={onHourlySectionLayout}>
+          <View style={dynamicStyles.section} onLayout={onHourlySectionLayout}>
             <Animated.View
-              style={[styles.stickyHeader, hourlyStickyAnim]}
+              style={[dynamicStyles.stickyHeader, hourlyStickyAnim]}
               onLayout={onHourlyHeaderLayout}
             >
               <Animated.View style={[styles.cardHeaderSwap, headerSwapAnim]}>
                 <Animated.View style={[styles.cardHeaderLayer, descAnim]}>
                   <Text style={styles.cardDescription}>
-                    Partly cloudy conditions expected around 08:00. Wind gusts
-                    are up to 2 m/s.
+                    {forecast.description}
                   </Text>
                 </Animated.View>
                 <Animated.View
@@ -405,7 +621,7 @@ export default function WeatherScreen() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.hourlyContent}
               >
-                {HOURLY_FORECAST.map((item, index) => (
+                {forecast.hourly.map((item, index) => (
                   <View key={index} style={styles.hourlyItem}>
                     <Text
                       style={[
@@ -426,9 +642,9 @@ export default function WeatherScreen() {
           </View>
 
           {/* ─── 10-Day Forecast Section ─── */}
-          <View style={styles.section} onLayout={onDailySectionLayout}>
+          <View style={dynamicStyles.section} onLayout={onDailySectionLayout}>
             <Animated.View
-              style={[styles.stickyHeader, dailyStickyAnim]}
+              style={[dynamicStyles.stickyHeader, dailyStickyAnim]}
               onLayout={onDailyHeaderLayout}
             >
               <View style={styles.sectionHeader}>
@@ -438,9 +654,9 @@ export default function WeatherScreen() {
             </Animated.View>
 
             <View style={[styles.cardBody, styles.dailyCard]}>
-              {DAILY_FORECAST.map((item, index) => {
-                const barLeft = ((item.low - OVERALL_LOW) / TEMP_RANGE) * 100;
-                const barWidth = ((item.high - item.low) / TEMP_RANGE) * 100;
+              {forecast.daily.map((item, index) => {
+                const barLeft = ((item.low - overallLow) / tempRange) * 100;
+                const barWidth = ((item.high - item.low) / tempRange) * 100;
 
                 return (
                   <View key={index}>
@@ -457,7 +673,9 @@ export default function WeatherScreen() {
                       <View style={styles.dailyIconWrap}>
                         <WeatherIcon type={item.icon} size={22} />
                         {item.precip && (
-                          <Text style={styles.precipText}>{item.precip}</Text>
+                          <Text style={dynamicStyles.precipText}>
+                            {item.precip}
+                          </Text>
                         )}
                       </View>
                       <Text style={styles.dailyLow}>{item.low}°</Text>
@@ -471,7 +689,9 @@ export default function WeatherScreen() {
                                 width: `${Math.max(barWidth, 8)}%`,
                                 experimental_backgroundImage: barGradient(
                                   item.low,
-                                  item.high
+                                  item.high,
+                                  overallLow,
+                                  tempRange
                                 ),
                               },
                             ]}
@@ -486,17 +706,30 @@ export default function WeatherScreen() {
             </View>
           </View>
         </Animated.ScrollView>
+        {scenario === 'rainy' && (
+          <Animated.View
+            style={[
+              {
+                position: 'absolute',
+                top: 0,
+                left: 14,
+                right: 14,
+                height: 200,
+                zIndex: 2,
+              },
+              rainSplashAnim,
+            ]}
+            pointerEvents="none"
+          >
+            <RainSplash style={{ flex: 1 }} />
+          </Animated.View>
+        )}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: BG_COLOR,
-  },
-
   // ═══ Fixed header ═══
   fixedHeader: {
     paddingTop: 60,
@@ -504,6 +737,33 @@ const styles = StyleSheet.create({
   },
   backButtonRow: {
     marginBottom: 6,
+  },
+  scenarioRow: {
+    position: 'absolute',
+    bottom: 40,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    zIndex: 10,
+  },
+  scenarioChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+  },
+  scenarioChipActive: {
+    backgroundColor: 'rgba(255,255,255,0.35)',
+  },
+  scenarioChipText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.6)',
+  },
+  scenarioChipTextActive: {
+    color: '#fff',
   },
   cityName: {
     fontSize: 36,
@@ -579,30 +839,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // ═══ Cards (section wraps sticky header + body) ═══
-  section: {
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: CARD_BORDER,
-    backgroundColor: CARD_BG,
-    overflow: 'hidden',
-    marginBottom: 14,
-  },
-  stickyHeader: {
-    margin: -1,
-    marginBottom: 0,
-    borderRadius: 15,
-    borderColor: CARD_BORDER,
-    borderTopWidth: 1,
-    borderRightWidth: 1,
-    borderLeftWidth: 1,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    backgroundColor: CARD_BG,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 12,
-  },
+  // ═══ Cards ═══
   cardBody: {
     paddingHorizontal: 16,
     paddingBottom: 16,
@@ -697,12 +934,6 @@ const styles = StyleSheet.create({
     width: 36,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  precipText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: RAIN_BLUE,
-    marginTop: 1,
   },
   dailyLow: {
     width: 36,

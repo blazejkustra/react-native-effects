@@ -12,6 +12,14 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'weather-example',
+    title: 'Weather App',
+    description: 'Apple Weather UI clone',
+    screen: 'WeatherExample',
+    color: '#1a2a6c',
+    image: require('../../assets/components/aurora.png'),
+  },
+  {
     id: 'iridescence',
     title: 'Iridescence',
     description: 'Mesmerizing iridescent animated backgrounds',
@@ -67,14 +75,7 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     color: '#4f46e5',
     image: require('../../assets/components/circular-gradient.png'),
   },
-  {
-    id: 'weather-example',
-    title: 'Weather App',
-    description: 'Apple Weather UI clone with gradients',
-    screen: 'WeatherExample',
-    color: '#1a2a6c',
-    image: require('../../assets/components/aurora.png'),
-  },
+
   {
     id: 'linear-gradient',
     title: 'Linear Gradient',

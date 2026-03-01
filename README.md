@@ -15,16 +15,16 @@ WebGPU-powered effects running on UI thread in React Native. Beautiful, animated
 
 ## Components
 
-| Component | Description |
-|-----------|-------------|
-| `Iridescence` | Mesmerizing iridescent animated effect |
-| `LiquidChrome` | Fluid metallic surface |
-| `Silk` | Smooth flowing silk fabric |
-| `Campfire` | Fire with drifting sparks and smoke |
-| `CalicoSwirl` | Warped noise pattern with flowing colors |
-| `Aurora` | Northern lights with flowing curtains of light |
-| `LinearGradient` | Smooth linear gradients (static & animated) |
-| `CircularGradient` | Customizable circular/radial gradients |
+| Component          | Description                                    |
+| ------------------ | ---------------------------------------------- |
+| `Iridescence`      | Mesmerizing iridescent animated effect         |
+| `LiquidChrome`     | Fluid metallic surface                         |
+| `Silk`             | Smooth flowing silk fabric                     |
+| `Campfire`         | Fire with drifting sparks and smoke            |
+| `CalicoSwirl`      | Warped noise pattern with flowing colors       |
+| `Aurora`           | Northern lights with flowing curtains of light |
+| `LinearGradient`   | Smooth linear gradients (static & animated)    |
+| `CircularGradient` | Customizable circular/radial gradients         |
 
 ## ShaderView
 
@@ -39,16 +39,16 @@ import { ShaderView } from 'react-native-effects';
   params={[1.0, 0.5]}
   speed={1.0}
   style={{ width: '100%', height: 300 }}
-/>
+/>;
 ```
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `fragmentShader` | `string` | — | WGSL fragment shader source |
-| `colors` | `ColorInput[]` | `[]` | Up to 2 colors mapped to `u.color0` and `u.color1` |
-| `params` | `number[]` | `[]` | Up to 8 floats mapped to `u.params0.xyzw` and `u.params1.xyzw` |
-| `speed` | `number` | `1.0` | Animation speed multiplier |
-| `isStatic` | `boolean` | `false` | Render once then stop the animation loop |
+| Prop             | Type           | Default | Description                                                    |
+| ---------------- | -------------- | ------- | -------------------------------------------------------------- |
+| `fragmentShader` | `string`       | —       | WGSL fragment shader source                                    |
+| `colors`         | `ColorInput[]` | `[]`    | Up to 2 colors mapped to `u.color0` and `u.color1`             |
+| `params`         | `number[]`     | `[]`    | Up to 8 floats mapped to `u.params0.xyzw` and `u.params1.xyzw` |
+| `speed`          | `number`       | `1.0`   | Animation speed multiplier                                     |
+| `isStatic`       | `boolean`      | `false` | Render once then stop the animation loop                       |
 
 All built-in effects (Silk, Aurora, Campfire, etc.) are thin wrappers around `ShaderView`. You can use it directly to create your own custom effects — see the [Custom Effects Guide](CUSTOM_EFFECTS.md) for a full walkthrough and a ready-to-use AI prompt.
 
@@ -130,18 +130,18 @@ import { Iridescence, LiquidChrome, Aurora } from 'react-native-effects';
 
 All shader components accept standard `View` props plus:
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `color` | `string \| number` | varies | Base tint color |
-| `speed` | `number` | `1.0` | Animation speed multiplier |
+| Prop    | Type               | Default | Description                |
+| ------- | ------------------ | ------- | -------------------------- |
+| `color` | `string \| number` | varies  | Base tint color            |
+| `speed` | `number`           | `1.0`   | Animation speed multiplier |
 
 ### Aurora
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `intensity` | `number` | `1.0` | Brightness of the aurora bands |
-| `layers` | `number` | `3` | Number of curtain layers (1-5) |
-| `waviness` | `number` | `1.0` | Turbulence of the curtains |
+| Prop        | Type     | Default | Description                    |
+| ----------- | -------- | ------- | ------------------------------ |
+| `intensity` | `number` | `1.0`   | Brightness of the aurora bands |
+| `layers`    | `number` | `3`     | Number of curtain layers (1-5) |
+| `waviness`  | `number` | `1.0`   | Turbulence of the curtains     |
 
 ### Gradients
 

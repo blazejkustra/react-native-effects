@@ -14,13 +14,13 @@ This guide explains how to create your own shader effects using `ShaderView`, th
 
 ### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `fragmentShader` | `string` | — | WGSL fragment shader source (must declare the `Uniforms` struct) |
-| `colors` | `ColorInput[]` | `[]` | Up to 2 colors — accepts hex strings, named colors, or numeric values |
-| `params` | `number[]` | `[]` | Up to 8 shader-specific floats |
-| `speed` | `number` | `1.0` | Time multiplier for animation speed |
-| `isStatic` | `boolean` | `false` | Render once then stop the animation loop |
+| Prop             | Type           | Default | Description                                                           |
+| ---------------- | -------------- | ------- | --------------------------------------------------------------------- |
+| `fragmentShader` | `string`       | —       | WGSL fragment shader source (must declare the `Uniforms` struct)      |
+| `colors`         | `ColorInput[]` | `[]`    | Up to 2 colors — accepts hex strings, named colors, or numeric values |
+| `params`         | `number[]`     | `[]`    | Up to 8 shader-specific floats                                        |
+| `speed`          | `number`       | `1.0`   | Time multiplier for animation speed                                   |
+| `isStatic`       | `boolean`      | `false` | Render once then stop the animation loop                              |
 
 `ShaderView` also accepts all standard React Native `View` props (`style`, `onLayout`, etc.).
 
@@ -42,14 +42,14 @@ struct Uniforms {
 
 ### Field Reference
 
-| Field | Components | Description |
-|-------|-----------|-------------|
-| `u.resolution` | `.x` = width, `.y` = height, `.z` = aspect ratio, `.w` = pixel ratio | Canvas dimensions |
-| `u.time` | `.x` = elapsed seconds (speed-adjusted), `.y` = delta time | Animation timing |
-| `u.color0` | `.rgba` | First color, normalized 0..1 |
-| `u.color1` | `.rgba` | Second color, normalized 0..1 |
-| `u.params0` | `.xyzw` = params[0..3] | First 4 custom parameters |
-| `u.params1` | `.xyzw` = params[4..7] | Last 4 custom parameters |
+| Field          | Components                                                           | Description                   |
+| -------------- | -------------------------------------------------------------------- | ----------------------------- |
+| `u.resolution` | `.x` = width, `.y` = height, `.z` = aspect ratio, `.w` = pixel ratio | Canvas dimensions             |
+| `u.time`       | `.x` = elapsed seconds (speed-adjusted), `.y` = delta time           | Animation timing              |
+| `u.color0`     | `.rgba`                                                              | First color, normalized 0..1  |
+| `u.color1`     | `.rgba`                                                              | Second color, normalized 0..1 |
+| `u.params0`    | `.xyzw` = params[0..3]                                               | First 4 custom parameters     |
+| `u.params1`    | `.xyzw` = params[4..7]                                               | Last 4 custom parameters      |
 
 ## Fragment Shader Contract
 
@@ -68,6 +68,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
 ```
 
 **Key points:**
+
 - The input `ndc` ranges from **-1 to 1** on both axes
 - Convert to standard UV coordinates (0..1) with `ndc * 0.5 + 0.5`
 - The vertex shader draws a full-screen triangle — you only write the fragment shader
