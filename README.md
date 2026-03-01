@@ -1,8 +1,10 @@
 # react-native-effects
 
-> **Experimental** — APIs may change without notice. Relies on `react-native-worklets` bundle mode, which is not yet stable. Use with caution.
+https://github.com/user-attachments/assets/5141208a-655a-4de8-94fb-3e66351bf36f
 
-WebGPU-powered effects running on UI thread in React Native. Beautiful, animated shader effects as drop-in components.
+> **Experimental** — APIs may change without notice. Relies on `react-native-worklets` bundle mode, which is not enabled by default yet.
+
+WebGPU-powered effects running on **background thread** in React Native. 
 
 ## Features
 
