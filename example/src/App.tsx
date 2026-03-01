@@ -13,6 +13,7 @@ import CampfireScreen from './screens/CampfireScreen';
 import CalicoSwirlScreen from './screens/CalicoSwirlScreen';
 import AuroraScreen from './screens/AuroraScreen';
 import CircularGradientScreen from './screens/CircularGradientScreen';
+import WeatherScreen from './screens/WeatherScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -54,6 +55,7 @@ export default function App() {
           name="CircularGradientList"
           component={CircularGradientScreen}
         />
+        <Stack.Screen name="WeatherExample" component={WeatherScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

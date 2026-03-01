@@ -68,6 +68,14 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     image: require('../../assets/components/circular-gradient.png'),
   },
   {
+    id: 'weather-example',
+    title: 'Weather App',
+    description: 'Apple Weather UI clone with gradients',
+    screen: 'WeatherExample',
+    color: '#1a2a6c',
+    image: require('../../assets/components/aurora.png'),
+  },
+  {
     id: 'linear-gradient',
     title: 'Linear Gradient',
     description: 'Smooth linear gradients',

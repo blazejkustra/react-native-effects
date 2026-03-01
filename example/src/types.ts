@@ -18,6 +18,7 @@ export type RootStackParamList = {
   DesertStatic: undefined;
   HoloStatic: undefined;
   GlitterStatic: undefined;
+  WeatherExample: undefined;
 };
 
 export type HomeScreenNavigationProp =
