@@ -4,7 +4,7 @@
   "globalEnv": ["NODE_ENV"],
   "tasks": {
     "build:android": {
-      "env": ["ANDROID_HOME", "ORG_GRADLE_PROJECT_newArchEnabled"],
+      "env": ["ANDROID_HOME"],
       "inputs": [
         "package.json",
         "android",
@@ -12,20 +12,12 @@
         "src/*.ts",
         "src/*.tsx",
         "example/package.json",
-        "example/android",
-        "!example/android/.gradle",
-        "!example/android/build",
-        "!example/android/app/build"
+        "example/app.json"
       ],
       "outputs": []
     },
     "build:ios": {
-      "env": [
-        "RCT_NEW_ARCH_ENABLED",
-        "RCT_REMOVE_LEGACY_ARCH",
-        "RCT_USE_RN_DEP",
-        "RCT_USE_PREBUILT_RNCORE"
-      ],
+      "env": [],
       "inputs": [
         "package.json",
         "*.podspec",
@@ -33,9 +25,7 @@
         "src/*.ts",
         "src/*.tsx",
         "example/package.json",
-        "example/ios",
-        "!example/ios/build",
-        "!example/ios/Pods"
+        "example/app.json"
       ],
       "outputs": []
     }

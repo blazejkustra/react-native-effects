@@ -1,4 +1,25 @@
 {
-  "name": "BundleModeApp",
-  "displayName": "3D Example"
+  "expo": {
+    "name": "RN Effects",
+    "slug": "react-native-effects-example",
+    "version": "1.0.0",
+    "scheme": "react-native-effects-example",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": {
+      "bundleIdentifier": "com.blazejkustra.rneffects",
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "com.blazejkustra.rneffects"
+    }
+  }
 }

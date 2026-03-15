@@ -68,7 +68,23 @@ npm install react-native-wgpu react-native-worklets react-native-reanimated reac
 
 ### Bundle mode setup
 
-This library relies on `react-native-worklets` [Bundle Mode](https://docs.swmansion.com/react-native-worklets/docs/bundleMode). You need to configure Metro and Babel in your app:
+This library relies on `react-native-worklets` [Bundle Mode](https://docs.swmansion.com/react-native-worklets/docs/bundleMode). You need to configure Metro, Babel, and package.json in your app.
+
+**package.json** (add at root level)
+
+```json
+{
+  "worklets": {
+    "staticFeatureFlags": {
+      "BUNDLE_MODE_ENABLED": true,
+      "FETCH_PREVIEW_ENABLED": true
+    }
+  }
+}
+```
+
+<details>
+<summary><strong>Bare React Native</strong></summary>
 
 **babel.config.js**
 
@@ -85,26 +101,73 @@ module.exports = {
 
 ```js
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
-const { bundleModeMetroConfig } = require('react-native-worklets/bundleMode');
+const { getBundleModeMetroConfig } = require('react-native-worklets/bundleMode');
 
-module.exports = mergeConfig(
-  getDefaultConfig(__dirname),
-  bundleModeMetroConfig
-);
+let config = getDefaultConfig(__dirname);
+config = getBundleModeMetroConfig(config);
+
+// CRITICAL: Enable inlineRequires for worklets compatibility
+config.transformer = {
+  ...config.transformer,
+  getTransformOptions: async () => ({
+    transform: {
+      inlineRequires: true,
+    },
+  }),
+};
+
+module.exports = config;
 ```
 
-**package.json** (add at root level)
+</details>
 
-```json
-{
-  "worklets": {
-    "staticFeatureFlags": {
-      "BUNDLE_MODE_ENABLED": true,
-      "FETCH_PREVIEW_ENABLED": true
-    }
-  }
-}
+<details>
+<summary><strong>Expo</strong></summary>
+
+Install additional dev dependencies:
+
+```sh
+npm install -D babel-preset-expo @react-native/metro-config
 ```
+
+**babel.config.js**
+
+```js
+module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
+    plugins: [
+      ['react-native-worklets/plugin', { bundleMode: true, strictGlobal: true }],
+    ],
+  };
+};
+```
+
+**metro.config.js**
+
+```js
+const { getDefaultConfig } = require('expo/metro-config');
+const { getBundleModeMetroConfig } = require('react-native-worklets/bundleMode');
+
+/** @type {import('expo/metro-config').MetroConfig} */
+let config = getDefaultConfig(__dirname);
+config = getBundleModeMetroConfig(config);
+
+// CRITICAL: Enable inlineRequires for worklets compatibility in Expo
+config.transformer = {
+  ...config.transformer,
+  getTransformOptions: async () => ({
+    transform: {
+      inlineRequires: true,
+    },
+  }),
+};
+
+module.exports = config;
+```
+
+</details>
 
 ## Usage
 
