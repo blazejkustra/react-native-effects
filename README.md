@@ -229,6 +229,17 @@ import { LinearGradient, CircularGradient } from 'react-native-effects';
 
 Want to build a custom shader effect? Check out the [Custom Effects Guide](CUSTOM_EFFECTS.md) — it includes everything you need to know about the `ShaderView` API, the uniform layout, and the WGSL shader contract. It also has a ready-to-use AI prompt you can paste into ChatGPT or Claude to generate a complete custom effect.
 
+## Running the example app
+
+```sh
+yarn install
+yarn prebuild        # generates native iOS/Android projects
+yarn ios             # run on iOS simulator
+yarn android         # run on Android emulator
+```
+
+To start fresh after config changes, use `yarn prebuild:clean` instead of `yarn prebuild`.
+
 ## Contributing
 
 - [Development workflow](CONTRIBUTING.md#development-workflow)
