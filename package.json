@@ -1,6 +1,6 @@
 {
   "name": "react-native-effects",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "WebGPU-powered visual effects running on a background thread in React Native",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
