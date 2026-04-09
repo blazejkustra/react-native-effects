@@ -19,6 +19,7 @@ export type RootStackParamList = {
   HoloStatic: undefined;
   GlitterStatic: undefined;
   SiriOrbStatic: undefined;
+  HoloCardExample: undefined;
   WeatherExample: undefined;
 };
 

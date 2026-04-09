@@ -14,6 +14,7 @@ import CalicoSwirlScreen from './screens/CalicoSwirlScreen';
 import AuroraScreen from './screens/AuroraScreen';
 import CircularGradientScreen from './screens/CircularGradientScreen';
 import SiriOrbScreen from './screens/SiriOrbScreen';
+import HoloCardScreen from './screens/HoloCardScreen';
 import WeatherScreen from './screens/WeatherScreen';
 import type { RootStackParamList } from './types';
 
@@ -57,6 +58,7 @@ export default function App() {
           component={CircularGradientScreen}
         />
         <Stack.Screen name="SiriOrbStatic" component={SiriOrbScreen} />
+        <Stack.Screen name="HoloCardExample" component={HoloCardScreen} />
         <Stack.Screen name="WeatherExample" component={WeatherScreen} />
       </Stack.Navigator>
     </NavigationContainer>

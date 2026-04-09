@@ -76,6 +76,14 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     image: require('../../assets/components/siri-orb.png'),
   },
   {
+    id: 'holo-card',
+    title: 'Holographic Cards',
+    description: 'Neobank iridescent credit cards',
+    screen: 'HoloCardExample',
+    color: '#6366f1',
+    image: require('../../assets/components/holo-card.png'),
+  },
+  {
     id: 'circular-gradient',
     title: 'Circular Gradient',
     description: 'Customizable circular gradients',
