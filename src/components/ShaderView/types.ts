@@ -12,4 +12,6 @@ export type ShaderViewProps = ViewProps & {
   params?: number[];
   /** Render once then stop the RAF loop. Default: false */
   isStatic?: boolean;
+  /** Use transparent background (clear to alpha 0). Default: false */
+  transparent?: boolean;
 };

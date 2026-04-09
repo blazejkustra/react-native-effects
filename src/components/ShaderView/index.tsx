@@ -24,6 +24,7 @@ export default function ShaderView({
   speed = 1.0,
   params = [],
   isStatic = false,
+  transparent = false,
   style,
   ...viewProps
 }: ShaderViewProps) {
@@ -189,7 +190,7 @@ export default function ShaderView({
           colorAttachments: [
             {
               view: textureView,
-              clearValue: [0, 0, 0, 1],
+              clearValue: transparent ? [0, 0, 0, 0] : [0, 0, 0, 1],
               loadOp: 'clear',
               storeOp: 'store',
             },
@@ -211,7 +212,7 @@ export default function ShaderView({
 
       requestAnimationFrame(render);
     });
-  }, [resources, runtime, propsSync, fragmentShader, isStatic]);
+  }, [resources, runtime, propsSync, fragmentShader, isStatic, transparent]);
 
   return (
     <Canvas ref={canvasRef} style={[styles.canvas, style]} {...viewProps} />

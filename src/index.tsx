@@ -9,6 +9,7 @@ import CalicoSwirl from './components/CalicoSwirl';
 import Aurora from './components/Aurora';
 
 export type { ShaderViewProps } from './components/ShaderView/types';
+export type { ColorInput } from './utils/colors';
 
 export {
   CircularGradient,

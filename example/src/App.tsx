@@ -13,6 +13,7 @@ import CampfireScreen from './screens/CampfireScreen';
 import CalicoSwirlScreen from './screens/CalicoSwirlScreen';
 import AuroraScreen from './screens/AuroraScreen';
 import CircularGradientScreen from './screens/CircularGradientScreen';
+import SiriOrbScreen from './screens/SiriOrbScreen';
 import WeatherScreen from './screens/WeatherScreen';
 import type { RootStackParamList } from './types';
 
@@ -55,6 +56,7 @@ export default function App() {
           name="CircularGradientList"
           component={CircularGradientScreen}
         />
+        <Stack.Screen name="SiriOrbStatic" component={SiriOrbScreen} />
         <Stack.Screen name="WeatherExample" component={WeatherScreen} />
       </Stack.Navigator>
     </NavigationContainer>

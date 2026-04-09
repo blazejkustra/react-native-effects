@@ -68,6 +68,14 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     image: require('../../assets/components/aurora.png'),
   },
   {
+    id: 'siri-orb',
+    title: 'Siri Orb',
+    description: 'Luminous breathing sphere with swirling colors',
+    screen: 'SiriOrbStatic',
+    color: '#a855f6',
+    image: require('../../assets/components/siri-orb.png'),
+  },
+  {
     id: 'circular-gradient',
     title: 'Circular Gradient',
     description: 'Customizable circular gradients',
