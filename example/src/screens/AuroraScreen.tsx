@@ -5,7 +5,7 @@ import { Header } from '../components/Header';
 export default function AuroraScreen() {
   return (
     <View style={styles.container}>
-      <Aurora style={StyleSheet.absoluteFillObject} />
+      <Aurora style={StyleSheet.absoluteFill} />
 
       <StatusBar barStyle="light-content" backgroundColor="transparent" />
 

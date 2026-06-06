@@ -5,7 +5,7 @@ import { Header } from '../components/Header';
 export default function SilkScreen() {
   return (
     <View style={styles.container}>
-      <Silk style={StyleSheet.absoluteFillObject} />
+      <Silk style={StyleSheet.absoluteFill} />
 
       <StatusBar barStyle="light-content" backgroundColor="transparent" />
 

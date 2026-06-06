@@ -5,7 +5,7 @@ import { Header } from '../components/Header';
 export default function LiquidChromeScreen() {
   return (
     <View style={styles.container}>
-      <LiquidChrome style={StyleSheet.absoluteFillObject} />
+      <LiquidChrome style={StyleSheet.absoluteFill} />
 
       <StatusBar barStyle="light-content" backgroundColor="transparent" />
 

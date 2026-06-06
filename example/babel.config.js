@@ -1,5 +1,3 @@
-const path = require('path');
-
 /** @type {import('react-native-worklets/plugin').PluginOptions} */
 const workletsPluginOptions = {
   bundleMode: true,
@@ -11,11 +9,5 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [['react-native-worklets/plugin', workletsPluginOptions]],
-    overrides: [
-      {
-        include: path.resolve(__dirname, '..', 'src'),
-        plugins: [['react-native-worklets/plugin', workletsPluginOptions]],
-      },
-    ],
   };
 };

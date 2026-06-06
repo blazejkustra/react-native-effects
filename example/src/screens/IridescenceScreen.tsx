@@ -5,7 +5,7 @@ import { Header } from '../components/Header';
 export default function IridescenceScreen() {
   return (
     <View style={styles.container}>
-      <Iridescence style={StyleSheet.absoluteFillObject} />
+      <Iridescence style={StyleSheet.absoluteFill} />
 
       <StatusBar barStyle="light-content" backgroundColor="transparent" />
 
