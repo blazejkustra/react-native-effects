@@ -20,6 +20,23 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     image: require('../../assets/components/weather.png'),
   },
   {
+    id: 'scroll-reactive',
+    title: 'Scroll Reactive',
+    description: 'Background that reacts to your scroll',
+    screen: 'ScrollReactiveExample',
+    color: '#0ea5e9',
+    image: require('../../assets/components/scroll.png'),
+  },
+  {
+    id: 'touch-field',
+    title: 'Touch Field',
+    description: 'Liquid light that follows your finger',
+    screen: 'TouchFieldExample',
+    color: '#f472b6',
+    // Placeholder art — swap for a real screen-recording still once captured.
+    image: require('../../assets/components/field.png'),
+  },
+  {
     id: 'iridescence',
     title: 'Iridescence',
     description: 'Mesmerizing iridescent animated backgrounds',

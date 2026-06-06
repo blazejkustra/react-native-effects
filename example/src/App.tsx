@@ -1,7 +1,8 @@
 // App.tsx
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import HomeScreen from './screens/HomeScreen';
 import LinearGradientListScreen from './screens/LinearGradient/LinearGradientListScreen';
 import LinearGradientAnimatedScreen from './screens/LinearGradient/LinearGradientAnimatedScreen';
@@ -16,51 +17,72 @@ import CircularGradientScreen from './screens/CircularGradientScreen';
 import SiriOrbScreen from './screens/SiriOrbScreen';
 import HoloCardScreen from './screens/HoloCardScreen';
 import WeatherScreen from './screens/WeatherScreen';
+import ScrollReactiveScreen from './screens/ScrollReactiveScreen';
+import TouchFieldScreen from './screens/TouchFieldScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          animation: Platform.OS === 'web' ? 'none' : 'slide_from_right',
-          contentStyle: { backgroundColor: '#000' },
-          presentation: 'card',
-        }}
-      >
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen
-          name="LinearGradientList"
-          component={LinearGradientListScreen}
-        />
-        <Stack.Screen
-          name="LinearGradientAnimated"
-          component={LinearGradientAnimatedScreen}
-        />
-        <Stack.Screen
-          name="LinearGradientStatic"
-          component={LinearGradientStaticScreen}
-        />
-        <Stack.Screen name="IridescenceStatic" component={IridescenceScreen} />
-        <Stack.Screen
-          name="LiquidChromeStatic"
-          component={LiquidChromeScreen}
-        />
-        <Stack.Screen name="SilkStatic" component={SilkScreen} />
-        <Stack.Screen name="CampfireStatic" component={CampfireScreen} />
-        <Stack.Screen name="CalicoSwirlStatic" component={CalicoSwirlScreen} />
-        <Stack.Screen name="AuroraStatic" component={AuroraScreen} />
-        <Stack.Screen
-          name="CircularGradientList"
-          component={CircularGradientScreen}
-        />
-        <Stack.Screen name="SiriOrbStatic" component={SiriOrbScreen} />
-        <Stack.Screen name="HoloCardExample" component={HoloCardScreen} />
-        <Stack.Screen name="WeatherExample" component={WeatherScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <GestureHandlerRootView style={styles.root}>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            animation: Platform.OS === 'web' ? 'none' : 'slide_from_right',
+            contentStyle: { backgroundColor: '#000' },
+            presentation: 'card',
+          }}
+        >
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen
+            name="LinearGradientList"
+            component={LinearGradientListScreen}
+          />
+          <Stack.Screen
+            name="LinearGradientAnimated"
+            component={LinearGradientAnimatedScreen}
+          />
+          <Stack.Screen
+            name="LinearGradientStatic"
+            component={LinearGradientStaticScreen}
+          />
+          <Stack.Screen
+            name="IridescenceStatic"
+            component={IridescenceScreen}
+          />
+          <Stack.Screen
+            name="LiquidChromeStatic"
+            component={LiquidChromeScreen}
+          />
+          <Stack.Screen name="SilkStatic" component={SilkScreen} />
+          <Stack.Screen name="CampfireStatic" component={CampfireScreen} />
+          <Stack.Screen
+            name="CalicoSwirlStatic"
+            component={CalicoSwirlScreen}
+          />
+          <Stack.Screen name="AuroraStatic" component={AuroraScreen} />
+          <Stack.Screen
+            name="CircularGradientList"
+            component={CircularGradientScreen}
+          />
+          <Stack.Screen name="SiriOrbStatic" component={SiriOrbScreen} />
+          <Stack.Screen name="HoloCardExample" component={HoloCardScreen} />
+          <Stack.Screen name="WeatherExample" component={WeatherScreen} />
+          <Stack.Screen
+            name="ScrollReactiveExample"
+            component={ScrollReactiveScreen}
+          />
+          <Stack.Screen name="TouchFieldExample" component={TouchFieldScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+});

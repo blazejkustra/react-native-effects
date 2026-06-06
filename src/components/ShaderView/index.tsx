@@ -25,6 +25,7 @@ export default function ShaderView({
   params = [],
   isStatic = false,
   transparent = false,
+  paramsSynchronizable,
   style,
   ...viewProps
 }: ShaderViewProps) {
@@ -89,6 +90,12 @@ export default function ShaderView({
     const { device, context, presentationFormat } = resources;
     const dpr = PixelRatio.get();
 
+    // Per-run cancellation token. On Fast Refresh / dep change / unmount, React
+    // runs this effect's cleanup, which flips the flag and stops *this* loop —
+    // otherwise the old worklet RAF loop keeps running forever alongside the new
+    // one, stacking a duplicate render loop on every Metro reload.
+    const cancelled = createSynchronizable<Float64Array>(new Float64Array(1));
+
     scheduleOnRuntime(runtime, () => {
       'worklet';
 
@@ -125,6 +132,12 @@ export default function ShaderView({
       function render(timestamp: number) {
         const props = propsSync.getDirty();
         if (props[IDX_ALIVE] === 0) {
+          return;
+        }
+
+        // This loop was superseded (Fast Refresh / unmount) — bail without
+        // scheduling another frame so it can be garbage-collected.
+        if (cancelled.getDirty()[0] === 1) {
           return;
         }
 
@@ -176,11 +189,19 @@ export default function ShaderView({
         uniformData[18] = props[IDX_PARAMS + 2]!;
         uniformData[19] = props[IDX_PARAMS + 3]!;
 
-        // params1: vec4<f32>
-        uniformData[20] = props[IDX_PARAMS + 4]!;
-        uniformData[21] = props[IDX_PARAMS + 5]!;
-        uniformData[22] = props[IDX_PARAMS + 6]!;
-        uniformData[23] = props[IDX_PARAMS + 7]!;
+        // params1: vec4<f32> — live input (touch/scroll) overrides these slots
+        if (paramsSynchronizable) {
+          const live = paramsSynchronizable.getDirty();
+          uniformData[20] = live[0]!;
+          uniformData[21] = live[1]!;
+          uniformData[22] = live[2]!;
+          uniformData[23] = live[3]!;
+        } else {
+          uniformData[20] = props[IDX_PARAMS + 4]!;
+          uniformData[21] = props[IDX_PARAMS + 5]!;
+          uniformData[22] = props[IDX_PARAMS + 6]!;
+          uniformData[23] = props[IDX_PARAMS + 7]!;
+        }
 
         device.queue.writeBuffer(uniformBuffer, 0, uniformData);
 
@@ -212,7 +233,19 @@ export default function ShaderView({
 
       requestAnimationFrame(render);
     });
-  }, [resources, runtime, propsSync, fragmentShader, isStatic, transparent]);
+
+    return () => {
+      cancelled.setBlocking(() => Float64Array.of(1));
+    };
+  }, [
+    resources,
+    runtime,
+    propsSync,
+    paramsSynchronizable,
+    fragmentShader,
+    isStatic,
+    transparent,
+  ]);
 
   return (
     <Canvas ref={canvasRef} style={[styles.canvas, style]} {...viewProps} />

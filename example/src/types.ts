@@ -21,6 +21,8 @@ export type RootStackParamList = {
   SiriOrbStatic: undefined;
   HoloCardExample: undefined;
   WeatherExample: undefined;
+  ScrollReactiveExample: undefined;
+  TouchFieldExample: undefined;
 };
 
 export type HomeScreenNavigationProp =
