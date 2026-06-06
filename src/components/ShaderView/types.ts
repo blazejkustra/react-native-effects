@@ -1,5 +1,17 @@
 import type { ViewProps } from 'react-native';
+import type { Synchronizable } from 'react-native-worklets';
 import type { ColorInput } from '../../utils/colors';
+
+/**
+ * A 4-float synchronizable whose values are written into `u.params1` (i.e.
+ * params[4..7]) every frame, overriding any static `params` in those slots.
+ *
+ * This is the bridge for live, per-frame input (touch position, scroll
+ * progress, velocity) coming from the JS thread into the off-thread render
+ * loop. Create one with `useParamsSynchronizable` and update it from
+ * gesture/scroll handlers. See `ShaderViewWithPanGesture`.
+ */
+export type ParamsSynchronizable = Synchronizable<Float64Array>;
 
 export type ShaderViewProps = ViewProps & {
   /** WGSL fragment shader source (must declare the Uniforms struct) */
@@ -14,4 +26,9 @@ export type ShaderViewProps = ViewProps & {
   isStatic?: boolean;
   /** Use transparent background (clear to alpha 0). Default: false */
   transparent?: boolean;
+  /**
+   * Optional live input. Its 4 floats are written into `u.params1` every
+   * frame, taking precedence over static `params[4..7]`. Use for touch/scroll.
+   */
+  paramsSynchronizable?: ParamsSynchronizable;
 };
