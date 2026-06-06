@@ -20,6 +20,16 @@
         "backgroundColor": "#000000"
       },
       "package": "com.blazejkustra.rneffects"
-    }
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 26
+          }
+        }
+      ]
+    ]
   }
 }

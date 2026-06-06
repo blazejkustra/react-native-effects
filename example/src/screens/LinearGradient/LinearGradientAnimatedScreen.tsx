@@ -45,7 +45,7 @@ export default function LinearGradientAnimatedScreen() {
         endColor={currentScheme.endColor}
         angle={0}
         speed={120}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       />
 
       <StatusBar barStyle="light-content" backgroundColor="transparent" />

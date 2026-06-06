@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   cardOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     padding: 24,
     justifyContent: 'space-between',
   },

@@ -1,5 +1,5 @@
 import { PixelRatio, StyleSheet } from 'react-native';
-import { Canvas } from 'react-native-wgpu';
+import { Canvas } from 'react-native-webgpu';
 import { useEffect, useRef } from 'react';
 import { createSynchronizable, scheduleOnRuntime } from 'react-native-worklets';
 import { colorToVec4 } from '../../utils/colors';

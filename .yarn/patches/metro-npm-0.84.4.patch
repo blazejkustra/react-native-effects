@@ -1,8 +1,8 @@
 diff --git a/src/node-haste/DependencyGraph.js b/src/node-haste/DependencyGraph.js
-index bd42485a8a6647757c0f5b2f2c4a5e659125fcdd..417de6c997067b4b1c686c35fe5007ba199b3897 100644
+index 8222d8c..33a74dd 100644
 --- a/src/node-haste/DependencyGraph.js
 +++ b/src/node-haste/DependencyGraph.js
-@@ -186,6 +186,14 @@ class DependencyGraph extends _events.default {
+@@ -197,6 +197,14 @@ class DependencyGraph extends _events.default {
      return (0, _nullthrows.default)(this._fileSystem).getAllFiles();
    }
    async getOrComputeSha1(mixedPath) {

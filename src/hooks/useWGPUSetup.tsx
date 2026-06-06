@@ -3,7 +3,7 @@ import {
   useCanvasRef,
   type CanvasRef,
   type RNCanvasContext,
-} from 'react-native-wgpu';
+} from 'react-native-webgpu';
 import { useEffect, useState } from 'react';
 import type { WorkletRuntime } from 'react-native-worklets';
 import { initWebGPU } from '../utils/initWebGPU';

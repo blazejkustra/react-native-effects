@@ -544,7 +544,7 @@ export default function WeatherScreen() {
       </View>
 
       <BackgroundComponent
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
         {...theme.backgroundProps}
       />
 
@@ -709,6 +709,7 @@ export default function WeatherScreen() {
         {scenario === 'rainy' && (
           <Animated.View
             style={[
+              // eslint-disable-next-line react-native/no-inline-styles
               {
                 position: 'absolute',
                 top: 0,
@@ -721,6 +722,7 @@ export default function WeatherScreen() {
             ]}
             pointerEvents="none"
           >
+            {/* eslint-disable-next-line react-native/no-inline-styles */}
             <RainSplash style={{ flex: 1 }} />
           </Animated.View>
         )}

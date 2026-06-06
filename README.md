@@ -4,11 +4,11 @@ https://github.com/user-attachments/assets/5141208a-655a-4de8-94fb-3e66351bf36f
 
 > **Experimental** — APIs may change without notice. Relies on `react-native-worklets` bundle mode, which is not enabled by default yet.
 
-WebGPU-powered effects running on **background thread** in React Native. 
+WebGPU-powered effects running on **background thread** in React Native.
 
 ## Features
 
-- **WebGPU rendering** via `react-native-wgpu`
+- **WebGPU rendering** via `react-native-webgpu`
 - **Off-thread rendering** using `react-native-worklets` bundle mode — the GPU render loop runs on a separate JS runtime, keeping the main thread free
 - **Drop-in components** — use like any React Native `View`
 - **Customizable** — control colors, speed, intensity, and effect-specific parameters
@@ -63,8 +63,24 @@ npm install react-native-effects
 ### Peer dependencies
 
 ```sh
-npm install react-native-wgpu react-native-worklets react-native-reanimated react-native-gesture-handler
+npm install react-native-webgpu react-native-worklets react-native-reanimated react-native-gesture-handler
 ```
+
+### Android requirements
+
+`react-native-webgpu` uses `AHardwareBuffer` APIs that require **Android API 26+**, so your app must set `minSdkVersion` to at least `26` (the default in many templates is `24`). In an Expo project, use [`expo-build-properties`](https://docs.expo.dev/versions/latest/sdk/build-properties/):
+
+```json
+{
+  "expo": {
+    "plugins": [
+      ["expo-build-properties", { "android": { "minSdkVersion": 26 } }]
+    ]
+  }
+}
+```
+
+In a bare React Native project, set `minSdkVersion = 26` in `android/build.gradle`.
 
 ### Bundle mode setup
 
@@ -101,7 +117,9 @@ module.exports = {
 
 ```js
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
-const { getBundleModeMetroConfig } = require('react-native-worklets/bundleMode');
+const {
+  getBundleModeMetroConfig,
+} = require('react-native-worklets/bundleMode');
 
 let config = getDefaultConfig(__dirname);
 config = getBundleModeMetroConfig(config);
@@ -138,7 +156,10 @@ module.exports = function (api) {
   return {
     presets: ['babel-preset-expo'],
     plugins: [
-      ['react-native-worklets/plugin', { bundleMode: true, strictGlobal: true }],
+      [
+        'react-native-worklets/plugin',
+        { bundleMode: true, strictGlobal: true },
+      ],
     ],
   };
 };
@@ -148,7 +169,9 @@ module.exports = function (api) {
 
 ```js
 const { getDefaultConfig } = require('expo/metro-config');
-const { getBundleModeMetroConfig } = require('react-native-worklets/bundleMode');
+const {
+  getBundleModeMetroConfig,
+} = require('react-native-worklets/bundleMode');
 
 /** @type {import('expo/metro-config').MetroConfig} */
 let config = getDefaultConfig(__dirname);

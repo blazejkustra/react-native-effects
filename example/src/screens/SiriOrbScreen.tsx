@@ -44,10 +44,7 @@ export default function SiriOrbScreen() {
         <SiriOrb />
       </View>
 
-      <SiriEdgeGlow
-        style={StyleSheet.absoluteFillObject}
-        pointerEvents="none"
-      />
+      <SiriEdgeGlow style={StyleSheet.absoluteFill} pointerEvents="none" />
     </View>
   );
 }
@@ -101,7 +98,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
     opacity: 0.9,
