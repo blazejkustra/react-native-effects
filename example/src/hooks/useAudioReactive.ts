@@ -13,12 +13,12 @@ const FFT_SIZE = 512;
 
 /**
  * Captures the microphone via react-native-audio-api and feeds a shader's
- * `u.params1` with live audio so the visual reacts to your voice:
+ * `u.live` with live audio so the visual reacts to your voice:
  *
- *   - `params1.x` → overall level (RMS, 0..1, boosted + smoothed)
- *   - `params1.y` → bass energy (0..1)
- *   - `params1.z` → treble energy (0..1)
- *   - `params1.w` → 1 while listening, 0 otherwise
+ *   - `live.x` → overall level (RMS, 0..1, boosted + smoothed)
+ *   - `live.y` → bass energy (0..1)
+ *   - `live.z` → treble energy (0..1)
+ *   - `live.w` → 1 while listening, 0 otherwise
  *
  * The mic runs through `recorder → adapter → analyser → (muted gain) →
  * destination`; the muted gain keeps the graph pulling without playing your

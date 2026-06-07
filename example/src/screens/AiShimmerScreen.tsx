@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Pressable,

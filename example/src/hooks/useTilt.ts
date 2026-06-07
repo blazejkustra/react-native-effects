@@ -11,7 +11,7 @@ const SENSITIVITY = 1.4;
 const DRAG_SCALE = 260; // px of drag for a full tilt sweep
 
 /**
- * Provides a tilt channel for a foil shader, written into `u.params1` as
+ * Provides a tilt channel for a foil shader, written into `u.live` as
  * `(tiltX, tiltY, active, 0)` with `0.5, 0.5` meaning "flat".
  *
  * On a device with a motion sensor it reads the accelerometer (tilt the phone →

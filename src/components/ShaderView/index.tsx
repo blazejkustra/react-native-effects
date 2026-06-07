@@ -158,7 +158,7 @@ export default function ShaderView({
         const height = canvas.height || 1;
         const aspect = width / height;
 
-        // Fill uniform data (6 × vec4 = 24 floats)
+        // Fill uniform data (7 × vec4 = 28 floats)
         // resolution: vec4<f32>
         uniformData[0] = width;
         uniformData[1] = height;
@@ -189,18 +189,21 @@ export default function ShaderView({
         uniformData[18] = props[IDX_PARAMS + 2]!;
         uniformData[19] = props[IDX_PARAMS + 3]!;
 
-        // params1: vec4<f32> — live input (touch/scroll) overrides these slots
+        // params1: vec4<f32> — static params[4..7]
+        uniformData[20] = props[IDX_PARAMS + 4]!;
+        uniformData[21] = props[IDX_PARAMS + 5]!;
+        uniformData[22] = props[IDX_PARAMS + 6]!;
+        uniformData[23] = props[IDX_PARAMS + 7]!;
+
+        // live: vec4<f32> — off-thread input (touch/scroll/audio) from
+        // paramsSynchronizable, written into its own slot so it never collides
+        // with the static params. Stays (0,0,0,0) when no channel is attached.
         if (paramsSynchronizable) {
           const live = paramsSynchronizable.getDirty();
-          uniformData[20] = live[0]!;
-          uniformData[21] = live[1]!;
-          uniformData[22] = live[2]!;
-          uniformData[23] = live[3]!;
-        } else {
-          uniformData[20] = props[IDX_PARAMS + 4]!;
-          uniformData[21] = props[IDX_PARAMS + 5]!;
-          uniformData[22] = props[IDX_PARAMS + 6]!;
-          uniformData[23] = props[IDX_PARAMS + 7]!;
+          uniformData[24] = live[0]!;
+          uniformData[25] = live[1]!;
+          uniformData[26] = live[2]!;
+          uniformData[27] = live[3]!;
         }
 
         device.queue.writeBuffer(uniformBuffer, 0, uniformData);

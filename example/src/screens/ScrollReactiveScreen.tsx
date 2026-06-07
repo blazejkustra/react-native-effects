@@ -37,7 +37,7 @@ const ENTRIES = [
 export default function ScrollReactiveScreen() {
   const insets = useSafeAreaInsets();
   // Drive the shader straight off the render loop — scrolling must never
-  // re-render React. `setParamsSynchronizable` writes (progress, overscroll) into u.params1.
+  // re-render React. `setParamsSynchronizable` writes (progress, overscroll) into u.live.
   const { paramsSynchronizable, setParamsSynchronizable } =
     useParamsSynchronizable();
 
@@ -67,6 +67,12 @@ export default function ScrollReactiveScreen() {
         colorA="#34d399"
         colorB="#1d4ed8"
         style={StyleSheet.absoluteFill}
+      />
+
+      {/* Faint scrim to lift text contrast without hiding the shader. */}
+      <View
+        style={[StyleSheet.absoluteFill, styles.scrim]}
+        pointerEvents="none"
       />
 
       <StatusBar
@@ -126,10 +132,20 @@ export default function ScrollReactiveScreen() {
 
 const GOLD = '#a7f3d0';
 
+// Soft black halo so type stays readable over the live shader behind it.
+const TEXT_SHADOW = {
+  textShadowColor: 'rgba(0, 0, 0, 0.95)',
+  textShadowOffset: { width: 0, height: 1 },
+  textShadowRadius: 12,
+} as const;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+  },
+  scrim: {
+    backgroundColor: 'rgba(0, 0, 0, 0.32)',
   },
   scroll: {
     flex: 1,
@@ -151,15 +167,17 @@ const styles = StyleSheet.create({
     lineHeight: 42,
     color: '#fff',
     letterSpacing: -0.5,
+    ...TEXT_SHADOW,
   },
   deck: {
     fontFamily: SERIF,
     fontSize: 17,
     lineHeight: 26,
-    color: 'rgba(255, 255, 255, 0.62)',
+    color: 'rgba(255, 255, 255, 0.95)',
     marginTop: 20,
     marginBottom: 26,
     maxWidth: 300,
+    ...TEXT_SHADOW,
   },
 
   /* Index entries */
@@ -167,8 +185,8 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   rule: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: 'rgba(167, 243, 208, 0.28)',
+    height: 1.5,
+    backgroundColor: 'rgba(167, 243, 208, 0.5)',
   },
   entryRow: {
     flexDirection: 'row',
@@ -181,6 +199,7 @@ const styles = StyleSheet.create({
     fontSize: 30,
     lineHeight: 34,
     color: GOLD,
+    ...TEXT_SHADOW,
   },
   fin: {
     width: 56,
@@ -189,6 +208,7 @@ const styles = StyleSheet.create({
     fontSize: 19,
     lineHeight: 34,
     color: 'rgba(167, 243, 208, 0.7)',
+    ...TEXT_SHADOW,
   },
   headline: {
     flex: 1,
@@ -197,6 +217,7 @@ const styles = StyleSheet.create({
     lineHeight: 34,
     color: '#fff',
     paddingTop: 1,
+    ...TEXT_SHADOW,
   },
   headlineFin: {
     fontStyle: 'italic',

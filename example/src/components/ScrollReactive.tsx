@@ -8,7 +8,7 @@ import {
 
 type Props = ViewProps & {
   /**
-   * Live scroll channel written into `u.params1` every frame: `x` = progress
+   * Live scroll channel written into `u.live` every frame: `x` = progress
    * (0..1), `y` = rubber-band overscroll. Drive it with `setParamsSynchronizable` from a scroll
    * handler (see `useParamsSynchronizable`) so scrolling never re-renders React.
    */
@@ -58,6 +58,7 @@ struct Uniforms {
   color1:     vec4<f32>,
   params0:    vec4<f32>,
   params1:    vec4<f32>,
+  live:       vec4<f32>,
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
 
@@ -98,11 +99,11 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let uv = ndc * 0.5 + 0.5;
   var p = (uv - 0.5) * vec2<f32>(aspect, 1.0);
 
-  // Live scroll channel (u.params1): x = progress 0..1, y = overscroll.
-  let prog = clamp(u.params1.x, 0.0, 1.0);
+  // Live scroll channel (u.live): x = progress 0..1, y = overscroll.
+  let prog = clamp(u.live.x, 0.0, 1.0);
   // Rubber-band overscroll (screen-heights): negative at the top, positive at
   // the bottom. Lets the terrain keep reacting past either end of the list.
-  let over = u.params1.y;
+  let over = u.live.y;
 
   // A slowly evolving elevation field. Scrolling pans the terrain upward and
   // lifts the relief, so the contour map drifts and tightens as you read.
@@ -119,8 +120,9 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let bands = 25.0 + prog * 2.0;
   let f = h * bands;
   let d = abs(fract(f) - 0.5);              // 0 exactly on a contour line
-  let aa = fwidth(f) * 1.1;                 // screen-space anti-aliased thickness
-  let lineMask = 1.0 - smoothstep(0.0, aa, d);
+  let aa = fwidth(f) * 1.1;                 // screen-space anti-aliasing falloff
+  let thickness = 0.14;                     // half-width of each contour line
+  let lineMask = 1.0 - smoothstep(thickness, thickness + aa, d);
 
   // Every 5th line is a brighter "index" contour, like a real survey map.
   let idx = floor(f);

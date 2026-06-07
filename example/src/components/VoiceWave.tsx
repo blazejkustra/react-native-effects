@@ -6,7 +6,7 @@ type Props = Omit<ShaderViewProps, 'fragmentShader' | 'colors' | 'params'>;
  * A simulated audio waveform — a glowing oscillating line with a soft filled
  * envelope, coloured blue→pink across its width, pulsing as if reacting to a
  * voice. The "amplitude" is faked from layered sines + noise for now; a real
- * mic could later drive it through `u.params1`. Render it `transparent`.
+ * mic could later drive it through `u.live`. Render it `transparent`.
  * Pure procedural — no texture sampling.
  */
 export default function VoiceWave({ speed = 1.0, ...viewProps }: Props) {
@@ -28,6 +28,7 @@ struct Uniforms {
   color1:     vec4<f32>,
   params0:    vec4<f32>,
   params1:    vec4<f32>,
+  live:       vec4<f32>,
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
 
@@ -55,10 +56,10 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let x = (uv.x - 0.5) * 2.0; // -1 .. 1
   let y = uv.y - 0.5;
 
-  // Live audio: params1 = (level, bass, treble, listening).
-  let level = u.params1.x;
-  let bass = u.params1.y;
-  let treble = u.params1.z;
+  // Live audio: live = (level, bass, treble, listening).
+  let level = u.live.x;
+  let bass = u.live.y;
+  let treble = u.live.z;
 
   // Loudness envelope: louder in the middle, tapering at the edges.
   let env = smoothstep(1.0, 0.15, abs(x));
