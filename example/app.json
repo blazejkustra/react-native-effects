@@ -29,6 +29,12 @@
             "minSdkVersion": 26
           }
         }
+      ],
+      [
+        "react-native-audio-api",
+        {
+          "iosMicrophonePermission": "RN Effects uses the microphone so the shaders react to your voice."
+        }
       ]
     ]
   }

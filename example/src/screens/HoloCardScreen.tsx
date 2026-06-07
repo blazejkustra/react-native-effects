@@ -78,7 +78,7 @@ export default function HoloCardScreen() {
 
       <View style={styles.header}>
         <BackButton />
-        <Text style={styles.title}>Holographic Cards</Text>
+        <Text style={styles.title}>Cards</Text>
         <Text style={styles.subtitle}>
           Each card uses a different shader effect
         </Text>

@@ -12,6 +12,46 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'thanos',
+    title: 'Thanos',
+    description: 'Tap to snap a card into dust',
+    screen: 'ThanosExample',
+    color: '#a855f6',
+    image: require('../../assets/components/thanos.png'),
+  },
+  {
+    id: 'ai-shimmer',
+    title: 'AI Shimmer',
+    description: 'Skeleton shimmer — restrained blue→violet',
+    screen: 'AiShimmerExample',
+    color: '#7c5cff',
+    image: require('../../assets/components/assistant.png'),
+  },
+  {
+    id: 'ai-orb',
+    title: 'AI Orb',
+    description: 'Gemini-style morphing thinking blob',
+    screen: 'AiOrbExample',
+    color: '#5b8cff',
+    image: require('../../assets/components/ai-orb.png'),
+  },
+  {
+    id: 'ai-voice',
+    title: 'AI Voice',
+    description: 'Simulated audio waveform, listening',
+    screen: 'AiVoiceExample',
+    color: '#5b8cff',
+    image: require('../../assets/components/waveform.png'),
+  },
+  {
+    id: 'holo-foil',
+    title: 'Holo Foil',
+    description: 'Rainbow foil that shifts as you tilt',
+    screen: 'HoloFoilExample',
+    color: '#ec4899',
+    image: require('../../assets/components/holo.png'),
+  },
+  {
     id: 'weather-example',
     title: 'Weather App',
     description: 'Apple Weather UI clone',
@@ -94,11 +134,11 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   },
   {
     id: 'holo-card',
-    title: 'Holographic Cards',
+    title: 'Cards',
     description: 'Neobank iridescent credit cards',
     screen: 'HoloCardExample',
     color: '#6366f1',
-    image: require('../../assets/components/holo-card.png'),
+    image: require('../../assets/components/cards.png'),
   },
   {
     id: 'circular-gradient',
@@ -142,7 +182,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             key={category.id}
             style={styles.card}
-            onPress={() => navigation.navigate(category.screen)}
+            onPress={() => navigation.navigate(category.screen as never)}
             activeOpacity={0.7}
           >
             <Image source={category.image} style={styles.cardImage} />

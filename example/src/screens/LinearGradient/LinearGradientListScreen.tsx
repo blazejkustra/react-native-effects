@@ -55,7 +55,7 @@ export default function LinearGradientListScreen() {
           <TouchableOpacity
             key={example.id}
             style={styles.card}
-            onPress={() => navigation.navigate(example.screen)}
+            onPress={() => navigation.navigate(example.screen as never)}
             activeOpacity={0.7}
           >
             <View style={[styles.previewBox]}>
