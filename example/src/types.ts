@@ -23,6 +23,11 @@ export type RootStackParamList = {
   WeatherExample: undefined;
   ScrollReactiveExample: undefined;
   TouchFieldExample: undefined;
+  ThanosExample: undefined;
+  AiShimmerExample: undefined;
+  AiOrbExample: undefined;
+  AiVoiceExample: undefined;
+  HoloFoilExample: undefined;
 };
 
 export type HomeScreenNavigationProp =

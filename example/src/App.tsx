@@ -1,5 +1,9 @@
 // App.tsx
-import { NavigationContainer } from '@react-navigation/native';
+import {
+  NavigationContainer,
+  DefaultTheme,
+  type Theme,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -19,14 +23,32 @@ import HoloCardScreen from './screens/HoloCardScreen';
 import WeatherScreen from './screens/WeatherScreen';
 import ScrollReactiveScreen from './screens/ScrollReactiveScreen';
 import TouchFieldScreen from './screens/TouchFieldScreen';
+import ThanosScreen from './screens/ThanosScreen';
+import AiShimmerScreen from './screens/AiShimmerScreen';
+import AiOrbScreen from './screens/AiOrbScreen';
+import AiVoiceScreen from './screens/AiVoiceScreen';
+import HoloFoilScreen from './screens/HoloFoilScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+// Dark theme so the surface revealed behind/around the cards during a stack
+// transition is black, not React Navigation's default light grey (which flashed
+// white at the screen edges while sliding).
+const navTheme: Theme = {
+  ...DefaultTheme,
+  dark: true,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#000',
+    card: '#000',
+  },
+};
+
 export default function App() {
   return (
     <GestureHandlerRootView style={styles.root}>
-      <NavigationContainer>
+      <NavigationContainer theme={navTheme}>
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
@@ -75,6 +97,11 @@ export default function App() {
             component={ScrollReactiveScreen}
           />
           <Stack.Screen name="TouchFieldExample" component={TouchFieldScreen} />
+          <Stack.Screen name="ThanosExample" component={ThanosScreen} />
+          <Stack.Screen name="AiShimmerExample" component={AiShimmerScreen} />
+          <Stack.Screen name="AiOrbExample" component={AiOrbScreen} />
+          <Stack.Screen name="AiVoiceExample" component={AiVoiceScreen} />
+          <Stack.Screen name="HoloFoilExample" component={HoloFoilScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
@@ -84,5 +111,6 @@ export default function App() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: '#000',
   },
 });
