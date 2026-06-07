@@ -27,6 +27,7 @@ struct Uniforms {
   color1:     vec4<f32>,
   params0:    vec4<f32>,
   params1:    vec4<f32>,
+  live:       vec4<f32>,
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
 
@@ -45,9 +46,9 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   // (otherwise the halo grazes — and gets clipped at — the box outskirts).
   let p = (uv - 0.5) * vec2<f32>(aspect, 1.0) * 1.4;
 
-  // Live audio: params1 = (level, bass, treble, listening).
-  let level = u.params1.x;
-  let treble = u.params1.z;
+  // Live audio: live = (level, bass, treble, listening).
+  let level = u.live.x;
+  let treble = u.live.z;
 
   // Breathing, swollen by your voice.
   let breathe = 1.0 + 0.04 * sin(t * 1.6) + level * 0.65;

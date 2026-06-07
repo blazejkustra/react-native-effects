@@ -9,7 +9,7 @@ export default createDissolveComponent(/* wgsl */ `
 fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let aspect = u.resolution.z;
   let uv = ndc * 0.5 + 0.5;
-  let prog = clamp(u.params1.x, 0.0, 1.0);
+  let prog = clamp(u.live.x, 0.0, 1.0);
 
   let base = cardSurface(uv);
   let n = fbm(uv * vec2<f32>(7.0 * aspect, 7.0));

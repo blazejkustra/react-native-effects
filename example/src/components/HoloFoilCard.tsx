@@ -8,14 +8,14 @@ type Props = Omit<
   ShaderViewProps,
   'fragmentShader' | 'paramsSynchronizable' | 'colors'
 > & {
-  /** Tilt channel: `u.params1 = (tiltX, tiltY, active, 0)`, 0.5 = flat. */
+  /** Tilt channel: `u.live = (tiltX, tiltY, active, 0)`, 0.5 = flat. */
   paramsSynchronizable: ParamsSynchronizable;
 };
 
 /**
  * A premium holographic foil surface — curved, desaturated iridescence under a
  * moving specular glare that blows out to white, with brushed micro-streaks and
- * fine sparkle dust. The tilt (from {@link useTilt}, via `u.params1`) sweeps the
+ * fine sparkle dust. The tilt (from {@link useTilt}, via `u.live`) sweeps the
  * spectrum and the glare across the surface so it reads like real foil catching
  * the light. Pure procedural — no texture sampling.
  */
@@ -38,6 +38,7 @@ struct Uniforms {
   color1:     vec4<f32>,
   params0:    vec4<f32>,
   params1:    vec4<f32>,
+  live:       vec4<f32>,
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
 
@@ -85,7 +86,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let c = (uv - 0.5) * vec2<f32>(aspect, 1.0);
 
   // Tilt in [-1, 1]; 0.5 in the channel means flat.
-  let tilt = (u.params1.xy - 0.5) * 2.0;
+  let tilt = (u.live.xy - 0.5) * 2.0;
 
   // Curved iridescence coordinate: warp straight bands with low-freq noise so
   // the colour flows like brushed foil instead of rigid candy stripes. Wide,

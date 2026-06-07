@@ -10,18 +10,18 @@ import { useParamsSynchronizable } from '../../hooks/useParamsSynchronizable';
 import type { ShaderViewProps } from '../ShaderView/types';
 
 /**
- * A {@link ShaderView} that feeds touch input into the shader's `u.params1`:
+ * A {@link ShaderView} that feeds touch input into the shader's `u.live`:
  *
- *   - `params1.x` → pointer X, normalized 0..1 (left → right)
- *   - `params1.y` → pointer Y, normalized 0..1 (bottom → top, matching UV space)
- *   - `params1.z` → 1.0 while touching, 0.0 when released
- *   - `params1.w` → 0.0 (reserved)
+ *   - `live.x` → pointer X, normalized 0..1 (left → right)
+ *   - `live.y` → pointer Y, normalized 0..1 (bottom → top, matching UV space)
+ *   - `live.z` → 1.0 while touching, 0.0 when released
+ *   - `live.w` → 0.0 (reserved)
  *
  * Dragging moves the pointer **relatively** — it pushes from where the pointer
  * already is rather than jumping under the finger — and a fling lets it glide to
  * a stop. The position is **remembered**: it stays wherever it ended and is
- * never reset; only the "touched" flag (`params1.z`) toggles on release. A
- * shader can read `params1.xy` as a stable resting position and use `params1.z`
+ * never reset; only the "touched" flag (`live.z`) toggles on release. A
+ * shader can read `live.xy` as a stable resting position and use `live.z`
  * purely for touch-driven emphasis, so the effect never snaps back.
  *
  * The resting value before the first touch is `[0, 0, 0, 0]` by default; pass
@@ -38,7 +38,7 @@ export type ShaderViewWithPanGestureProps = Omit<
   'paramsSynchronizable'
 > & {
   /**
-   * Initial value for the gesture channel (`u.params1`) before the first touch.
+   * Initial value for the gesture channel (`u.live`) before the first touch.
    * Defaults to `[0, 0, 0, 0]`. Use e.g. `[0.5, 0.5, 0, 0]` to rest a pointer at
    * screen center.
    */

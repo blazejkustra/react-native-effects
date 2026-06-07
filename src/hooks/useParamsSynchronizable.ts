@@ -3,14 +3,15 @@ import { createSynchronizable } from 'react-native-worklets';
 import type { ParamsSynchronizable } from '../components/ShaderView/types';
 
 /**
- * Creates a {@link ParamsSynchronizable} — a 4-float channel written into
- * `u.params1` (params[4..7]) of a {@link ShaderView} every frame.
+ * Creates a {@link ParamsSynchronizable} — a 4-float channel written into the
+ * dedicated `u.live` slot of a {@link ShaderView} every frame. It has its own
+ * uniform slot, so it leaves all 8 static `params` untouched.
  *
  * The returned `setParamsSynchronizable` runs on the JS thread (call it from gesture or scroll
  * handlers); the values are read by the off-thread render loop. By convention
  * the four floats carry `(x, y, active, extra)` for pointer input, or
  * `(progress, ...)` for scroll-driven effects — but the meaning is up to the
- * shader consuming `u.params1`.
+ * shader consuming `u.live`.
  *
  * Pass `initial` to seed the channel's starting value (read once on first
  * render), so the shader has a sane resting state before the first update —

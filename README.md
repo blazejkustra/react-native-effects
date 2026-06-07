@@ -44,15 +44,54 @@ import { ShaderView } from 'react-native-effects';
 />;
 ```
 
-| Prop             | Type           | Default | Description                                                    |
-| ---------------- | -------------- | ------- | -------------------------------------------------------------- |
-| `fragmentShader` | `string`       | —       | WGSL fragment shader source                                    |
-| `colors`         | `ColorInput[]` | `[]`    | Up to 2 colors mapped to `u.color0` and `u.color1`             |
-| `params`         | `number[]`     | `[]`    | Up to 8 floats mapped to `u.params0.xyzw` and `u.params1.xyzw` |
-| `speed`          | `number`       | `1.0`   | Animation speed multiplier                                     |
-| `isStatic`       | `boolean`      | `false` | Render once then stop the animation loop                       |
+| Prop                   | Type                   | Default | Description                                                                                             |
+| ---------------------- | ---------------------- | ------- | ------------------------------------------------------------------------------------------------------- |
+| `fragmentShader`       | `string`               | —       | WGSL fragment shader source                                                                             |
+| `colors`               | `ColorInput[]`         | `[]`    | Up to 2 colors mapped to `u.color0` and `u.color1`                                                      |
+| `params`               | `number[]`             | `[]`    | Up to 8 floats mapped to `u.params0.xyzw` and `u.params1.xyzw`                                          |
+| `speed`                | `number`               | `1.0`   | Animation speed multiplier                                                                              |
+| `isStatic`             | `boolean`              | `false` | Render once then stop the animation loop                                                                |
+| `transparent`          | `boolean`              | `false` | Clear the canvas to alpha `0` for an overlay-friendly transparent background                            |
+| `paramsSynchronizable` | `ParamsSynchronizable` | —       | Live 4-float input written into the dedicated `u.live` slot every frame (touch/scroll/audio). See below |
 
 All built-in effects (Silk, Aurora, Campfire, etc.) are thin wrappers around `ShaderView`. You can use it directly to create your own custom effects — see the [Custom Effects Guide](CUSTOM_EFFECTS.md) for a full walkthrough and a ready-to-use AI prompt.
+
+### Live input with `paramsSynchronizable`
+
+Static `params` are great for values that change on the JS thread occasionally, but the render loop runs off-thread — so feeding it fast, per-frame input (a finger drag, scroll progress, audio level) through React props would be laggy. `paramsSynchronizable` is the bridge: a 4-float [Synchronizable](https://docs.swmansion.com/react-native-worklets/docs/synchronization/synchronizable) that the off-thread render loop reads every frame and writes into its own dedicated `u.live` slot — so it never collides with the static `params` (you keep all 8 _and_ get a live channel).
+
+Create one with the `useParamsSynchronizable` hook and update it from your gesture or scroll handlers:
+
+```tsx
+import { ShaderView, useParamsSynchronizable } from 'react-native-effects';
+
+function TouchReactive() {
+  // initial resting value, read once: (x, y, active, extra)
+  const { paramsSynchronizable, setParamsSynchronizable } =
+    useParamsSynchronizable([0.5, 0.5, 0, 0]);
+
+  return (
+    <ShaderView
+      fragmentShader={myShader}
+      paramsSynchronizable={paramsSynchronizable}
+      style={{ width: '100%', height: 300 }}
+      onTouchMove={(e) => {
+        const { locationX, locationY } = e.nativeEvent;
+        setParamsSynchronizable(locationX, locationY, 1, 0);
+      }}
+    />
+  );
+}
+```
+
+Inside the shader, declare the `live` field on the `Uniforms` struct (right after `params1`) and read the live values from `u.live`:
+
+```wgsl
+let pointer = u.live.xy;   // (x, y) you wrote
+let active  = u.live.z;    // 1 while touching, 0 otherwise
+```
+
+`setParamsSynchronizable(x, y, active, extra)` runs on the JS thread; the four floats are by convention `(x, y, active, extra)` for pointer input or `(progress, …)` for scroll-driven effects, but the meaning is entirely up to your shader. For a ready-made pan-gesture variant, use [`ShaderViewWithPanGesture`](src/components/ShaderViewWithPanGesture/index.tsx).
 
 ## Installation
 

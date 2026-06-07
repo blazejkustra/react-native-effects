@@ -19,7 +19,7 @@ type Props = Omit<
 
 /**
  * A draggable "liquid light" field. A molten, glowing core follows your finger
- * (fed in through `u.params1` by {@link ShaderViewWithPanGesture}); it warps the
+ * (fed in through `u.live` by {@link ShaderViewWithPanGesture}); it warps the
  * flowing noise field around it and pushes concentric ripples outward. When you
  * are not touching, the core auto-orbits so the effect still feels alive.
  *
@@ -54,6 +54,7 @@ struct Uniforms {
   color1:     vec4<f32>,
   params0:    vec4<f32>,
   params1:    vec4<f32>,
+  live:       vec4<f32>,
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
 
@@ -101,9 +102,9 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let uv = ndc * 0.5 + 0.5;
   var p = (uv - 0.5) * vec2<f32>(aspect, 1.0);
 
-  // ShaderViewWithPanGesture remembers the pointer: u.params1.xy is the current
+  // ShaderViewWithPanGesture remembers the pointer: u.live.xy is the current
   // finger, or wherever the gesture last ended (center before the first touch).
-  let home = (u.params1.xy - 0.5) * vec2<f32>(aspect, 1.0);
+  let home = (u.live.xy - 0.5) * vec2<f32>(aspect, 1.0);
   // A small idle drift so it always feels alive.
   let wobble = vec2<f32>(sin(t * 0.7), cos(t * 0.9)) * 0.03;
   let center = home + wobble;
@@ -133,7 +134,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
 
   // Hue sweeps with the orb's position — drag it around to recolor the field.
   // Centered (the resting spot) leaves the colors untouched.
-  let hue = (u.params1.x - 0.5) * 4.5 + (u.params1.y - 0.5) * 1.8;
+  let hue = (u.live.x - 0.5) * 4.5 + (u.live.y - 0.5) * 1.8;
   col = hueRotate(col, hue);
 
   // Settle the edges into the dark.

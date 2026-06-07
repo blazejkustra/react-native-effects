@@ -10,7 +10,7 @@ export type DissolveProps = Omit<
   ShaderViewProps,
   'fragmentShader' | 'colors' | 'paramsSynchronizable'
 > & {
-  /** Dissolve progress channel: `u.params1.x` 0 (intact) → 1 (gone). */
+  /** Dissolve progress channel: `u.live.x` 0 (intact) → 1 (gone). */
   paramsSynchronizable: ParamsSynchronizable;
   /** Base card tone. */
   baseColor?: ColorInput;
@@ -21,7 +21,7 @@ export type DissolveProps = Omit<
 /**
  * Shared WGSL prelude for the dissolve variants: the Uniforms struct plus the
  * noise / voronoi helpers and the procedural holographic `cardSurface`. Each
- * variant appends its own `@fragment main` that reads `u.params1.x` as the
+ * variant appends its own `@fragment main` that reads `u.live.x` as the
  * dissolve progress and erodes `cardSurface` in its own style. No texture
  * sampling — the card is generated in-shader, so it can dissolve itself.
  */
@@ -33,6 +33,7 @@ struct Uniforms {
   color1:     vec4<f32>,
   params0:    vec4<f32>,
   params1:    vec4<f32>,
+  live:       vec4<f32>,
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
 
