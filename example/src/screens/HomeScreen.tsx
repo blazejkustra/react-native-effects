@@ -12,6 +12,15 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'banners',
+    title: 'Banners',
+    description: 'iOS notification banners with shader effects',
+    screen: 'BannersExample',
+    color: '#f59e0b',
+    // Placeholder art — replaced by a live capture once rendered.
+    image: require('../../assets/components/campfire.png'),
+  },
+  {
     id: 'thanos',
     title: 'Thanos',
     description: 'Tap to snap a card into dust',
