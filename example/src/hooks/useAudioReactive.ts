@@ -24,10 +24,16 @@ const FFT_SIZE = 512;
  * destination`; the muted gain keeps the graph pulling without playing your
  * voice back. Each frame we read the analyser on the JS thread and write the
  * synchronizable the off-thread render loop consumes.
+ *
+ * When no real mic input is available (the usual case on the iOS Simulator),
+ * it falls back to synthesizing a speech-like envelope — syllable bursts with
+ * phrase pauses — so the visuals still behave as if someone were talking.
  */
 export function useAudioReactive(): {
   paramsSynchronizable: ParamsSynchronizable;
   listening: boolean;
+  /** True when no real mic was available and a fake voice drives the params. */
+  simulated: boolean;
   error: string | null;
   start: () => Promise<void>;
   stop: () => void;
@@ -36,6 +42,7 @@ export function useAudioReactive(): {
   const { paramsSynchronizable, setParamsSynchronizable } =
     useParamsSynchronizable([0, 0, 0, 0]);
   const [listening, setListening] = useState(false);
+  const [simulated, setSimulated] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const ctxRef = useRef<AudioContext | null>(null);
@@ -61,6 +68,46 @@ export function useAudioReactive(): {
     smooth.current = { level: 0, bass: 0, treble: 0 };
     setParamsSynchronizable(0, 0, 0, 0);
     setListening(false);
+    setSimulated(false);
+  }, [setParamsSynchronizable]);
+
+  /**
+   * Fake voice for environments without a mic: syllables pulse at ~4–7 Hz
+   * inside phrases of a couple of seconds, separated by silences, with the
+   * amplitude wandering so no two phrases look alike.
+   */
+  const startSimulation = useCallback(() => {
+    const t0 = performance.now();
+    const loop = () => {
+      const tt = (performance.now() - t0) / 1000;
+
+      // Phrase gate: mostly on, with natural pauses between "sentences".
+      const phraseWave =
+        Math.sin(tt * 0.9) + Math.sin(tt * 0.53 + 1.7) + Math.sin(tt * 0.31);
+      const phrase = phraseWave > -0.9 ? 1 : 0;
+
+      // Syllables: a few interfering pulse trains, rectified.
+      const syll =
+        Math.max(0, Math.sin(tt * 6.8) * 0.6 + Math.sin(tt * 4.1 + 0.9) * 0.4) *
+        (0.55 + 0.45 * Math.sin(tt * 1.3 + Math.sin(tt * 2.7) * 1.5));
+      const target = phrase * Math.min(1, 0.18 + 0.85 * syll);
+
+      const s = smooth.current;
+      s.level += (target - s.level) * 0.35;
+      s.bass +=
+        (phrase * (0.25 + 0.45 * Math.abs(Math.sin(tt * 2.3 + 0.4))) - s.bass) *
+        0.25;
+      s.treble +=
+        (phrase * (0.15 + 0.55 * Math.abs(Math.sin(tt * 9.7 + 2.1))) -
+          s.treble) *
+        0.35;
+      setParamsSynchronizable(s.level, s.bass, s.treble, 1);
+
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    rafRef.current = requestAnimationFrame(loop);
+    setSimulated(true);
+    setListening(true);
   }, [setParamsSynchronizable]);
 
   const start = useCallback(async () => {
@@ -74,12 +121,12 @@ export function useAudioReactive(): {
 
       const permission = await AudioManager.requestRecordingPermissions();
       if (permission !== 'Granted') {
-        setError('Microphone permission denied');
+        startSimulation();
         return;
       }
       const active = await AudioManager.setAudioSessionActivity(true);
       if (!active) {
-        setError('Could not activate the audio session');
+        startSimulation();
         return;
       }
 
@@ -110,16 +157,21 @@ export function useAudioReactive(): {
       // so its return value can't be trusted. Verify the real state instead.
       recorder.start();
       if (!recorder.isRecording()) {
-        setError(
-          'No microphone input. On the iOS Simulator pick a host mic via ' +
-            'Simulator → I/O → Audio Input, or run on a physical device.'
-        );
-        stop();
+        // No real mic (typical on the iOS Simulator) — synthesize a voice.
+        try {
+          recorder.stop();
+        } catch {}
+        startSimulation();
         return;
       }
 
       const times = new Uint8Array(analyser.fftSize);
       const freqs = new Uint8Array(analyser.frequencyBinCount);
+
+      // Watchdog: a simulator "mic" happily records dead silence. If the
+      // first ~1.5s is perfectly flat, hand over to the simulated voice.
+      let frames = 0;
+      let maxRms = 0;
 
       const loop = () => {
         const a = analyserRef.current;
@@ -136,6 +188,16 @@ export function useAudioReactive(): {
           sum += v * v;
         }
         const rms = Math.sqrt(sum / times.length);
+
+        frames++;
+        maxRms = Math.max(maxRms, rms);
+        if (frames >= 90 && maxRms < 0.001) {
+          try {
+            recorder.stop();
+          } catch {}
+          startSimulation();
+          return;
+        }
 
         // Bass = low bins, treble = high bins.
         const n = freqs.length;
@@ -156,9 +218,9 @@ export function useAudioReactive(): {
 
         // Boost + smooth so the visuals feel lively but not jittery.
         const s = smooth.current;
-        s.level += (Math.min(1, rms * 3.0) - s.level) * 0.4;
-        s.bass += (Math.min(1, bass * 1.3) - s.bass) * 0.4;
-        s.treble += (Math.min(1, treble * 1.6) - s.treble) * 0.4;
+        s.level += (Math.min(1, rms * 3.0) - s.level) * 1.2;
+        s.bass += (Math.min(1, bass * 1.3) - s.bass) * 1.2;
+        s.treble += (Math.min(1, treble * 1.6) - s.treble) * 1.2;
         setParamsSynchronizable(s.level, s.bass, s.treble, 1);
 
         rafRef.current = requestAnimationFrame(loop);
@@ -167,8 +229,9 @@ export function useAudioReactive(): {
       setListening(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
+      startSimulation();
     }
-  }, [setParamsSynchronizable, stop]);
+  }, [setParamsSynchronizable, startSimulation]);
 
   const toggle = useCallback(() => {
     if (listening) {
@@ -181,5 +244,13 @@ export function useAudioReactive(): {
   // Clean up on unmount.
   useEffect(() => () => stop(), [stop]);
 
-  return { paramsSynchronizable, listening, error, start, stop, toggle };
+  return {
+    paramsSynchronizable,
+    listening,
+    simulated,
+    error,
+    start,
+    stop,
+    toggle,
+  };
 }

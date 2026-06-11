@@ -21,6 +21,15 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     image: require('../../assets/components/campfire.png'),
   },
   {
+    id: 'siri-glass',
+    title: 'Siri Glass',
+    description: 'iOS 26 Siri capsule — liquid glass + rainbow wave',
+    screen: 'SiriGlassExample',
+    color: '#0a84ff',
+    // Placeholder art — replaced by a live capture once rendered.
+    image: require('../../assets/components/siri-orb.png'),
+  },
+  {
     id: 'thanos',
     title: 'Thanos',
     description: 'Tap to snap a card into dust',

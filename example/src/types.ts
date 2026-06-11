@@ -29,6 +29,7 @@ export type RootStackParamList = {
   AiVoiceExample: undefined;
   HoloFoilExample: undefined;
   BannersExample: undefined;
+  SiriGlassExample: undefined;
 };
 
 export type HomeScreenNavigationProp =

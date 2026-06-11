@@ -1560,6 +1560,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@callstack/liquid-glass@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "@callstack/liquid-glass@npm:0.8.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/95e504bc49e8ecd919eb6fa29992e7fdfa0e33d9815816317814e86530b4acd80f4317327e7da4d2f8c910aaf0eaccc856bdcc574c61c1f780806d19d966338d
+  languageName: node
+  linkType: hard
+
 "@commitlint/cli@npm:^21.0.2":
   version: 21.0.2
   resolution: "@commitlint/cli@npm:21.0.2"
@@ -10726,6 +10736,7 @@ __metadata:
     "@babel/core": "npm:^7.29.7"
     "@babel/preset-env": "npm:^7.29.7"
     "@babel/runtime": "npm:^7.29.7"
+    "@callstack/liquid-glass": "npm:^0.8.0"
     "@react-native/metro-config": "npm:^0.85.3"
     "@react-navigation/native": "npm:7.2.5"
     "@react-navigation/native-stack": "npm:7.16.0"
