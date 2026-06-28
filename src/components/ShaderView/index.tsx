@@ -29,7 +29,7 @@ export default function ShaderView({
   style,
   ...viewProps
 }: ShaderViewProps) {
-  const { canvasRef, runtime, resources } = useWGPUSetup();
+  const { canvasRef, runtime, resources, onCanvasLayout } = useWGPUSetup();
 
   const propsSync = useRef(
     createSynchronizable<Float64Array>(new Float64Array(SYNC_SIZE))
@@ -262,6 +262,10 @@ export default function ShaderView({
       transparent={transparent}
       style={[styles.canvas, style]}
       {...viewProps}
+      onLayout={(event) => {
+        onCanvasLayout(event);
+        viewProps.onLayout?.(event);
+      }}
     />
   );
 }
