@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import Animated, {
 import type { LayoutChangeEvent } from 'react-native';
 import { BackButton } from '../components/BackButton';
 import RainSplash from '../components/RainSplash';
+import CrossfadeBackground from '../components/CrossfadeBackground';
 import { WEATHER_THEMES, type WeatherScenario } from '../config/weatherThemes';
 
 const SCENARIOS: WeatherScenario[] = ['night', 'sunny', 'cloudy', 'rainy'];
@@ -324,8 +325,21 @@ export default function WeatherScreen() {
   const [scenario, setScenario] = useState<WeatherScenario>('night');
   const theme = WEATHER_THEMES[scenario];
   const { colors } = theme;
-  const BackgroundComponent = theme.BackgroundComponent;
   const forecast = SCENARIO_FORECASTS[scenario];
+
+  // Pure key → background element mapping. Returning the same element for a key
+  // every render lets CrossfadeBackground hold an outgoing layer's ShaderView
+  // mounted (and rendering) while the incoming one warms up and fades in.
+  const renderBackground = useCallback((key: string) => {
+    const layerTheme = WEATHER_THEMES[key as WeatherScenario];
+    const Background = layerTheme.BackgroundComponent;
+    return (
+      <Background
+        style={StyleSheet.absoluteFill}
+        {...layerTheme.backgroundProps}
+      />
+    );
+  }, []);
   const { overallLow, tempRange } = getTempRange(forecast.daily);
 
   const scrollY = useSharedValue(0);
@@ -543,9 +557,9 @@ export default function WeatherScreen() {
         ))}
       </View>
 
-      <BackgroundComponent
-        style={StyleSheet.absoluteFill}
-        {...theme.backgroundProps}
+      <CrossfadeBackground
+        activeKey={scenario}
+        renderLayer={renderBackground}
       />
 
       {/* ═══ Fixed header — outside scroll view ═══ */}
