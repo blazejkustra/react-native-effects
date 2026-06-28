@@ -1,5 +1,5 @@
 import { PixelRatio, StyleSheet } from 'react-native';
-import { Canvas } from 'react-native-webgpu';
+import { Canvas, installWebGPU } from 'react-native-webgpu';
 import { useEffect, useRef } from 'react';
 import { createSynchronizable, scheduleOnRuntime } from 'react-native-worklets';
 import { colorToVec4 } from '../../utils/colors';
@@ -98,6 +98,12 @@ export default function ShaderView({
 
     scheduleOnRuntime(runtime, () => {
       'worklet';
+
+      // Worklet runtimes start without the WebGPU flag constants
+      // (GPUBufferUsage, GPUTextureUsage, ...). installWebGPU() captures them
+      // into this runtime so they're available below. Idempotent / safe no-op
+      // if already installed.
+      installWebGPU();
 
       // Create pipeline once
       const pipeline = device.createRenderPipeline({
@@ -251,7 +257,12 @@ export default function ShaderView({
   ]);
 
   return (
-    <Canvas ref={canvasRef} style={[styles.canvas, style]} {...viewProps} />
+    <Canvas
+      ref={canvasRef}
+      transparent={transparent}
+      style={[styles.canvas, style]}
+      {...viewProps}
+    />
   );
 }
 

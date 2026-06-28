@@ -6,7 +6,6 @@ import {
 } from 'react-native-webgpu';
 import { useEffect, useState } from 'react';
 import type { WorkletRuntime } from 'react-native-worklets';
-import { initWebGPU } from '../utils/initWebGPU';
 import { BackgroundRuntime } from '../utils/backgroundRuntime';
 
 type GPUResources = {
@@ -55,8 +54,6 @@ export function useWGPUSetup(): WGPUSetupResult {
         format: presentationFormat,
         alphaMode: 'premultiplied',
       });
-
-      initWebGPU(runtime);
 
       if (!cancelled) {
         setResources({ device, context, presentationFormat });

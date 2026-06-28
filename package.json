@@ -89,7 +89,7 @@
     "react-native-builder-bob": "^0.41.0",
     "react-native-gesture-handler": "2.31.1",
     "react-native-reanimated": "4.3.1",
-    "react-native-webgpu": "0.5.14",
+    "react-native-webgpu": "0.5.15",
     "react-native-worklets": "0.8.3",
     "release-it": "^20.2.0",
     "turbo": "^2.9.16",
