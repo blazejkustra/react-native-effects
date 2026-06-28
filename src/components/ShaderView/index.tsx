@@ -1,6 +1,6 @@
-import { PixelRatio, StyleSheet } from 'react-native';
+import { AppState, PixelRatio, StyleSheet } from 'react-native';
 import { Canvas, installWebGPU } from 'react-native-webgpu';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createSynchronizable, scheduleOnRuntime } from 'react-native-worklets';
 import { colorToVec4 } from '../../utils/colors';
 import { useWGPUSetup } from '../../hooks/useWGPUSetup';
@@ -30,6 +30,21 @@ export default function ShaderView({
   ...viewProps
 }: ShaderViewProps) {
   const { canvasRef, runtime, resources, onCanvasLayout } = useWGPUSetup();
+
+  // Pause the render loop while the app is backgrounded. The rAF loop otherwise
+  // keeps churning frames against a surface that's offscreen (and often
+  // transiently invalid), wasting battery/GPU. We only pause on a true
+  // 'background' transition — iOS 'inactive' (app switcher peek, notification
+  // pulldown) is left running to avoid flicker on brief, foreground interruptions.
+  const [appActive, setAppActive] = useState(
+    () => (AppState.currentState ?? 'active') !== 'background'
+  );
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      setAppActive(state !== 'background');
+    });
+    return () => subscription.remove();
+  }, []);
 
   const propsSync = useRef(
     createSynchronizable<Float64Array>(new Float64Array(SYNC_SIZE))
@@ -81,9 +96,12 @@ export default function ShaderView({
     };
   }, [propsSync]);
 
-  // Start render loop when GPU resources are ready
+  // Start render loop when GPU resources are ready and the app is foregrounded.
+  // When the app backgrounds, `appActive` flips false and this effect's cleanup
+  // tears the loop down (via the `cancelled` token below); on return to the
+  // foreground it re-runs and starts a fresh loop.
   useEffect(() => {
-    if (!resources) {
+    if (!resources || !appActive) {
       return;
     }
 
@@ -285,6 +303,7 @@ export default function ShaderView({
     };
   }, [
     resources,
+    appActive,
     runtime,
     propsSync,
     paramsSynchronizable,
