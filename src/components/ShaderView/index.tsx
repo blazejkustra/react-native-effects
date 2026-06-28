@@ -134,6 +134,7 @@ export default function ShaderView({
       const uniformData = new Float32Array(UNIFORM_FLOAT_COUNT);
       let accumulatedTime = 0;
       let lastTimestamp = 0;
+      let warned = false;
 
       function render(timestamp: number) {
         const props = propsSync.getDirty();
@@ -212,29 +213,44 @@ export default function ShaderView({
           uniformData[27] = live[3]!;
         }
 
-        device.queue.writeBuffer(uniformBuffer, 0, uniformData);
+        // GPU work can throw when the surface is transiently invalid — the app
+        // backgrounded, the view detached, or the device was lost. Swallow the
+        // failed frame so the loop survives and recovers when the surface comes
+        // back (rather than the worklet crashing or the loop dying silently).
+        try {
+          device.queue.writeBuffer(uniformBuffer, 0, uniformData);
 
-        const commandEncoder = device.createCommandEncoder();
-        const textureView = context.getCurrentTexture().createView();
-        const passEncoder = commandEncoder.beginRenderPass({
-          colorAttachments: [
-            {
-              view: textureView,
-              clearValue: transparent ? [0, 0, 0, 0] : [0, 0, 0, 1],
-              loadOp: 'clear',
-              storeOp: 'store',
-            },
-          ],
-        });
+          const commandEncoder = device.createCommandEncoder();
+          const textureView = context.getCurrentTexture().createView();
+          const passEncoder = commandEncoder.beginRenderPass({
+            colorAttachments: [
+              {
+                view: textureView,
+                clearValue: transparent ? [0, 0, 0, 0] : [0, 0, 0, 1],
+                loadOp: 'clear',
+                storeOp: 'store',
+              },
+            ],
+          });
 
-        passEncoder.setPipeline(pipeline);
-        passEncoder.setBindGroup(0, bindGroup);
-        passEncoder.draw(3);
-        passEncoder.end();
+          passEncoder.setPipeline(pipeline);
+          passEncoder.setBindGroup(0, bindGroup);
+          passEncoder.draw(3);
+          passEncoder.end();
 
-        device.queue.submit([commandEncoder.finish()]);
-        context.present();
+          device.queue.submit([commandEncoder.finish()]);
+          context.present();
+        } catch (e) {
+          // Warn once to avoid spamming the console every frame on a persistent
+          // failure (e.g. a lost device).
+          if (!warned) {
+            warned = true;
+            console.warn('[react-native-effects] render frame failed:', e);
+          }
+        }
 
+        // Always reschedule animated loops, even after a caught failure, so the
+        // effect self-heals once the surface is valid again.
         if (!isStatic) {
           requestAnimationFrame(render);
         }
