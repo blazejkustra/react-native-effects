@@ -5,7 +5,7 @@ import {
   type RNCanvasContext,
 } from 'react-native-webgpu';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { WorkletRuntime } from 'react-native-worklets';
+import { scheduleOnRuntime, type WorkletRuntime } from 'react-native-worklets';
 import { BackgroundRuntime } from '../utils/backgroundRuntime';
 
 type GPUResources = {
@@ -38,6 +38,8 @@ export function useWGPUSetup(): WGPUSetupResult {
   const configuredSizeRef = useRef<{ width: number; height: number } | null>(
     null
   );
+  // Kept so the device can be released on unmount.
+  const deviceRef = useRef<GPUDevice | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -50,8 +52,12 @@ export function useWGPUSetup(): WGPUSetupResult {
 
       const device = await adapter.requestDevice();
       if (cancelled) {
+        // Unmounted mid-init: the worklet never used this device, so it's safe
+        // to drop it right here on the JS thread.
+        device.destroy();
         return;
       }
+      deviceRef.current = device;
 
       const context = canvasRef.current!.getContext('webgpu')!;
       const canvas = context.canvas as CanvasWithSize;
@@ -76,6 +82,19 @@ export function useWGPUSetup(): WGPUSetupResult {
 
     return () => {
       cancelled = true;
+      const device = deviceRef.current;
+      deviceRef.current = null;
+      if (device) {
+        // Release the device (and all GPU resources created from it: pipeline,
+        // buffers, ...) on the render runtime — the thread that used it — after
+        // the render loop has been signalled to stop, so we don't race an
+        // in-flight frame. Any frame that does slip through hits a destroyed
+        // device and is swallowed by the render loop's try/catch.
+        scheduleOnRuntime(runtime, () => {
+          'worklet';
+          device.destroy();
+        });
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

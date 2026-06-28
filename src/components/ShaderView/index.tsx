@@ -135,16 +135,37 @@ export default function ShaderView({
       let accumulatedTime = 0;
       let lastTimestamp = 0;
       let warned = false;
+      let bufferDestroyed = false;
+
+      // Free this loop's uniform buffer when the loop ends (alive=0 / superseded
+      // by Fast Refresh / unmount). On a fragmentShader change the effect
+      // re-runs and schedules a fresh loop with a new buffer while the device
+      // persists, so without this the old buffer leaks every shader swap.
+      function destroyBuffer() {
+        if (bufferDestroyed) {
+          return;
+        }
+        bufferDestroyed = true;
+        try {
+          uniformBuffer.destroy();
+        } catch {
+          // The device may already have been destroyed on unmount — the buffer
+          // is gone either way, so there's nothing to recover.
+          return;
+        }
+      }
 
       function render(timestamp: number) {
         const props = propsSync.getDirty();
         if (props[IDX_ALIVE] === 0) {
+          destroyBuffer();
           return;
         }
 
         // This loop was superseded (Fast Refresh / unmount) — bail without
         // scheduling another frame so it can be garbage-collected.
         if (cancelled.getDirty()[0] === 1) {
+          destroyBuffer();
           return;
         }
 
