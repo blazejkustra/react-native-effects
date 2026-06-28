@@ -4,7 +4,7 @@
     "paths": {
       "react-native-effects": ["./src/index"]
     },
-    "types": ["@webgpu/types"],
+    "types": ["@webgpu/types", "jest"],
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "customConditions": ["react-native-strict-api"],

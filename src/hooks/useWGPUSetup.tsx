@@ -7,6 +7,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { scheduleOnRuntime, type WorkletRuntime } from 'react-native-worklets';
 import { BackgroundRuntime } from '../utils/backgroundRuntime';
+import { warnIfNotHardwareAccelerated } from '../utils/warnIfNotHardwareAccelerated';
 
 type GPUResources = {
   device: GPUDevice;
@@ -49,6 +50,10 @@ export function useWGPUSetup(): WGPUSetupResult {
       if (!adapter || cancelled) {
         return;
       }
+
+      // Surface the "software adapter = slow" footgun (most notably SwiftShader
+      // on Android emulators) once, during development.
+      warnIfNotHardwareAccelerated(adapter);
 
       const device = await adapter.requestDevice();
       if (cancelled) {
