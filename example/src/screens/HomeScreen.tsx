@@ -78,10 +78,10 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   },
   {
     id: 'touch-field',
-    title: 'Touch Field',
-    description: 'Liquid light that follows your finger',
+    title: 'Sauron Eye',
+    description: 'The lidless Eye, wreathed in flame',
     screen: 'TouchFieldExample',
-    color: '#f472b6',
+    color: '#c40000',
     // Placeholder art — swap for a real screen-recording still once captured.
     image: require('../../assets/components/field.png'),
   },
