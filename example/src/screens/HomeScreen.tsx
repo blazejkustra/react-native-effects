@@ -12,6 +12,14 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'ink-bloom',
+    title: 'Ink Bloom',
+    description: 'A drop of ink curling through water',
+    screen: 'InkBloomExample',
+    color: '#4338ca',
+    image: require('../../assets/components/calico-swirl.png'),
+  },
+  {
     id: 'banners',
     title: 'Banners',
     description: 'iOS notification banners with shader effects',
