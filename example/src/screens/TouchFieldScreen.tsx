@@ -10,8 +10,8 @@ export default function TouchFieldScreen() {
     <View style={styles.container}>
       {/* Full-screen, gesture-driven shader. Drag anywhere to move the core. */}
       <TouchField
-        colorA="#312e81"
-        colorB="#f472b6"
+        colorA="#200404"
+        colorB="#c40000"
         style={StyleSheet.absoluteFill}
       />
 

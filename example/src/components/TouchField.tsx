@@ -125,17 +125,32 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let ripple = sin(dist * 24.0 - t * 4.5) * exp(-dist * 2.6);
   col = col + u.color1.rgb * ripple * 0.10;
 
-  // Molten glowing core plus a soft halo around it.
-  let core = exp(-dist * dist * 16.0);
-  let halo = 0.05 / (dist * dist + 0.015);
-  let glow = core * 1.5 + halo * 0.45;
-  let hot = mix(u.color1.rgb, vec3<f32>(1.0), 0.6);
+  // Drag shifts the tone across red variants only — deep crimson ↔ bright ember.
+  let warmth = clamp(0.5 + (u.live.x - 0.5) * 1.0 + (u.live.y - 0.5) * 0.5, 0.0, 1.0);
+
+  // Licking flames — turbulent noise that rises over time, densest near the core.
+  let flameField = fbm(warped * 4.5 + vec2<f32>(sin(t * 0.6), -t * 1.4));
+  let flameMask = exp(-dist * 3.0);
+  let flame = pow(clamp(flameField, 0.0, 1.0), 1.7) * flameMask;
+  let fireHot = mix(vec3<f32>(0.9, 0.10, 0.02), vec3<f32>(1.0, 0.40, 0.05), warmth);
+  col = col + flame * fireHot * 1.7;
+
+  // Molten glowing core plus a soft halo around it, with a live fire flicker.
+  // Tighter falloff keeps the Eye contained in darkness instead of flooding the screen.
+  let flicker = 1.0 + 0.14 * sin(t * 11.0) + 0.09 * sin(t * 23.0 + 1.7);
+  let core = exp(-dist * dist * 30.0);
+  let halo = (0.05 / (dist * dist + 0.012)) * exp(-dist * 2.8);
+  let glow = (core * 1.6 + halo * 0.5) * flicker;
+  // Keep the core a hot blood-red instead of blowing out to white.
+  let hot = mix(u.color1.rgb, mix(vec3<f32>(1.0, 0.10, 0.05), vec3<f32>(1.0, 0.30, 0.08), warmth), 0.5);
   col = col + glow * hot * 0.55;
 
-  // Hue sweeps with the orb's position — drag it around to recolor the field.
-  // Centered (the resting spot) leaves the colors untouched.
-  let hue = (u.live.x - 0.5) * 4.5 + (u.live.y - 0.5) * 1.8;
-  col = hueRotate(col, hue);
+  // The cat-slit pupil — a dark vertical lens carved through the hot core,
+  // the unmistakable mark of the Eye.
+  let pupil = 1.0 - smoothstep(0.05, 0.12, length(vec2<f32>(toCenter.x * 8.0, toCenter.y * 1.5)));
+  col = mix(col, col * 0.05, pupil);
+
+  // The Eye stays blood-red wherever you drag it — no hue sweep.
 
   // Settle the edges into the dark.
   let vd = uv - vec2<f32>(0.5, 0.5);

@@ -12,6 +12,23 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'materials',
+    title: 'Materials',
+    description: 'Natural material banners — tap to go full screen',
+    screen: 'MaterialsExample',
+    color: '#8a6d4a',
+    // Placeholder art — replaced by a live capture once rendered.
+    image: require('../../assets/components/silk.png'),
+  },
+  {
+    id: 'ink-bloom',
+    title: 'Ink Bloom',
+    description: 'A drop of ink curling through water',
+    screen: 'InkBloomExample',
+    color: '#4338ca',
+    image: require('../../assets/components/calico-swirl.png'),
+  },
+  {
     id: 'banners',
     title: 'Banners',
     description: 'iOS notification banners with shader effects',
@@ -78,10 +95,10 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   },
   {
     id: 'touch-field',
-    title: 'Touch Field',
-    description: 'Liquid light that follows your finger',
+    title: 'Sauron Eye',
+    description: 'The lidless Eye, wreathed in flame',
     screen: 'TouchFieldExample',
-    color: '#f472b6',
+    color: '#c40000',
     // Placeholder art — swap for a real screen-recording still once captured.
     image: require('../../assets/components/field.png'),
   },

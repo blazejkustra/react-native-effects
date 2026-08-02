@@ -14,7 +14,10 @@ ShaderView renders a WGSL fragment shader on a WebGPU canvas with the render loo
 import { useMemo } from 'react';
 import { ShaderView, type ColorInput } from 'react-native-effects';
 
-export default function MyEffect({ color = '#3b82f6' as ColorInput, ...viewProps }) {
+export default function MyEffect({
+  color = '#3b82f6' as ColorInput,
+  ...viewProps
+}) {
   const colors = useMemo(() => [color], [color]);
   return <ShaderView fragmentShader={SHADER} colors={colors} {...viewProps} />;
 }
@@ -58,6 +61,7 @@ Full uniform layout, props, live-input API, and WGSL gotchas: [WGSL.md](WGSL.md)
 ## Debugging a blank/black view
 
 A blank view almost always means the WGSL failed to compile (silently). In order:
+
 1. Grep your identifiers against the reserved-word list in [WGSL.md](WGSL.md).
 2. Check for GLSL-isms: ternaries, `vec3(x)` shorthand without `<f32>`, int/float mixing, swizzle assignment (`p.xy = ...` is illegal).
 3. Bisect: `return vec4<f32>(1.0, 0.0, 1.0, 1.0);` at the top of `main`, move it down until it breaks.

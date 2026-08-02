@@ -115,12 +115,7 @@ export default function CoinGeyser({
         <Text style={styles.caption}>
           {finale > 0 ? 'Piggy Bank · Goal reached 🎉' : caption}
         </Text>
-        <Animated.Text
-          style={[
-            styles.title,
-            { transform: [{ scale }], transformOrigin: 'left center' },
-          ]}
-        >
+        <Animated.Text style={[styles.title, { transform: [{ scale }] }]}>
           {title}
         </Animated.Text>
       </View>
@@ -366,5 +361,6 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.45)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 6,
+    transformOrigin: 'left center',
   },
 });

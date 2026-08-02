@@ -4,21 +4,21 @@ Source of truth: `src/shaders/uniforms.ts`, `src/components/ShaderView/types.ts`
 
 ## Props
 
-| Prop | Type | Default | Notes |
-| --- | --- | --- | --- |
-| `fragmentShader` | `string` | — | WGSL source; must declare the `Uniforms` struct |
-| `colors` | `ColorInput[]` | `[]` | Max 2 → `u.color0`, `u.color1`. Hex string/number, `rgb()`, `rgba()`, named CSS colors. Normalized to RGBA 0..1 |
-| `params` | `number[]` | `[]` | Max 8 floats → `u.params0.xyzw`, `u.params1.xyzw`. Missing = 0.0 |
-| `speed` | `number` | `1.0` | Time multiplier; `u.time.x` is already speed-adjusted |
-| `isStatic` | `boolean` | `false` | Render one frame, stop the rAF loop entirely |
-| `transparent` | `boolean` | `false` | Clear to alpha 0; output must be **premultiplied** |
-| `paramsSynchronizable` | `ParamsSynchronizable` | — | Live 4-float channel → `u.live`, read every frame off-thread |
+| Prop                   | Type                   | Default | Notes                                                                                                           |
+| ---------------------- | ---------------------- | ------- | --------------------------------------------------------------------------------------------------------------- |
+| `fragmentShader`       | `string`               | —       | WGSL source; must declare the `Uniforms` struct                                                                 |
+| `colors`               | `ColorInput[]`         | `[]`    | Max 2 → `u.color0`, `u.color1`. Hex string/number, `rgb()`, `rgba()`, named CSS colors. Normalized to RGBA 0..1 |
+| `params`               | `number[]`             | `[]`    | Max 8 floats → `u.params0.xyzw`, `u.params1.xyzw`. Missing = 0.0                                                |
+| `speed`                | `number`               | `1.0`   | Time multiplier; `u.time.x` is already speed-adjusted                                                           |
+| `isStatic`             | `boolean`              | `false` | Render one frame, stop the rAF loop entirely                                                                    |
+| `transparent`          | `boolean`              | `false` | Clear to alpha 0; output must be **premultiplied**                                                              |
+| `paramsSynchronizable` | `ParamsSynchronizable` | —       | Live float channel (4 up to 388 floats) → `u.live` + `u.liveData`, read every frame off-thread                  |
 
 Plus all standard `ViewProps` (`style`, `onLayout`, `onTouchMove`, ...).
 
-## Uniform buffer (112 bytes = 7 × vec4<f32>)
+## Uniform buffer (1648 bytes = (7 + 96) × vec4<f32>)
 
-Declare fields **top-down in this exact order**; you may stop after the last field you read (e.g. omit `live` if unused).
+Declare fields **top-down in this exact order**; you may stop after the last field you read (e.g. omit `live` if unused — most shaders stop at `live` or earlier).
 
 ```wgsl
 struct Uniforms {
@@ -28,7 +28,8 @@ struct Uniforms {
   color1:     vec4<f32>,  // colors[1] RGBA 0..1
   params0:    vec4<f32>,  // params[0..3]
   params1:    vec4<f32>,  // params[4..7]
-  live:       vec4<f32>,  // paramsSynchronizable; (0,0,0,0) when unused
+  live:       vec4<f32>,  // paramsSynchronizable[0..3]; (0,0,0,0) when unused
+  liveData:   array<vec4<f32>, 96>,  // paramsSynchronizable[4..387] for long channels (trails, multi-touch)
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
 ```
@@ -52,7 +53,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
 
 ## Live input (`paramsSynchronizable` → `u.live`)
 
-For anything updating faster than ~once a second (touch, scroll, audio level, tilt). Has its own slot — all 8 static params stay available alongside it.
+For anything updating faster than ~once a second (touch, scroll, audio level, tilt). Has its own slots — all 8 static params stay available alongside it. The channel length is fixed by the `initial` array passed to the hook (min 4, max 388 floats): floats 0..3 land in `u.live`, floats 4+ fill `u.liveData` vec4-by-vec4 — seed a longer `initial` for trail / multi-point effects (see `example/src/components/materials/SandMaterial.tsx`). The setter takes varargs and replaces the whole channel.
 
 ```tsx
 import { ShaderView, useParamsSynchronizable } from 'react-native-effects';
@@ -68,7 +69,7 @@ const { paramsSynchronizable, setParamsSynchronizable } =
     setParamsSynchronizable(locationX, locationY, 1, 0);
   }}
   onTouchEnd={() => setParamsSynchronizable(0, 0, 0, 0)}
-/>
+/>;
 ```
 
 Conventions used in this repo: pointer `(x, y, isActive, extra)`, scroll `(progress, 0, 0, 0)`, audio `(level, ...)`, tilt `(tiltX, tiltY, active, 0)` with 0.5 = flat. Touch coordinates from `nativeEvent` are in **points with y-down** — normalize by view size and flip y before comparing to `uv`. Smooth jittery sources (audio) on the JS side before writing; the shader sees raw values. For drag + momentum, use `ShaderViewWithPanGesture` from the library.
@@ -87,18 +88,18 @@ When a shader renders nothing, rename suspect identifiers FIRST (e.g. `active` �
 
 ## GLSL → WGSL translation table
 
-| GLSL | WGSL |
-| --- | --- |
-| `cond ? a : b` | `select(b, a, cond)` — note arg order: (false, true, cond) |
-| `vec2(x)` / `vec3(1.0)` | `vec2<f32>(x)` / `vec3<f32>(1.0)` |
-| `mat2(a,b,c,d)` | `mat2x2<f32>(a,b,c,d)` |
-| `float x = 1;` | `let x = 1.0;` — no implicit int→float, ever |
-| mutable local | `var x = ...;` (`let` is immutable) |
-| `for (int i=0; i<4; i++)` | `for (var i = 0; i < 4; i++)` |
-| `atan(y, x)` | `atan2(y, x)` |
-| `mod(x, y)` | `x % y` (f32 ok) — `mod` is reserved |
-| `p.xy = q;` (swizzle write) | illegal — assign whole vector or components singly |
-| `fract`, `mix`, `clamp`, `smoothstep`, `dot`, `normalize` | same names, same behavior |
-| `texture2D(...)` | not available in ShaderView — go procedural |
+| GLSL                                                      | WGSL                                                       |
+| --------------------------------------------------------- | ---------------------------------------------------------- |
+| `cond ? a : b`                                            | `select(b, a, cond)` — note arg order: (false, true, cond) |
+| `vec2(x)` / `vec3(1.0)`                                   | `vec2<f32>(x)` / `vec3<f32>(1.0)`                          |
+| `mat2(a,b,c,d)`                                           | `mat2x2<f32>(a,b,c,d)`                                     |
+| `float x = 1;`                                            | `let x = 1.0;` — no implicit int→float, ever               |
+| mutable local                                             | `var x = ...;` (`let` is immutable)                        |
+| `for (int i=0; i<4; i++)`                                 | `for (var i = 0; i < 4; i++)`                              |
+| `atan(y, x)`                                              | `atan2(y, x)`                                              |
+| `mod(x, y)`                                               | `x % y` (f32 ok) — `mod` is reserved                       |
+| `p.xy = q;` (swizzle write)                               | illegal — assign whole vector or components singly         |
+| `fract`, `mix`, `clamp`, `smoothstep`, `dot`, `normalize` | same names, same behavior                                  |
+| `texture2D(...)`                                          | not available in ShaderView — go procedural                |
 
 Casts are explicit: `f32(i)`, `i32(x)`, `u32(x)`. Function parameters are immutable — copy to a `var` to mutate (`fn fbm(p0: vec2<f32>) { var p = p0; ... }`).

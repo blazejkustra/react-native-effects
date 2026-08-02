@@ -15,15 +15,15 @@ This guide explains how to create your own shader effects using `ShaderView`, th
 
 ### Props
 
-| Prop                   | Type                   | Default | Description                                                                                                                      |
-| ---------------------- | ---------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `fragmentShader`       | `string`               | —       | WGSL fragment shader source (must declare the `Uniforms` struct)                                                                 |
-| `colors`               | `ColorInput[]`         | `[]`    | Up to 2 colors — accepts hex strings, named colors, or numeric values                                                            |
-| `params`               | `number[]`             | `[]`    | Up to 8 shader-specific floats                                                                                                   |
-| `speed`                | `number`               | `1.0`   | Time multiplier for animation speed                                                                                              |
-| `isStatic`             | `boolean`              | `false` | Render once then stop the animation loop                                                                                         |
-| `transparent`          | `boolean`              | `false` | Clear the canvas to alpha `0` for a transparent background                                                                       |
-| `paramsSynchronizable` | `ParamsSynchronizable` | —       | Live 4-float input written into the dedicated `u.live` slot every frame (touch/scroll/audio), independent of the static `params` |
+| Prop                   | Type                   | Default | Description                                                                                                                                                                |
+| ---------------------- | ---------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fragmentShader`       | `string`               | —       | WGSL fragment shader source (must declare the `Uniforms` struct)                                                                                                           |
+| `colors`               | `ColorInput[]`         | `[]`    | Up to 2 colors — accepts hex strings, named colors, or numeric values                                                                                                      |
+| `params`               | `number[]`             | `[]`    | Up to 8 shader-specific floats                                                                                                                                             |
+| `speed`                | `number`               | `1.0`   | Time multiplier for animation speed                                                                                                                                        |
+| `isStatic`             | `boolean`              | `false` | Render once then stop the animation loop                                                                                                                                   |
+| `transparent`          | `boolean`              | `false` | Clear the canvas to alpha `0` for a transparent background                                                                                                                 |
+| `paramsSynchronizable` | `ParamsSynchronizable` | —       | Live float input (4 up to 388 floats) written into the dedicated `u.live` / `u.liveData` slots every frame (touch/scroll/audio/trails), independent of the static `params` |
 
 `ShaderView` also accepts all standard React Native `View` props (`style`, `onLayout`, etc.).
 
@@ -39,14 +39,15 @@ struct Uniforms {
   color1:     vec4<f32>,  // colors[1] as normalized RGBA (0..1)
   params0:    vec4<f32>,  // params[0], params[1], params[2], params[3]
   params1:    vec4<f32>,  // params[4], params[5], params[6], params[7]
-  live:       vec4<f32>,  // paramsSynchronizable (touch/scroll/audio); (0,0,0,0) when unused
+  live:       vec4<f32>,  // paramsSynchronizable[0..3] (touch/scroll/audio); (0,0,0,0) when unused
+  liveData:   array<vec4<f32>, 96>,  // paramsSynchronizable[4..387] for long channels (trails, multi-touch)
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
 ```
 
 You only need to declare the fields you actually read, top-down — a shader that
-never uses live input can stop at `params1`. The full struct is shown here so
-the offsets are unambiguous.
+never uses live input can stop at `params1`, and most live-input shaders stop
+at `live`. The full struct is shown here so the offsets are unambiguous.
 
 ### Field Reference
 
@@ -58,7 +59,8 @@ the offsets are unambiguous.
 | `u.color1`     | `.rgba`                                                              | Second color, normalized 0..1         |
 | `u.params0`    | `.xyzw` = params[0..3]                                               | First 4 custom parameters             |
 | `u.params1`    | `.xyzw` = params[4..7]                                               | Last 4 custom parameters              |
-| `u.live`       | `.xyzw` = paramsSynchronizable channel                               | Live per-frame input; `0` when unused |
+| `u.live`       | `.xyzw` = paramsSynchronizable[0..3]                                 | Live per-frame input; `0` when unused |
+| `u.liveData`   | `[i]` = paramsSynchronizable[4+4i .. 7+4i]                           | Overflow vec4s for long live channels |
 
 ## Fragment Shader Contract
 

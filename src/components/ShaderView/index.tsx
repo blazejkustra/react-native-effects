@@ -6,6 +6,7 @@ import { colorToVec4 } from '../../utils/colors';
 import { useWGPUSetup } from '../../hooks/useWGPUSetup';
 import { TRIANGLE_VERTEX_SHADER } from '../../shaders/TRIANGLE_VERTEX_SHADER';
 import {
+  LIVE_FLOAT_COUNT,
   UNIFORM_BUFFER_SIZE,
   UNIFORM_FLOAT_COUNT,
 } from '../../shaders/uniforms';
@@ -241,15 +242,16 @@ export default function ShaderView({
         uniformData[22] = props[IDX_PARAMS + 6]!;
         uniformData[23] = props[IDX_PARAMS + 7]!;
 
-        // live: vec4<f32> — off-thread input (touch/scroll/audio) from
-        // paramsSynchronizable, written into its own slot so it never collides
-        // with the static params. Stays (0,0,0,0) when no channel is attached.
+        // live + liveData — off-thread input (touch/scroll/audio) from
+        // paramsSynchronizable, written into its own slots so it never collides
+        // with the static params. The channel's length is fixed at creation
+        // (min 4 floats, up to LIVE_FLOAT_COUNT); unattached slots stay 0.
         if (paramsSynchronizable) {
           const live = paramsSynchronizable.getDirty();
-          uniformData[24] = live[0]!;
-          uniformData[25] = live[1]!;
-          uniformData[26] = live[2]!;
-          uniformData[27] = live[3]!;
+          const liveCount = Math.min(live.length, LIVE_FLOAT_COUNT);
+          for (let i = 0; i < liveCount; i++) {
+            uniformData[24 + i] = live[i]!;
+          }
         }
 
         // GPU work can throw when the surface is transiently invalid — the app
