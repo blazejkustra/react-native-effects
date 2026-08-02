@@ -12,6 +12,15 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'materials',
+    title: 'Materials',
+    description: 'Natural material banners — tap to go full screen',
+    screen: 'MaterialsExample',
+    color: '#8a6d4a',
+    // Placeholder art — replaced by a live capture once rendered.
+    image: require('../../assets/components/silk.png'),
+  },
+  {
     id: 'ink-bloom',
     title: 'Ink Bloom',
     description: 'A drop of ink curling through water',

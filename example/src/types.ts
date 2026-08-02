@@ -30,6 +30,7 @@ export type RootStackParamList = {
   HoloFoilExample: undefined;
   BannersExample: undefined;
   InkBloomExample: undefined;
+  MaterialsExample: undefined;
 };
 
 export type HomeScreenNavigationProp =

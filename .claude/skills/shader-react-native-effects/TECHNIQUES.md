@@ -43,20 +43,24 @@ Need noise that evolves over time without visible scrolling? Use the 3D simplex 
 ## Color: palettes that look expensive
 
 **Cosine palette** — smooth full-spectrum hue from one float (`HoloFoilCard.tsx:76-79`):
+
 ```wgsl
 fn spectrum(h: f32) -> vec3<f32> {
   return 0.5 + 0.5 * cos(6.2831853 * (vec3<f32>(h) + vec3<f32>(0.0, 0.33, 0.67)));
 }
 ```
+
 Vary the phase vector `(0.0, 0.33, 0.67)` for other moods (IQ palettes); feed it slowly-varying fields (noise, position, tilt), never raw time.
 
 **Desaturate toward luma** — the single biggest "premium vs neon" lever:
+
 ```wgsl
 let luma = dot(col, vec3<f32>(0.299, 0.587, 0.114));
 col = mix(vec3<f32>(luma), col, 0.72);  // 0.6–0.8 = metallic/tasteful; 1.0 = arcade
 ```
 
 **Vignette** — grounds the effect in its frame:
+
 ```wgsl
 let vd = uv - 0.5;
 col = col * (1.0 - dot(vd, vd) * 0.55);
@@ -65,12 +69,14 @@ col = col * (1.0 - dot(vd, vd) * 0.55);
 ## Light: specular glare and glow
 
 **Gaussian glare** (cheap, no `pow`): a stripe of light that blows out to white, like foil/glass catching light (`HoloFoilCard.tsx:107-116`):
+
 ```wgsl
 let glarePos = (c.x * 0.8 - c.y * 0.6) - drive;   // drive = tilt, touch, or slow sin(t)
 let glare = exp(-glarePos * glarePos * 3.5);       // bigger k = tighter stripe
 col = col + glare * 0.45;                          // additive energy
 col = mix(col, vec3<f32>(1.0), glare * 0.45);      // AND blow toward white — both, not either
 ```
+
 Add a second, softer counter-glare on the opposite diagonal at ~25% strength for depth.
 
 **Point glow** with natural falloff: `let glow = k / (length(c - center) + k);` — reads as light, unlike `smoothstep` discs which read as stickers.
@@ -94,6 +100,7 @@ Real materials never move uniformly. Give each layer its own speed, slowest for 
 ## Banding
 
 Smooth dark gradients band visibly on OLED. Dither before returning:
+
 ```wgsl
 col = col + (hash21(uv * u.resolution.xy) - 0.5) * (1.5 / 255.0);
 ```
@@ -104,11 +111,13 @@ col = col + (hash21(uv * u.resolution.xy) - 0.5) * (1.5 / 255.0);
 let alpha = clamp(line + glow + fill, 0.0, 1.0);
 return vec4<f32>(col * alpha, alpha);   // PREMULTIPLIED — col * alpha, always
 ```
+
 (`example/src/components/VoiceWave.tsx:93`.) Straight alpha produces grey fringing wherever alpha approaches 0. Size the view to the effect's bounding box, not full-screen — transparent pixels still pay full fragment cost.
 
 ## Interactivity sells realism
 
 A static foil is a gradient; a tilt-driven foil is foil. Drive at least one parameter from `u.live`:
+
 - Tilt/parallax sweeping a glare or hue (`HoloFoilCard` + `useTilt`)
 - Touch position warping the field locally (`TouchField.tsx`)
 - Scroll progress tightening/morphing structure (`ScrollReactive.tsx`)

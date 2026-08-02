@@ -30,6 +30,7 @@ import AiVoiceScreen from './screens/AiVoiceScreen';
 import HoloFoilScreen from './screens/HoloFoilScreen';
 import BannersScreen from './screens/BannersScreen';
 import InkBloomScreen from './screens/InkBloomScreen';
+import MaterialsScreen from './screens/MaterialsScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -106,6 +107,7 @@ export default function App() {
           <Stack.Screen name="HoloFoilExample" component={HoloFoilScreen} />
           <Stack.Screen name="BannersExample" component={BannersScreen} />
           <Stack.Screen name="InkBloomExample" component={InkBloomScreen} />
+          <Stack.Screen name="MaterialsExample" component={MaterialsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

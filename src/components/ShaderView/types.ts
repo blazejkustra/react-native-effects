@@ -3,14 +3,15 @@ import type { Synchronizable } from 'react-native-worklets';
 import type { ColorInput } from '../../utils/colors';
 
 /**
- * A 4-float synchronizable whose values are written into the dedicated `u.live`
- * uniform slot every frame. It has its own slot, so it never collides with the
- * 8 static `params` (`u.params0`/`u.params1`).
+ * A float-array synchronizable whose values are written into the dedicated
+ * `u.live` (+ `u.liveData` for channels longer than 4 floats) uniform slots
+ * every frame. It has its own region, so it never collides with the 8 static
+ * `params` (`u.params0`/`u.params1`).
  *
  * This is the bridge for live, per-frame input (touch position, scroll
- * progress, velocity) coming from the JS thread into the off-thread render
- * loop. Create one with `useParamsSynchronizable` and update it from
- * gesture/scroll handlers. See `ShaderViewWithPanGesture`.
+ * progress, velocity, touch trails) coming from the JS thread into the
+ * off-thread render loop. Create one with `useParamsSynchronizable` and update
+ * it from gesture/scroll handlers. See `ShaderViewWithPanGesture`.
  */
 export type ParamsSynchronizable = Synchronizable<Float64Array>;
 
@@ -28,9 +29,10 @@ export type ShaderViewProps = ViewProps & {
   /** Use transparent background (clear to alpha 0). Default: false */
   transparent?: boolean;
   /**
-   * Optional live input. Its 4 floats are written into the dedicated `u.live`
-   * slot every frame — independent of the static `params`. Use for
-   * touch/scroll/audio. Create it with `useParamsSynchronizable`.
+   * Optional live input. Its floats are written into the dedicated `u.live`
+   * slot (and `u.liveData` for channels longer than 4 floats) every frame —
+   * independent of the static `params`. Use for touch/scroll/audio/trails.
+   * Create it with `useParamsSynchronizable`.
    */
   paramsSynchronizable?: ParamsSynchronizable;
 };
