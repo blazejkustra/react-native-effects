@@ -12,13 +12,22 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'beer',
+    title: 'Beer',
+    description: 'Tilt to slosh, rotate to drink, tap to refill',
+    screen: 'BeerExample',
+    color: '#e5920a',
+    // Placeholder art — replaced by a live capture once rendered.
+    image: require('../../assets/components/beer.png'),
+  },
+  {
     id: 'materials',
     title: 'Materials',
     description: 'Natural material banners — tap to go full screen',
     screen: 'MaterialsExample',
     color: '#8a6d4a',
     // Placeholder art — replaced by a live capture once rendered.
-    image: require('../../assets/components/silk.png'),
+    image: require('../../assets/components/material.png'),
   },
   {
     id: 'ink-bloom',
@@ -26,7 +35,7 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     description: 'A drop of ink curling through water',
     screen: 'InkBloomExample',
     color: '#4338ca',
-    image: require('../../assets/components/calico-swirl.png'),
+    image: require('../../assets/components/ink.png'),
   },
   {
     id: 'banners',
@@ -35,7 +44,7 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     screen: 'BannersExample',
     color: '#f59e0b',
     // Placeholder art — replaced by a live capture once rendered.
-    image: require('../../assets/components/campfire.png'),
+    image: require('../../assets/components/banners.png'),
   },
   {
     id: 'thanos',
