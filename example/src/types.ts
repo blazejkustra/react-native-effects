@@ -32,6 +32,7 @@ export type RootStackParamList = {
   InkBloomExample: undefined;
   MaterialsExample: undefined;
   BeerExample: undefined;
+  StickerExample: undefined;
 };
 
 export type HomeScreenNavigationProp =

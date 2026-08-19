@@ -13,7 +13,7 @@ export default function BeerScreen() {
 
   return (
     <Pressable style={styles.container} onPress={refill}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" translucent />
+      <StatusBar hidden />
       <BeerGlass
         paramsSynchronizable={paramsSynchronizable}
         style={StyleSheet.absoluteFill}

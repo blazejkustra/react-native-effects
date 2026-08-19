@@ -12,6 +12,15 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'sticker',
+    title: 'Stickers',
+    description: 'Drag vinyl stickers onto the wall, hold to peel them off',
+    screen: 'StickerExample',
+    color: '#ff4d6d',
+    // Placeholder art — replaced by a live capture once rendered.
+    image: require('../../assets/components/sticker.png'),
+  },
+  {
     id: 'beer',
     title: 'Beer',
     description: 'Tilt to slosh, rotate to drink, tap to refill',

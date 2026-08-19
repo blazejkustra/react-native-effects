@@ -228,6 +228,62 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
 
 For a ready-made pan-gesture wrapper that drives a `paramsSynchronizable` for you (with drag + momentum), see [`ShaderViewWithPanGesture`](src/components/ShaderViewWithPanGesture/index.tsx).
 
+## Sampling an Image with `ShaderImageView`
+
+Everything above generates its pixels procedurally. When the effect needs to act on a real image — warping it, lighting it, cutting it up — use `ShaderImageView` instead. It is a `ShaderView` that also uploads an image and binds it as a texture.
+
+```tsx
+import { ShaderImageView } from 'react-native-effects';
+
+<ShaderImageView
+  fragmentShader={MY_SHADER}
+  image={require('./art.png')}
+  params={params}
+  transparent
+  style={{ width: 240, height: 240 }}
+/>;
+```
+
+### Extra bindings
+
+On top of the uniform block at `@binding(0)`, declare:
+
+```wgsl
+@group(0) @binding(0) var<uniform> u: Uniforms;
+@group(0) @binding(1) var imageSampler: sampler;
+@group(0) @binding(2) var image: texture_2d<f32>;
+```
+
+Your shader **must read both** — the pipeline is built with `layout: 'auto'`, so a binding the shader never touches is not part of the generated layout and the bind group fails to build.
+
+### Sampling
+
+```wgsl
+let texel = textureSampleLevel(image, imageSampler, uv, 0.0);
+```
+
+Use `textureSampleLevel`, not `textureSample`. Any shader interesting enough to want a texture ends up sampling inside `if`/`for` — non-uniform control flow, where WGSL's implicit derivatives are invalid. That means you also choose the mip level yourself.
+
+`ShaderImageView` generates a full mip chain on upload, so pick a level that matches how much you are minifying. A shader that compresses UVs heavily and always asks for level `0` will alias into shimmering noise; deriving the level from the local compression is what keeps the edges clean:
+
+```wgsl
+let squeeze = max(abs(cos(phi)), 0.003);          // how much this pixel is foreshortened
+let spanTexels = (pixelSize() / squeeze) * f32(textureDimensions(image).y);
+let lod = clamp(log2(max(spanTexels, 1.0)), 0.0, 12.0);
+```
+
+`textureDimensions(image)` returns the source size, so the aspect ratio never has to spend a uniform slot.
+
+### Extra props
+
+| Prop           | Description                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------- |
+| `image`        | `require()`d asset, `{ uri }`, or a URI string — anything RN's `Image` takes                      |
+| `onImageLoad`  | Fires with `{ width, height }` once the texture is uploaded and drawing                           |
+| `onImageError` | Fires if the image could not be fetched or decoded; the view renders nothing rather than crashing |
+
+For a full example, [`Sticker.tsx`](example/src/components/Sticker.tsx) grows a die-cut vinyl border out of the image's own alpha channel and wraps the sheet around a cylinder to stick and peel it.
+
 ## AI Prompt for Generating Custom Effects
 
 Copy and paste the prompt below into ChatGPT, Claude, or any AI assistant. Replace the placeholder description with your desired effect, and the AI will generate a complete component.

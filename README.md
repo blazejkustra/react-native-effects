@@ -93,6 +93,36 @@ let active  = u.live.z;    // 1 while touching, 0 otherwise
 
 `setParamsSynchronizable(x, y, active, extra)` runs on the JS thread; the four floats are by convention `(x, y, active, extra)` for pointer input or `(progress, …)` for scroll-driven effects, but the meaning is entirely up to your shader. For a ready-made pan-gesture variant, use [`ShaderViewWithPanGesture`](src/components/ShaderViewWithPanGesture/index.tsx).
 
+## ShaderImageView
+
+`ShaderImageView` is a `ShaderView` that also binds an image as a sampled texture, so the shader can warp, light, and cut up real pixels instead of generating everything procedurally.
+
+```tsx
+import { ShaderImageView } from 'react-native-effects';
+
+<ShaderImageView
+  fragmentShader={MY_SHADER}
+  image={require('./sticker.png')}
+  transparent
+  style={{ width: 240, height: 240 }}
+/>;
+```
+
+It takes every `ShaderView` prop plus `image` (anything React Native's `Image` accepts), and adds two bindings your shader must declare alongside the uniform block:
+
+```wgsl
+@group(0) @binding(1) var imageSampler: sampler;
+@group(0) @binding(2) var image: texture_2d<f32>;
+```
+
+Both have to actually be read — the pipeline uses `layout: 'auto'`, so a binding the shader ignores never makes it into the layout.
+
+The image is fetched, decoded, and uploaded once, and a full mip chain is generated for it. Sample with `textureSampleLevel` rather than `textureSample`: shaders that warp UVs almost always do so inside non-uniform control flow, where implicit derivatives are invalid, and picking the level yourself is what keeps a heavily minified region from aliasing. `textureDimensions(image)` gives the source size, so the aspect ratio costs no uniform slot.
+
+`onImageLoad` fires with the decoded pixel dimensions once the texture is on the GPU and drawing; `onImageError` fires if it could not be fetched or decoded.
+
+For a worked example — a vinyl sticker whose die-cut border is grown from the image's own alpha, and which rolls on and peels off with real cylindrical-roll geometry — see [`Sticker.tsx`](example/src/components/Sticker.tsx).
+
 ## Installation
 
 ```sh
