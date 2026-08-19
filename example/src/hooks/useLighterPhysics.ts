@@ -17,7 +17,7 @@ const SNUFF_RATE = 16;
 const FLARE_TAU = 0.17;
 const SPARK_DURATION = 0.38;
 /** How long the wisp of smoke lingers after the flame is put out (s). */
-const SMOKE_DURATION = 2.8;
+const SMOKE_DURATION = 3.6;
 
 type LighterSim = {
   /** In-plane gravity angle from the sensor (rad), confidence-blended. */
@@ -156,7 +156,7 @@ export function useLighterPhysics(): {
       const smoke =
         age >= 1
           ? 0
-          : Math.min(1, age / 0.12) * (1 - age) * (1 - age) * (1 - s.flame);
+          : Math.min(1, age / 0.1) * Math.pow(1 - age, 1.3) * (1 - s.flame);
 
       // Turbulence runs faster on a big flame and while the lighter is moving.
       s.phase += dt * (0.85 + s.flame * 0.55 + Math.abs(s.tiltVel) * 0.22);

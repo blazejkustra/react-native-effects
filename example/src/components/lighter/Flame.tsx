@@ -216,14 +216,22 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   // ---- Smoke: one thin wisp, leaning with the flame, widening as it goes. ----
   if (smoke > 0.003) {
     let sy = fp.y / (flameH * 1.9);
-    let wsp = flameW * (0.45 + 2.6 * max(sy, 0.0));
+    let wsp = flameW * (0.55 + 3.0 * max(sy, 0.0));
     let sx = fp.x / max(wsp, 0.0001);
-    let wisp = fbm(vec2<f32>(sx * 0.9 + 21.0, sy * 2.4 - phase * 0.75));
-    let colM = exp(-sx * sx * 1.2)
-             * smoothstep(-0.02, 0.14, sy)
-             * (1.0 - smoothstep(0.20 + smokeAge * 1.0, 0.80 + smokeAge * 1.4, sy));
-    let sa = clamp(colM * (0.22 + 0.78 * wisp) * smoke * 0.42, 0.0, 1.0);
-    col = mix(col, vec3<f32>(0.40, 0.385, 0.375), sa);
+    // Two layers at different scales: a coarse curl and a finer one drifting
+    // faster, so the wisp has structure instead of being a soft grey cone.
+    let wispA = fbm(vec2<f32>(sx * 0.9 + 21.0, sy * 2.4 - phase * 0.75));
+    let wispB = vnoise(vec2<f32>(sx * 2.1 + 5.0, sy * 5.5 - phase * 1.35));
+    let wisp = clamp(wispA * 1.45 + (wispB - 0.5) * 0.45, 0.0, 1.2);
+    // Rooted AT the wick to begin with — the window opens below the rim, so
+    // the plume is already solid where it clears the windscreen rather than
+    // fading in above it — then it lets go and floats up as it thins out.
+    let bot = smokeAge * 0.50;
+    let colM = exp(-sx * sx * 1.1)
+             * smoothstep(bot - 0.16, bot + 0.04, sy)
+             * (1.0 - smoothstep(0.24 + smokeAge * 1.1, 0.85 + smokeAge * 1.5, sy));
+    let sa = clamp(colM * (0.20 + 0.80 * wisp) * smoke * 0.95, 0.0, 1.0);
+    col = mix(col, vec3<f32>(0.52, 0.505, 0.495), sa);
   }
 
   // ---- Frame: vignette and dither. ----

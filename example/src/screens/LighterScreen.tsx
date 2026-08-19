@@ -16,7 +16,7 @@ import Lighter, {
 import { useLighterPhysics } from '../hooks/useLighterPhysics';
 
 /** How far the lighter's bounding box sits above the bottom of the screen. */
-const BOX_BOTTOM = 132;
+const BOX_BOTTOM = 110;
 
 /**
  * A lighter you can strike.

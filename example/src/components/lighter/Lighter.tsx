@@ -10,16 +10,16 @@ import LighterHardware from './LighterHardware';
  * screen-space wick position the flame shader needs — keep the two in step,
  * they describe the same object.
  */
-export const BOX_W = 204;
-export const BOX_H = 330;
-export const CASE_W = 176;
-export const CASE_H = 214;
+export const BOX_W = 255;
+export const BOX_H = 412;
+export const CASE_W = 220;
+export const CASE_H = 268;
 /** Where the flame is born, from the box's bottom-left corner. */
-export const WICK_X = 86;
-export const WICK_Y = 288;
+export const WICK_X = 107;
+export const WICK_Y = 360;
 /** Flame size, in points — turned into height-fractions for the shader. */
-export const FLAME_H = 178;
-export const FLAME_W = 29;
+export const FLAME_H = 222;
+export const FLAME_W = 36;
 
 /**
  * LeatherMaterial sizes its grain to its own view, so the wrap is drawn on a
@@ -76,9 +76,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: CASE_W,
     height: CASE_H,
-    borderRadius: 12,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
+    borderRadius: 15,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
     overflow: 'hidden',
     backgroundColor: '#1a1917',
     shadowColor: '#000',
