@@ -12,6 +12,14 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'lighter',
+    title: 'Lighter',
+    description: 'Tap to strike, tilt and the flame stays upright',
+    screen: 'LighterExample',
+    color: '#ff9a3c',
+    image: require('../../assets/components/lighter.png'),
+  },
+  {
     id: 'beer',
     title: 'Beer',
     description: 'Tilt to slosh, rotate to drink, tap to refill',
