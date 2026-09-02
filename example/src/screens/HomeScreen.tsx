@@ -29,6 +29,14 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     image: require('../../assets/components/beer.png'),
   },
   {
+    id: 'foamlab',
+    title: 'Foam lab',
+    description: 'Eight foam treatments side by side — pick one',
+    screen: 'FoamLabExample',
+    color: '#f3ead2',
+    image: require('../../assets/components/beer.png'),
+  },
+  {
     id: 'materials',
     title: 'Materials',
     description: 'Natural material banners — tap to go full screen',
