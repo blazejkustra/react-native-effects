@@ -26,7 +26,8 @@ const BASE_H = 0.34;
  * Shake the phone and the snow lifts off the drift, swirls, and takes several
  * seconds to come back down. Tilt it and the flakes fall toward whatever is
  * really downhill while the trees stay glued to the base — and the snow that
- * has already landed slides to the low side and levels itself off. Tapping
+ * has already landed stays where it lay until the tilt passes the angle a
+ * heap of snow can hold, then slides and banks up the low side. Tapping
  * the glass gives it a stir too, which is the only way to see any of this on
  * a simulator with no accelerometer.
  */

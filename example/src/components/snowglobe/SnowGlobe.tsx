@@ -119,8 +119,9 @@ fn flakeLayer(
       let cid = cell + vec2<f32>(f32(i), f32(j));
       let h1 = hash21(cid + vec2<f32>(seed, seed * 0.7 + 4.3));
       // Cells fade in as the density passes their own hash — snow lifts into
-      // the air instead of popping into it.
-      let vis = smoothstep(h1, h1 - 0.22, dens);
+      // the air instead of popping into it. Edge order matters: dens BELOW the
+      // cell's hash means empty air, above it means a flake.
+      let vis = smoothstep(h1 - 0.22, h1, dens);
       if (vis > 0.003) {
         let h2 = hash21(cid + vec2<f32>(seed + 37.7, seed * 1.3 + 11.1));
         let h3 = hash21(cid + vec2<f32>(seed + 91.3, seed * 0.4 + 63.9));
@@ -247,16 +248,17 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
     let thick = 0.160 + 0.041 * pile;
     let bumps = (vnoise(vec2<f32>(ax * 2.30 + 13.0, 2.0)) - 0.5)
               + (vnoise(vec2<f32>(ax * 6.10 + 41.0, 5.0)) - 0.5) * 0.45;
-    // Snow is not a liquid: it holds a slope instead of levelling off. The
-    // surface follows gravity only up to the angle of repose (~34 degrees),
-    // saturating smoothly past it, so a hard tilt gives a snowbank rather
-    // than a waterline. The excess is taken back out in the gravity frame.
+    // Snow is not a liquid: it holds a slope instead of levelling off. A pile
+    // glued to the base reads as slope tilt here in the gravity frame, a
+    // liquid as 0; snow keeps all of it up to the angle of repose (~34
+    // degrees) and only slides past that, which tanh saturates smoothly. So a
+    // gentle tilt leaves the drift where it lay and a hard one banks it.
     let repose = 0.60;
-    let overSteep = tilt - repose * tanh(tilt / repose);
+    let held = repose * tanh(tilt / repose);
     let surf = 1.0 - 2.0 * thick
              + bumps * 0.075
              + surfTilt * ax
-             + overSteep * ax
+             + held * ax
              + wobble * 0.045 * sin(ax * 5.5 + swirlPhase * 1.6);
     let pm = smoothstep(surf - 0.012, surf + 0.012, al);
     let depth = max(al - surf, 0.0);

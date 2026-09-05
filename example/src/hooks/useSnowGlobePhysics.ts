@@ -41,9 +41,10 @@ const SWIRL_REST = 0.34;
 const SWIRL_STIRRED = 2.9;
 
 /**
- * The settled snow behaves like a shallow liquid: its surface lags the
- * gravity direction on a soft spring, so it slides toward the low side and
- * overshoots slightly before levelling off.
+ * Turning the globe drags the settled surface out of true on a soft spring,
+ * so the drift lags the hand and overshoots slightly before it settles. Where
+ * it settles is not level — the shader caps the lean at snow's angle of
+ * repose — this spring is only the transient on the way there.
  */
 const SURF_STIFFNESS = 42;
 const SURF_DAMPING = 7.2;
@@ -92,8 +93,8 @@ type SnowSim = {
  * signal gives a shake: past a noise floor it lifts snow off the pile
  * (`airborne`), speeds the fall up, and cranks the swirl amplitude, then
  * decays over several seconds while the snow comes back down. The settled
- * surface rides its own soft spring, so it slides to the low side and
- * overshoots once before levelling.
+ * surface rides its own soft spring, so it lags a turn of the globe and
+ * overshoots once before it comes to rest.
  *
  * Writes the live channel every frame:
  * `u.live = (tilt rad, stir 0..1, airborne 0..1, pile 0..1)`,
