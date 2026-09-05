@@ -12,6 +12,14 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'cigarette',
+    title: 'Cigarette',
+    description: 'Hold to drag, tap to flick the ash, tilt the smoke',
+    screen: 'CigaretteExample',
+    color: '#ff6a1a',
+    image: require('../../assets/components/cigarette.png'),
+  },
+  {
     id: 'particle-dispersion',
     title: 'Particle Dispersion',
     description: 'Reveal the subject — the background blows away as dust',

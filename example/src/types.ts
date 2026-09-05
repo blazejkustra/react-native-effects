@@ -37,6 +37,7 @@ export type RootStackParamList = {
   BirthdayCandleExample: undefined;
   ParticleDispersionExample: undefined;
   FoamLabExample: undefined;
+  CigaretteExample: undefined;
 };
 
 export type HomeScreenNavigationProp =
