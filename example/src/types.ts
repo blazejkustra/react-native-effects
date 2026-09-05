@@ -34,6 +34,7 @@ export type RootStackParamList = {
   BeerExample: undefined;
   LighterExample: undefined;
   TelegramDissolveExample: undefined;
+  BirthdayCandleExample: undefined;
   FoamLabExample: undefined;
 };
 
