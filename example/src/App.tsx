@@ -37,6 +37,7 @@ import TelegramDissolveScreen from './screens/TelegramDissolveScreen';
 import BirthdayCandleScreen from './screens/BirthdayCandleScreen';
 import ParticleDispersionScreen from './screens/ParticleDispersionScreen';
 import FoamLabScreen from './screens/FoamLabScreen';
+import VoiceDeleteScreen from './screens/VoiceDeleteScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -129,6 +130,10 @@ export default function App() {
             component={ParticleDispersionScreen}
           />
           <Stack.Screen name="FoamLabExample" component={FoamLabScreen} />
+          <Stack.Screen
+            name="VoiceDeleteExample"
+            component={VoiceDeleteScreen}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
