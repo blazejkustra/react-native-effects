@@ -12,6 +12,14 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'telegram-dissolve',
+    title: 'Telegram Dissolve',
+    description: 'Delete a message and watch it turn to dust',
+    screen: 'TelegramDissolveExample',
+    color: '#7C40FB',
+    image: require('../../assets/components/telegram-dissolve.png'),
+  },
+  {
     id: 'lighter',
     title: 'Lighter',
     description: 'Tap to strike, tilt and the flame stays upright',
