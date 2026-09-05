@@ -12,6 +12,14 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'birthday-candle',
+    title: 'Birthday Candle',
+    description: 'Blow on your phone to put it out, tap to relight',
+    screen: 'BirthdayCandleExample',
+    color: '#f2a93b',
+    image: require('../../assets/components/candle.png'),
+  },
+  {
     id: 'telegram-dissolve',
     title: 'Telegram Dissolve',
     description: 'Delete a message and watch it turn to dust',

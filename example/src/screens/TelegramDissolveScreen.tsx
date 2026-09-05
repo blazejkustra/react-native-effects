@@ -1,4 +1,5 @@
 import {
+  type ComponentRef,
   forwardRef,
   useCallback,
   useEffect,
@@ -104,7 +105,9 @@ type BubbleHandle = {
 
 type Snapshot = { uri: string; content: DissolveRect; bubble: DissolveRect };
 
-function measure(view: View): Promise<DissolveRect> {
+type ViewHandle = ComponentRef<typeof View>;
+
+function measure(view: ViewHandle): Promise<DissolveRect> {
   return new Promise((resolve) => {
     view.measureInWindow((x, y, w, h) => resolve({ x, y, w, h }));
   });
@@ -129,7 +132,7 @@ const Bubble = forwardRef<
   { msg, phase = 'idle', onLongPress, cloneWidth, hidden = false },
   ref
 ) {
-  const bubbleRef = useRef<View>(null);
+  const bubbleRef = useRef<ViewHandle>(null);
 
   useImperativeHandle(ref, () => ({
     measure: () => measure(bubbleRef.current!),

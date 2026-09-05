@@ -34,6 +34,7 @@ import MaterialsScreen from './screens/MaterialsScreen';
 import BeerScreen from './screens/BeerScreen';
 import LighterScreen from './screens/LighterScreen';
 import TelegramDissolveScreen from './screens/TelegramDissolveScreen';
+import BirthdayCandleScreen from './screens/BirthdayCandleScreen';
 import FoamLabScreen from './screens/FoamLabScreen';
 import type { RootStackParamList } from './types';
 
@@ -117,6 +118,10 @@ export default function App() {
           <Stack.Screen
             name="TelegramDissolveExample"
             component={TelegramDissolveScreen}
+          />
+          <Stack.Screen
+            name="BirthdayCandleExample"
+            component={BirthdayCandleScreen}
           />
           <Stack.Screen name="FoamLabExample" component={FoamLabScreen} />
         </Stack.Navigator>

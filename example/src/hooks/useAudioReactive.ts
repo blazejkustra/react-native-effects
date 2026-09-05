@@ -11,6 +11,17 @@ import {
 
 const FFT_SIZE = 512;
 
+export type AudioReactiveOptions = {
+  /**
+   * Called every frame with the raw analyser readings (RMS 0..1, bass 0..1,
+   * treble 0..1) BEFORE the boost + smoothing applied to `u.live`. For effects
+   * that need a faster attack than a visualiser wants (a puff of breath).
+   */
+  onFrame?: (rms: number, bass: number, treble: number) => void;
+  /** Analyser `smoothingTimeConstant`; lower = snappier. Default 0.8. */
+  analyserSmoothing?: number;
+};
+
 /**
  * Captures the microphone via react-native-audio-api and feeds a shader's
  * `u.live` with live audio so the visual reacts to your voice:
@@ -25,7 +36,7 @@ const FFT_SIZE = 512;
  * voice back. Each frame we read the analyser on the JS thread and write the
  * synchronizable the off-thread render loop consumes.
  */
-export function useAudioReactive(): {
+export function useAudioReactive(options: AudioReactiveOptions = {}): {
   paramsSynchronizable: ParamsSynchronizable;
   listening: boolean;
   error: string | null;
@@ -45,6 +56,10 @@ export function useAudioReactive(): {
   );
   const rafRef = useRef<number | null>(null);
   const smooth = useRef({ level: 0, bass: 0, treble: 0 });
+  // Read through a ref so a new callback identity never restarts the mic.
+  const onFrameRef = useRef(options.onFrame);
+  onFrameRef.current = options.onFrame;
+  const analyserSmoothing = options.analyserSmoothing ?? 0.8;
 
   const stop = useCallback(() => {
     if (rafRef.current != null) {
@@ -90,7 +105,7 @@ export function useAudioReactive(): {
 
       const analyser = ctx.createAnalyser();
       analyser.fftSize = FFT_SIZE;
-      analyser.smoothingTimeConstant = 0.8;
+      analyser.smoothingTimeConstant = analyserSmoothing;
       analyserRef.current = analyser;
 
       // mic → adapter → analyser → muted gain → destination (no playback echo)
@@ -154,6 +169,8 @@ export function useAudioReactive(): {
         }
         treble = tc ? treble / tc / 255 : 0;
 
+        onFrameRef.current?.(rms, bass, treble);
+
         // Boost + smooth so the visuals feel lively but not jittery.
         const s = smooth.current;
         s.level += (Math.min(1, rms * 3.0) - s.level) * 0.4;
@@ -168,7 +185,7 @@ export function useAudioReactive(): {
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     }
-  }, [setParamsSynchronizable, stop]);
+  }, [analyserSmoothing, setParamsSynchronizable, stop]);
 
   const toggle = useCallback(() => {
     if (listening) {
