@@ -1,9 +1,10 @@
-import { AppState, PixelRatio, StyleSheet } from 'react-native';
-import { Canvas, installWebGPU } from 'react-native-webgpu';
+import { AppState, Image, PixelRatio, StyleSheet } from 'react-native';
+import { Canvas, GPUTextureUsage, installWebGPU } from 'react-native-webgpu';
 import { useEffect, useRef, useState } from 'react';
 import { createSynchronizable, scheduleOnRuntime } from 'react-native-worklets';
 import { colorToVec4 } from '../../utils/colors';
 import { useWGPUSetup } from '../../hooks/useWGPUSetup';
+import { getSharedGPUDevice } from '../../utils/gpuDevice';
 import { TRIANGLE_VERTEX_SHADER } from '../../shaders/TRIANGLE_VERTEX_SHADER';
 import {
   LIVE_FLOAT_COUNT,
@@ -19,6 +20,12 @@ const IDX_SPEED = 8;
 const IDX_PARAMS = 9; // 9..16
 const IDX_ALIVE = 17;
 
+type BoundTexture = {
+  texture: GPUTexture;
+  view: GPUTextureView;
+  sampler: GPUSampler;
+};
+
 export default function ShaderView({
   fragmentShader,
   colors = [],
@@ -27,6 +34,7 @@ export default function ShaderView({
   isStatic = false,
   transparent = false,
   paramsSynchronizable,
+  texture,
   style,
   ...viewProps
 }: ShaderViewProps) {
@@ -46,6 +54,65 @@ export default function ShaderView({
     });
     return () => subscription.remove();
   }, []);
+
+  // Optional image texture: decoded and uploaded on the JS thread against the
+  // shared device, then captured into the render worklet like `device` is.
+  const textureUri = texture
+    ? Image.resolveAssetSource(texture)?.uri
+    : undefined;
+  const [boundTexture, setBoundTexture] = useState<BoundTexture | null>(null);
+  useEffect(() => {
+    // Drop the previous texture immediately (its cleanup destroys it) so the
+    // loop never draws with a destroyed view while the next one decodes.
+    setBoundTexture(null);
+    if (!textureUri) {
+      return;
+    }
+    let cancelled = false;
+    let created: GPUTexture | null = null;
+    (async () => {
+      const device = await getSharedGPUDevice();
+      if (!device || cancelled) {
+        return;
+      }
+      const response = await fetch(textureUri);
+      const bitmap = await createImageBitmap(await response.arrayBuffer());
+      if (cancelled) {
+        return;
+      }
+      const gpuTexture = device.createTexture({
+        size: [bitmap.width, bitmap.height, 1],
+        format: 'rgba8unorm',
+        usage:
+          GPUTextureUsage.TEXTURE_BINDING |
+          GPUTextureUsage.COPY_DST |
+          GPUTextureUsage.RENDER_ATTACHMENT,
+      });
+      device.queue.copyExternalImageToTexture(
+        { source: bitmap },
+        { texture: gpuTexture },
+        [bitmap.width, bitmap.height]
+      );
+      const sampler = device.createSampler({
+        magFilter: 'linear',
+        minFilter: 'linear',
+        addressModeU: 'mirror-repeat',
+        addressModeV: 'mirror-repeat',
+      });
+      created = gpuTexture;
+      setBoundTexture({
+        texture: gpuTexture,
+        view: gpuTexture.createView(),
+        sampler,
+      });
+    })().catch((e) => {
+      console.warn('[react-native-effects] texture load failed:', e);
+    });
+    return () => {
+      cancelled = true;
+      created?.destroy();
+    };
+  }, [textureUri]);
 
   const propsSync = useRef(
     createSynchronizable<Float64Array>(new Float64Array(SYNC_SIZE))
@@ -102,11 +169,19 @@ export default function ShaderView({
   // tears the loop down (via the `cancelled` token below); on return to the
   // foreground it re-runs and starts a fresh loop.
   useEffect(() => {
-    if (!resources || !appActive) {
+    // With a texture prop the shader declares its bindings, so the bind group
+    // must carry them: wait for the upload rather than render a broken frame.
+    if (
+      !resources ||
+      !appActive ||
+      (textureUri !== undefined && !boundTexture)
+    ) {
       return;
     }
 
     const { device, context, presentationFormat } = resources;
+    const textureView = boundTexture?.view ?? null;
+    const textureSampler = boundTexture?.sampler ?? null;
     const dpr = PixelRatio.get();
 
     // Per-run cancellation token. On Fast Refresh / dep change / unmount, React
@@ -145,9 +220,16 @@ export default function ShaderView({
         usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
       });
 
+      const entries: GPUBindGroupEntry[] = [
+        { binding: 0, resource: { buffer: uniformBuffer } },
+      ];
+      if (textureView && textureSampler) {
+        entries.push({ binding: 1, resource: textureSampler });
+        entries.push({ binding: 2, resource: textureView });
+      }
       const bindGroup = device.createBindGroup({
         layout: pipeline.getBindGroupLayout(0),
-        entries: [{ binding: 0, resource: { buffer: uniformBuffer } }],
+        entries,
       });
 
       const uniformData = new Float32Array(UNIFORM_FLOAT_COUNT);
@@ -262,11 +344,11 @@ export default function ShaderView({
           device.queue.writeBuffer(uniformBuffer, 0, uniformData);
 
           const commandEncoder = device.createCommandEncoder();
-          const textureView = context.getCurrentTexture().createView();
+          const frameView = context.getCurrentTexture().createView();
           const passEncoder = commandEncoder.beginRenderPass({
             colorAttachments: [
               {
-                view: textureView,
+                view: frameView,
                 clearValue: transparent ? [0, 0, 0, 0] : [0, 0, 0, 1],
                 loadOp: 'clear',
                 storeOp: 'store',
@@ -312,6 +394,8 @@ export default function ShaderView({
     fragmentShader,
     isStatic,
     transparent,
+    textureUri,
+    boundTexture,
   ]);
 
   return (

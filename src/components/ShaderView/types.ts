@@ -1,4 +1,4 @@
-import type { ViewProps } from 'react-native';
+import type { ImageSourcePropType, ViewProps } from 'react-native';
 import type { Synchronizable } from 'react-native-worklets';
 import type { ColorInput } from '../../utils/colors';
 
@@ -35,4 +35,14 @@ export type ShaderViewProps = ViewProps & {
    * Create it with `useParamsSynchronizable`.
    */
   paramsSynchronizable?: ParamsSynchronizable;
+  /**
+   * Optional image sampled by the shader (a `require('./photo.jpg')` or
+   * `{ uri }`). It is decoded once, uploaded to the GPU and bound as
+   * `@group(0) @binding(1) var samp: sampler;` and
+   * `@group(0) @binding(2) var tex: texture_2d<f32>;` — declare both in the
+   * shader when passing this, and neither when not. The sampler is linear
+   * with mirror-repeat wrapping; sample with `textureSampleLevel(tex, samp,
+   * uv, 0.0)` (no mipmaps). Rendering waits for the image to load.
+   */
+  texture?: ImageSourcePropType;
 };

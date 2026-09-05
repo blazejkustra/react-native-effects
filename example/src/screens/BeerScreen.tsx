@@ -9,13 +9,14 @@ import { useBeerPhysics } from '../hooks/useBeerPhysics';
  * one Pressable holding the shader (back = native edge swipe).
  */
 export default function BeerScreen() {
-  const { paramsSynchronizable, refill } = useBeerPhysics();
+  const { paramsSynchronizable, refill, onLayout } = useBeerPhysics();
 
   return (
     <Pressable style={styles.container} onPress={refill}>
       <StatusBar barStyle="light-content" backgroundColor="#000" translucent />
       <BeerGlass
         paramsSynchronizable={paramsSynchronizable}
+        onLayout={onLayout}
         style={StyleSheet.absoluteFill}
       />
     </Pressable>

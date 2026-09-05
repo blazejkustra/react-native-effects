@@ -33,6 +33,7 @@ export type RootStackParamList = {
   MaterialsExample: undefined;
   BeerExample: undefined;
   LighterExample: undefined;
+  FoamLabExample: undefined;
 };
 
 export type HomeScreenNavigationProp =

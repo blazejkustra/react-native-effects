@@ -8,31 +8,40 @@ import {
 
 type Props = Omit<
   ShaderViewProps,
-  'fragmentShader' | 'paramsSynchronizable' | 'colors'
+  'fragmentShader' | 'paramsSynchronizable' | 'colors' | 'texture'
 > & {
   /**
-   * Live channel from {@link useBeerPhysics}:
-   * `u.live = (surfaceAngle rad, surfaceLevelOnScreen, sloshEnergy, pourIntensity)`,
-   * `u.liveData[0].x` = integrated bubble phase.
+   * Live channel from {@link useBeerPhysics} (12 floats):
+   * `u.live = (surfaceAngle rad, surfaceOffset k, sloshEnergy, pourIntensity)`,
+   * `u.liveData[0] = (bubblePhase, mode2, mode3, chordMid)`,
+   * `u.liveData[1] = (chordHalf, fillFraction, mode1Curvature, foamOut)`.
    */
   paramsSynchronizable: ParamsSynchronizable;
   /** Amber-gold beer body. */
   liquidColor?: ColorInput;
-  /** Creamy foam head. */
+  /** White the head's half-transparent seam bubbles are lifted toward. */
   foamColor?: ColorInput;
 };
 
+// The head is a photograph of foam (iBeer's own trick — every procedural
+// head read as drawn). Foam over beer, its lacy bottom line at 0.615 of the
+// height; the shader keys the photo's beer out. Stock image: clear its
+// licence before shipping.
+const FOAM_PHOTO = require('../../assets/foam.jpg');
+
 /**
  * The phone as a glass of beer — full-screen amber liquid with parallax layers
- * of rising bubbles, a constant-thickness creamy foam head riding the surface,
- * a glinting meniscus, dark glass headspace with lacing and condensation, and
- * a turbulent refill stream while pouring. The surface angle, level, slosh
- * energy, pour intensity and bubble phase all arrive through the live channel.
+ * of rising bubbles, a photographed foam head riding the surface, a
+ * glinting meniscus, dark glass headspace with lacing and condensation, and
+ * a turbulent refill stream while pouring. The liquid is a signed depth field
+ * below a volume-conserving surface solved on the JS side, with the sloshing
+ * modes riding on top — so the scene is valid at any angle, including past
+ * horizontal when the beer pours out of the top of the screen.
  */
 export default function BeerGlass({
   paramsSynchronizable,
   liquidColor = '#e5920a',
-  foamColor = '#f8f1dd',
+  foamColor = '#faf8f3',
   ...rest
 }: Props) {
   const colors = useMemo(
@@ -43,6 +52,7 @@ export default function BeerGlass({
   return (
     <ShaderView
       fragmentShader={BEER_SHADER}
+      texture={FOAM_PHOTO}
       colors={colors}
       paramsSynchronizable={paramsSynchronizable}
       {...rest}
@@ -62,6 +72,12 @@ struct Uniforms {
   liveData:   array<vec4<f32>, 96>,
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
+@group(0) @binding(1) var samp: sampler;
+@group(0) @binding(2) var tex: texture_2d<f32>;
+
+// The foam photo: square, its lacy foam-over-beer seam at PHOTO_SEAM of the
+// height from the top. It is scaled so the head above the seam is foamThick.
+const PHOTO_SEAM: f32 = 0.615;
 
 fn hash21(p: vec2<f32>) -> f32 {
   var p3 = fract(vec3<f32>(p.xyx) * 0.1031);
@@ -135,55 +151,6 @@ fn bubbles(p0: vec2<f32>, phase: f32, cells: f32, riseSpeed: f32, seed: f32) -> 
   let bright = 0.6 + 0.4 * fract(rnd * 3.17);
   return vec2<f32>(hasB * bodyShade,
                    hasB * bright * (rimLight * 0.9 + glints * 0.9));
-}
-
-// Micro-pore field: EVERY cell holds one tiny, soft, slightly darker dot —
-// the dense matte body of packed micro-bubbles that fills real foam between
-// the visible domes. Kept at whisper contrast; the sheer density is what
-// reads, not any single pore.
-fn foamPores(p0: vec2<f32>, cells: f32, seed: f32) -> f32 {
-  let p = p0 * cells + seed * 11.7;
-  let cell = floor(p);
-  let rnd = hash21(cell + seed * 5.3);
-  let ctr = vec2<f32>(0.28 + fract(rnd * 7.31) * 0.44,
-                      0.28 + fract(rnd * 13.7) * 0.44);
-  let rel = fract(p) - ctr;
-  let r = 0.12 + fract(rnd * 5.13) * 0.17;
-  let dot1 = smoothstep(r, r * 0.25, length(rel));
-  return dot1 * (0.45 + 0.55 * fract(rnd * 3.71));
-}
-
-// One layer of visible foam bubbles on a sparse cell grid. Each bubble is a
-// smooth bright DOME (never a ring or a hole): gentle circular lift, a small
-// highlight nudged toward the upper-left, and a SOFT gray contact-shadow just
-// outside the rim — strongest below the bubble — where it presses into the
-// surrounding micro-foam. That shadow is what makes the dome read as 3D.
-// gate: cells below this hash never spawn a bubble (rarer at larger sizes).
-// Returns (domeCoverage, highlight, contactShadow).
-fn foamDome(p0: vec2<f32>, cells: f32, gate: f32, seed: f32) -> vec3<f32> {
-  let p = p0 * cells + seed * 17.3;
-  let cell = floor(p);
-  let rnd = hash21(cell + seed * 3.9);
-  if (rnd < gate) {
-    return vec3<f32>(0.0);
-  }
-  let ctr = vec2<f32>(0.36 + fract(rnd * 7.31) * 0.28,
-                      0.36 + fract(rnd * 13.7) * 0.28);
-  let rel = fract(p) - ctr;
-  let d = length(rel);
-  let r = 0.15 + fract(rnd * 5.13) * 0.15;
-  // Smooth bright cap — a defined circle, but the edge stays soft.
-  let dome = smoothstep(r, r * 0.68, d);
-  // Highlight offset toward the upper-left of the cap.
-  let hd = length(rel - vec2<f32>(-r * 0.3, r * 0.3));
-  let hi = smoothstep(r * 0.6, r * 0.12, hd);
-  // Soft contact-shadow ring hugging the OUTSIDE of the rim — clipped so it
-  // never bleeds onto the cap itself...
-  let ring = smoothstep(r * 0.38, r * 0.07, abs(d - r * 1.18))
-           * smoothstep(r * 0.94, r * 1.08, d);
-  // ...biased below the bubble, fading around the top.
-  let below = 0.6 + 0.4 * clamp(-rel.y / max(d, 0.001), -1.0, 1.0);
-  return vec3<f32>(dome, hi, ring * below);
 }
 
 // --- Rain-on-glass droplet system ---
@@ -276,29 +243,58 @@ fn rainDrops(uv: vec2<f32>, t: f32, l0: f32, l1: f32, l2: f32) -> vec2<f32> {
   return vec2<f32>(c, max(m1.y * l0, m2.y * l1));
 }
 
+// Signed depth below the liquid surface at p (aspect-corrected screen coords,
+// y up): positive inside the beer, negative in the headspace. The hydrostatic
+// surface is the line dot(p, dn) = k that the JS side solved for volume
+// conservation; the sloshing modes ride on top of it as standing waves across
+// the wetted chord (xi = -1 .. 1 wall to wall): the mode-1 curvature term
+// bends the rigid tilt into its real sin(pi x / L) shape, mode 2 is the
+// symmetric hump, mode 3 the second antisymmetric wave. All three integrate
+// to zero across the chord, so the level never breathes while it sloshes.
+// A whisper of capillary ripple on top, scaled by the slosh energy.
+fn liquidDepth(p: vec2<f32>, dn: vec2<f32>, es: vec2<f32>, t: f32, ripple: f32) -> f32 {
+  let k = u.live.y;
+  let a2 = u.liveData[0].y;
+  let a3 = u.liveData[0].z;
+  let sMid = u.liveData[0].w;
+  let sHalf = max(u.liveData[1].x, 0.02);
+  let c1 = u.liveData[1].z;
+  let s = dot(p, es);
+  let xi = clamp((s - sMid) / sHalf, -1.2, 1.2);
+  let eta = a2 * cos(3.14159 * xi)
+          + a3 * sin(4.71239 * xi)
+          + c1 * (0.63662 * sin(1.5708 * xi) - xi)
+          + ripple * (sin(s * 11.0 - t * 3.7) * 0.6
+                    + sin(s * 19.0 + t * 5.1) * 0.3
+                    + sin(s * 31.0 - t * 6.9) * 0.15);
+  return dot(p, dn) - k - eta;
+}
+
 @fragment
 fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let t = u.time.x;
   let aspect = u.resolution.z;
   let screenUV = ndc * 0.5 + 0.5;        // y-up: uv.y = 1 is the TOP
 
-  let ang = clamp(u.live.x, -1.2, 1.2);  // tan() blows up near +-90 deg
-  let lvl = u.live.y;                    // surface height ON SCREEN, 0..1
+  let ang = u.live.x;                    // sprung surface angle, any value
   let slosh = clamp(u.live.z, 0.0, 1.0);
   let pour = clamp(u.live.w, 0.0, 1.0);
   let phase = u.liveData[0].x;           // integrated bubble phase
+  let lvl = u.liveData[1].y;             // fill fraction, 1 = full glass
+  let foamOut = u.liveData[1].w;         // 0 seated .. 1 slid out of the mouth
 
-  // World-level surface with volume conservation (used both for the liquid
-  // itself and to bound the condensation region). While the line spans the
-  // full width, the centre height IS the level. Once the remaining beer is a
-  // corner wedge (lvl < slope / 2) the line slides down into the gravity-side
-  // corner so the wedge area still equals the level — the last of the beer
-  // recedes into the corner and drains away smoothly (no snap to a flat film
-  // on the bottom).
-  let slope = tan(ang) * aspect;
-  let m = max(abs(slope), 0.0001);
-  let wedgeH = m * (sqrt(2.0 * lvl / m) - 0.5);
-  let h0 = select(lvl, wedgeH, lvl < m * 0.5);
+  // World frame in aspect-corrected screen units: dn points DOWN along the
+  // effective gravity, es runs along the liquid surface. Because everything
+  // below is expressed with dot products against these two vectors, the
+  // scene is valid at ANY angle — including past horizontal, when gravity
+  // points out of the mouth of the glass and the beer pours out of the top.
+  let dn = vec2<f32>(sin(ang), -cos(ang));
+  let es = vec2<f32>(cos(ang), sin(ang));
+
+  // Ripples fade only over the very last drop, so an empty glass is not
+  // left with a shimmering film.
+  let nearEmpty = smoothstep(0.0, 0.03, lvl);
+  let ripple = (0.0015 + slosh * 0.012 + pour * 0.006) * nearEmpty;
 
   // --- Condensation drop field, computed FIRST in SCREEN-FIXED coords ---
   // The glass is the phone: drops never tilt or slosh with the beer, they
@@ -306,8 +302,9 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   // scene below is then evaluated at coordinates refracted by the drops.
   // Condensation only forms where the cold beer chills the glass, so the
   // field fades out at the liquid surface — the headspace glass stays dry.
-  let surfH0 = h0 + slope * (screenUV.x - 0.5);
-  let coldMask = smoothstep(surfH0 + 0.01, surfH0 - 0.06, screenUV.y);
+  let pS = vec2<f32>((screenUV.x - 0.5) * aspect, screenUV.y);
+  let depthS = liquidDepth(pS, dn, es, t, 0.0);
+  let coldMask = smoothstep(-0.01, 0.06, depthS);
   let rainT = t * 0.07;                  // languid — condensation, not rain
   let dl0 = 0.9;                         // static beads
   let dl1 = 0.55;                        // occasional big sliding drops
@@ -326,71 +323,48 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   // undistorted screenUV.
   let uv = screenUV + dropN * 1.0;
   let cx = (uv.x - 0.5) * aspect;        // aspect-corrected, centred x
+  let p = vec2<f32>(cx, uv.y);
 
-  // Slosh waves fade only over the very last drop, so an empty glass is not
-  // left with a shimmering film.
-  let nearEmpty = smoothstep(0.0, 0.03, lvl);
-  let waveAmp = (0.004 + slosh * 0.028 + pour * 0.012) * nearEmpty;
-  let waves = waveAmp * (sin(cx * 9.0 - t * 3.1) * 0.6
-                       + sin(cx * 15.7 + t * 4.3) * 0.3
-                       + sin(cx * 23.0 - t * 5.7) * 0.15);
-
-  // Surface line in the (drop-refracted) scene frame — the level math
-  // itself (h0, slope) is computed once above the drop block.
-  let surfH = h0 + slope * (uv.x - 0.5) + waves;
-
-  // Rigid surface-aligned frame: fu runs along the liquid surface, fv is the
-  // perpendicular distance above it. Foam sampled here turns rigidly with the
-  // world when the phone rotates — sampling by (y - surface(x)) instead would
-  // SHEAR the texture and smear every foam bubble into a diagonal streak.
-  let ca = cos(ang);
-  let sa = sin(ang);
-  let dvec = vec2<f32>(cx, uv.y - h0);
-  let fu = dvec.x * ca + dvec.y * sa;
-  let fv = -dvec.x * sa + dvec.y * ca;
+  // Signed depth below the surface (positive = inside the beer) and the
+  // along-surface coordinate. Every band, mask and texture below hangs off
+  // these two numbers.
+  let depth = liquidDepth(p, dn, es, t, ripple);
+  let s = dot(p, es);
 
   let feather = 3.0 / u.resolution.y;
-  let inLiquid = smoothstep(surfH, surfH - feather, uv.y);
+  let inLiquid = smoothstep(0.0, feather, depth);
 
-  // Constant-thickness foam head riding the surface (thickens a touch while
-  // pouring, NEVER with fill level). The top edge is built from two scales of
+  // Constant-thickness foam head riding the surface (never with fill level
+  // or the pour). The top edge is built from two scales of
   // slow-drifting blobs so it reads as mounds of foam, not a wavy line; the
-  // bottom edge grows sparse soaked fingers that drip into the beer.
-  // Constant thickness, always — the head never compresses. Over the last
-  // stretch of the drink the whole band slides down past the surface and
-  // flows out of the screen with the beer, like it's being drunk with it.
-  // While pouring it stays seated on the rising surface instead.
-  let foamThick = 0.11 * (1.0 + pour * 0.35);
-  let foamShift = (1.0 - smoothstep(0.0, 0.15, lvl)) * (1.0 - pour)
-                * (foamThick + 0.06);
-  // The band edges are vertical offsets from the surface line, so divide by
-  // cos(angle): the thickness you SEE is perpendicular to the surface, and
-  // without the correction the foam visibly thins as the phone rotates.
-  let vScale = 1.0 / max(ca, 0.35);
-  let lumpA = vnoise(vec2<f32>(fu * 5.0, t * 0.06));
-  let lumpB = vnoise(vec2<f32>(fu * 13.0 + 4.0, t * 0.1));
-  let foamTop = surfH - foamShift
-              + foamThick * (0.78 + lumpA * 0.38 + lumpB * 0.16) * vScale;
-  let fingerN = vnoise(vec2<f32>(fu * 11.0, t * 0.1 + 7.0));
-  let foamBot = surfH - foamShift
-              - foamThick * 0.22 * fingerN * fingerN * vScale;
-  let inFoam = smoothstep(foamTop, foamTop - feather, uv.y)
-             * smoothstep(foamBot - feather, foamBot, uv.y);
+  // bottom edge is the photo's own lacy seam.
+  // Thickness is measured PERPENDICULAR to the surface, so it stays the same
+  // on screen at any rotation. Once the beer is gone the whole band slides
+  // past the surface and out of the mouth after it, at the unhurried pace
+  // the JS side sets (foamOut), like it is being drunk with it; a pour
+  // brings it back onto the rising surface.
+  let foamThick = 0.17;
+  let foamShift = smoothstep(0.0, 1.0, foamOut) * (foamThick + 0.06);
+  let dF = depth - foamShift;            // depth below the (shifted) band seat
+  let lumpA = vnoise(vec2<f32>(s * 3.5, t * 0.05));
+  let lumpB = vnoise(vec2<f32>(s * 9.0 + 4.0, t * 0.08));
+  // Big soft mounds on top of the foam MASS, like a head that has been
+  // poured rather than levelled.
+  let topH = foamThick * (0.55 + lumpA * 0.62 + lumpB * 0.22);
 
   // --- Beer body ---
   var beer = u.color0.rgb;
   // Subtle depth gradient: only slightly darker toward the bottom, stays golden.
-  let depth = clamp((surfH - uv.y) * 0.9, 0.0, 1.0);
-  beer = beer * (1.0 - depth * 0.2);
+  let deep = clamp(depth * 0.9, 0.0, 1.0);
+  beer = beer * (1.0 - deep * 0.2);
   // Slow drifting haze.
   let haze = fbm(vec2<f32>(cx * 2.4 + t * 0.03, uv.y * 2.4 - t * 0.05));
   beer = beer * (0.9 + haze * 0.18);
-  // Three parallax layers of rising bubbles, sampled in a world-aligned frame
-  // (screen coords rotated by the surface angle) so they rise toward the
-  // level surface and the field turns rigidly with the world when the phone
+  // Three parallax layers of rising bubbles, sampled in the world frame
+  // (along the surface, up against gravity) so they rise toward the level
+  // surface and the field turns rigidly with the world when the phone
   // rotates instead of flattening out.
-  let py = uv.y - 0.5;
-  let bp = vec2<f32>(cx * ca + py * sa, py * ca - cx * sa);
+  let bp = vec2<f32>(s, -dot(p, dn));
   let b1 = bubbles(bp, phase, 11.0, 1.5, 1.0);
   let b2 = bubbles(bp, phase, 18.0, 2.4, 2.0);
   let b3 = bubbles(bp, phase, 28.0, 3.6, 3.0);
@@ -402,58 +376,34 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   beer = beer + vec3<f32>(1.0, 0.97, 0.85) * bubHi * 0.42;
   beer = mix(beer, vec3<f32>(1.0, 0.98, 0.9), clamp(bubHi * 0.2, 0.0, 1.0));
 
-  // --- Foam head: bright cream packed with fine bubbles ---
-  var foam = vec3<f32>(0.0);
-  if (inFoam > 0.001) {
-    // Surface-aligned frame: rides the surface (and the end-of-drink slide)
-    // AND rotates rigidly with it. No drift: a real head sits still on the
-    // beer — only the surface itself moves it.
-    let fq = vec2<f32>(fu, fv + foamShift * ca);
-    let fd = fq;
-    // Barely-there large-scale cream billow keeps the head from going flat.
-    let billow = vnoise(fd * 7.0);
-    var lum = 1.0 + (billow - 0.5) * 0.04;
-    // Dense micro-pore field at two fine scales: the matte gray-speckled
-    // body of the foam between the visible bubbles. A slow patch noise
-    // clusters the pores like the photo instead of uniform pepper.
-    let poreCluster = 0.55 + 0.45 * vnoise(fd * 22.0 + 5.0);
-    let pores1 = foamPores(fd, 230.0, 1.0);
-    let pores2 = foamPores(fd, 400.0, 2.0);
-    lum = lum - (pores1 * 0.075 + pores2 * 0.05) * poreCluster;
-    // Visible bubbles fade out before the band edges: a dome must never be
-    // SLICED by the lumpy top edge or the soaked bottom — half-circles
-    // against the dark headspace destroy the illusion instantly. Each layer
-    // gets a margin matched to its bubble size, so tiny bubbles still live
-    // near the edge while the big domes bow out early.
-    let botFade = smoothstep(foamBot, foamBot + 0.02, uv.y);
-    let fade1 = smoothstep(foamTop, foamTop - 0.014, uv.y) * botFade;
-    let fade2 = smoothstep(foamTop, foamTop - 0.03, uv.y) * botFade;
-    let fade3 = smoothstep(foamTop, foamTop - 0.055, uv.y) * botFade;
-    // Three dome layers, power-law sized: many small, some medium, few
-    // large. Contact shadows land first (they live in the micro-foam)...
-    let dm1 = foamDome(fd, 34.0, 0.30, 1.0);
-    let dm2 = foamDome(fd, 17.0, 0.62, 2.0);
-    let dm3 = foamDome(fd, 11.0, 0.86, 3.0);
-    lum = lum - (dm1.z * fade1 * 0.055 + dm2.z * fade2 * 0.065
-               + dm3.z * fade3 * 0.075);
-    // ...then the smooth caps cover the pores beneath them and lift toward
-    // bright, with a soft upper-left highlight on top.
-    let cover = clamp(dm1.x * fade1 + dm2.x * fade2 + dm3.x * fade3, 0.0, 1.0);
-    lum = mix(lum, 1.05, cover * 0.95);
-    lum = lum + dm1.y * fade1 * 0.04 + dm2.y * fade2 * 0.05
-              + dm3.y * fade3 * 0.06;
-    // Bright and airy: crevices never dip far below base, and the head
-    // pulls toward true WHITE — most on the bubble caps — so it reads as
-    // real beer foam rather than flat cream.
-    foam = u.color1.rgb * clamp(lum, 0.88, 1.1);
-    let whiten = clamp((lum - 0.97) * 3.0, 0.0, 0.8);
-    foam = mix(foam, vec3<f32>(1.0), whiten);
-    // Beer-soaked only near the liquid, creamy white above.
-    let fpos = clamp((fv + foamShift * ca) / max(foamThick, 0.001), 0.0, 1.0);
-    foam = mix(foam * vec3<f32>(0.94, 0.8, 0.55), foam,
-               smoothstep(0.0, 0.22, fpos));
-    foam = foam * (0.97 + fpos * 0.07);
-  }
+  // --- Foam head ---
+  // The photo, sampled in the surface-aligned frame that rides the beer:
+  // its seam sits on the band seat, it mirrors sideways so it tiles without
+  // a join, and the big mounds above cut its silhouette against the glass.
+  // Yellowness (and darkness: bubble rims over beer) keys the photo's own
+  // beer out — foam is ~0.13 red-minus-blue, beer ~0.85 — so its lacy seam
+  // of half-transparent bubbles is what sits on OUR beer.
+  let photoH = foamThick / PHOTO_SEAM;
+  let puv = vec2<f32>(s / photoH + 0.5, PHOTO_SEAM + dF / photoH);
+  let pc = textureSampleLevel(tex, samp, puv, 0.0).rgb;
+  let plum = dot(pc, vec3<f32>(0.299, 0.587, 0.114));
+  let beerness = max(smoothstep(0.35, 0.6, pc.r - pc.b),
+                     1.0 - smoothstep(0.3, 0.55, plum));
+  let topMask = smoothstep(-topH, -topH + 0.006, dF);
+  // Nothing of the photo below its seam band (the photo's beer has bright
+  // droplets that would survive the key as specks in ours).
+  let seamCut = smoothstep(0.014, 0.008, dF);
+  // While the band is sliding (out of the mouth, or back up through a
+  // pour) only what is above the beer shows: the head builds on the
+  // surface instead of showing through the liquid.
+  let aboveBeer = smoothstep(0.03, 0.005, depth);
+  let foamA = topMask * seamCut * aboveBeer * (1.0 - beerness);
+  // Half-keyed seam bubbles lose their yellow so they read as translucent
+  // white over our beer, not the photo's.
+  let foam = mix(pc, u.color1.rgb * min(plum * 1.15, 1.0), beerness);
+  // The seam's keyed pixels must land on beer, never on the dark glass: run
+  // the beer a little way up under the head.
+  let seamFill = smoothstep(-0.03, -0.02, dF) * seamCut * topMask;
 
   // --- Glass headspace above the foam ---
   var glass = vec3<f32>(0.1, 0.065, 0.032);
@@ -464,29 +414,40 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   // glass is one cold surface in front of the whole scene.)
 
   // --- Composite bottom-up: glass, then liquid, then foam ---
+  // Thin film: when the phone is pitched back the beer lies on the back of
+  // the box and thins to nothing at its visible edge, so that edge is a
+  // paler wedge of beer instead of a hard line.
+  let film = clamp(depth / 0.0005, 0.0, 1.0);
+  let thinBeer = mix(beer, vec3<f32>(1.0, 0.9, 0.62), 0.45);
   var col = glass;
-  col = mix(col, beer, inLiquid);
-  col = mix(col, foam, inFoam);
+  col = mix(col, mix(thinBeer, beer, film), inLiquid);
+  col = mix(col, beer, seamFill);
+  col = mix(col, foam, foamA);
 
   // A subtle wet line where the foam sits on the beer.
-  let mdist = uv.y - surfH;
-  let glint = 0.7 + 0.3 * sin(cx * 30.0 + t * 2.0);
+  let glint = 0.7 + 0.3 * sin(s * 30.0 + t * 2.0);
   col = col + vec3<f32>(1.0, 0.9, 0.6)
-            * exp(-mdist * mdist * 90000.0) * glint * 0.15 * nearEmpty;
+            * exp(-depth * depth * 90000.0) * glint * 0.15 * nearEmpty;
 
   // --- Refill stream + splash churn ---
   if (pour > 0.001) {
-    // A falling stream is straight, and it TAPERS toward the bottom as the
-    // liquid accelerates — no side-to-side snaking.
-    let sx = cx;
-    let streamW = (0.011 + 0.009 * uv.y) * (0.7 + pour * 0.3);
-    let streamMask = smoothstep(streamW, streamW * 0.3, abs(sx))
-                   * smoothstep(surfH - 0.01, surfH + 0.05, uv.y) * pour;
-    let streamTex = 0.7 + 0.5 * vnoise(vec2<f32>(sx * 160.0, uv.y * 8.0 - t * 14.0));
+    // The stream enters at the top centre of the glass and falls along
+    // WORLD down — a falling stream is straight, it tapers as the liquid
+    // accelerates, and it hits the surface wherever gravity takes it.
+    let rel = p - vec2<f32>(0.0, 1.0);
+    let along = dot(rel, dn);
+    let across = dot(rel, es);
+    let inStream = smoothstep(-0.01, 0.01, along);
+    let streamW = (0.011 + 0.009 * (1.0 - clamp(along, 0.0, 1.0)))
+                * (0.7 + pour * 0.3);
+    let streamMask = smoothstep(streamW, streamW * 0.3, abs(across))
+                   * smoothstep(0.01, -0.05, depth) * inStream * pour;
+    let streamTex = 0.7 + 0.5 * vnoise(vec2<f32>(across * 160.0, along * 8.0 - t * 14.0));
     col = mix(col, vec3<f32>(1.0, 0.85, 0.45) * streamTex, streamMask * 0.85);
-    let spd = length(vec2<f32>(cx * 1.6, uv.y - surfH));
-    let churn = 0.6 + 0.8 * vnoise(vec2<f32>(cx * 60.0, surfH * 30.0 + t * 12.0));
-    col = col + vec3<f32>(1.0, 0.95, 0.75) * exp(-spd * spd * 300.0) * pour * churn * 0.5;
+    let spd = length(vec2<f32>(across * 1.6, depth));
+    let churn = 0.6 + 0.8 * vnoise(vec2<f32>(across * 60.0, s * 30.0 + t * 12.0));
+    col = col + vec3<f32>(1.0, 0.95, 0.75) * exp(-spd * spd * 300.0)
+              * pour * churn * 0.5 * inStream;
   }
 
   // --- Foggy cold glass, wiped clear by the running drops ---
