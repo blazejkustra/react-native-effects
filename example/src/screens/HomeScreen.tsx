@@ -12,6 +12,14 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'snow-globe',
+    title: 'Snow Globe',
+    description: 'Shake your phone and the snow falls with real gravity',
+    screen: 'SnowGlobeExample',
+    color: '#8fb7e8',
+    image: require('../../assets/components/snow-globe.png'),
+  },
+  {
     id: 'particle-dispersion',
     title: 'Particle Dispersion',
     description: 'Reveal the subject — the background blows away as dust',
