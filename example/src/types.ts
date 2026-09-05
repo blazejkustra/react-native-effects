@@ -38,6 +38,7 @@ export type RootStackParamList = {
   ParticleDispersionExample: undefined;
   FoamLabExample: undefined;
   SnowGlobeExample: undefined;
+  Magic8BallExample: undefined;
 };
 
 export type HomeScreenNavigationProp =

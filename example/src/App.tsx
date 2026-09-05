@@ -38,6 +38,7 @@ import BirthdayCandleScreen from './screens/BirthdayCandleScreen';
 import ParticleDispersionScreen from './screens/ParticleDispersionScreen';
 import FoamLabScreen from './screens/FoamLabScreen';
 import SnowGlobeScreen from './screens/SnowGlobeScreen';
+import Magic8BallScreen from './screens/Magic8BallScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -131,6 +132,7 @@ export default function App() {
           />
           <Stack.Screen name="FoamLabExample" component={FoamLabScreen} />
           <Stack.Screen name="SnowGlobeExample" component={SnowGlobeScreen} />
+          <Stack.Screen name="Magic8BallExample" component={Magic8BallScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
