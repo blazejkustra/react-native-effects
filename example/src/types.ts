@@ -40,6 +40,7 @@ export type RootStackParamList = {
   VoiceDeleteExample: undefined;
   SnowGlobeExample: undefined;
   Magic8BallExample: undefined;
+  CigaretteExample: undefined;
 };
 
 export type HomeScreenNavigationProp =
