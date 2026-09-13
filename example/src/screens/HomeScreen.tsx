@@ -28,14 +28,6 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     image: require('../../assets/components/magic-8-ball.png'),
   },
   {
-    id: 'snow-globe',
-    title: 'Snow Globe',
-    description: 'Shake your phone and the snow falls with real gravity',
-    screen: 'SnowGlobeExample',
-    color: '#8fb7e8',
-    image: require('../../assets/components/snow-globe.png'),
-  },
-  {
     id: 'voice-delete',
     title: 'Voice Delete',
     description: 'Instagram DM — delete a voice message',
