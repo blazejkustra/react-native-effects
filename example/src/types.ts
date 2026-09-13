@@ -37,6 +37,9 @@ export type RootStackParamList = {
   BirthdayCandleExample: undefined;
   ParticleDispersionExample: undefined;
   FoamLabExample: undefined;
+  VoiceDeleteExample: undefined;
+  SnowGlobeExample: undefined;
+  Magic8BallExample: undefined;
   CigaretteExample: undefined;
 };
 
