@@ -28,6 +28,14 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     image: require('../../assets/components/snow-globe.png'),
   },
   {
+    id: 'voice-delete',
+    title: 'Voice Delete',
+    description: 'Instagram DM — delete a voice message',
+    screen: 'VoiceDeleteExample',
+    color: '#4C49FA',
+    image: require('../../assets/components/voice-delete.png'),
+  },
+  {
     id: 'particle-dispersion',
     title: 'Particle Dispersion',
     description: 'Reveal the subject — the background blows away as dust',

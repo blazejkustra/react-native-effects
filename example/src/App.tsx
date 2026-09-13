@@ -37,6 +37,7 @@ import TelegramDissolveScreen from './screens/TelegramDissolveScreen';
 import BirthdayCandleScreen from './screens/BirthdayCandleScreen';
 import ParticleDispersionScreen from './screens/ParticleDispersionScreen';
 import FoamLabScreen from './screens/FoamLabScreen';
+import VoiceDeleteScreen from './screens/VoiceDeleteScreen';
 import SnowGlobeScreen from './screens/SnowGlobeScreen';
 import Magic8BallScreen from './screens/Magic8BallScreen';
 import type { RootStackParamList } from './types';
@@ -131,6 +132,10 @@ export default function App() {
             component={ParticleDispersionScreen}
           />
           <Stack.Screen name="FoamLabExample" component={FoamLabScreen} />
+          <Stack.Screen
+            name="VoiceDeleteExample"
+            component={VoiceDeleteScreen}
+          />
           <Stack.Screen name="SnowGlobeExample" component={SnowGlobeScreen} />
           <Stack.Screen name="Magic8BallExample" component={Magic8BallScreen} />
         </Stack.Navigator>
