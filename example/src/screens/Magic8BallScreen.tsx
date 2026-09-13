@@ -13,15 +13,15 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Header } from '../components/Header';
+import { BackButton } from '../components/BackButton';
 import Magic8Ball from '../components/magic8ball/Magic8Ball';
 import { useMagic8BallPhysics } from '../hooks/useMagic8BallPhysics';
 
 /** Ball radius as a fraction of the screen height, and of its width. */
 const RADIUS_H = 0.25;
-const RADIUS_W = 0.42;
+const RADIUS_W = 0.47;
 /** Where the ball's centre sits, in screen uv (y-up). */
-const CENTER_Y = 0.48;
+const CENTER_Y = 0.5;
 /** The window, in ball radii. */
 const WINDOW_R = 0.46;
 const WINDOW_Y = -0.04;
@@ -31,32 +31,56 @@ const WINDOW_Y = -0.04;
  * width falls away toward the bottom: the text has to live in the upper third,
  * where there is room for a phrase, and stay narrow enough not to poke out
  * through the sloping sides.
+ *
+ * TEXT_WIDTH is what makes that true, and it is deliberately narrower than the
+ * die's top edge. The box is a rectangle over a triangle, so it has to be cut
+ * to the width the triangle still has at the BOTTOM line of the block, not at
+ * the top — sized to the top edge, a second line runs out through both sloping
+ * sides. Nothing measures at runtime: the answers carry their own line breaks,
+ * and these four numbers are chosen so the longest of them fits.
  */
-const TEXT_WIDTH = 1.15;
-const TEXT_TOP = 0.34;
-const TEXT_HEIGHT = 0.42;
-const FONT_SCALE = 0.14;
+const TEXT_WIDTH = 0.84;
+const TEXT_TOP = 0.33;
+const TEXT_HEIGHT = 0.44;
+const FONT_SCALE = 0.165;
 
-/** The classic twenty, minus the duplicates. */
+/**
+ * The classic twenty, said short — and broken into lines HERE, by hand.
+ *
+ * Two constraints, and they fight. The answer is printed on a triangle that
+ * narrows as it goes down, so a line has room for about six characters at a
+ * size anyone can read. And React Native's own answer to that,
+ * `adjustsFontSizeToFit`, does not wrap a phrase that is too wide — it shrinks
+ * it, past `minimumFontScale`, so NO CHANCE came out two thirds the size of
+ * LIKELY and the screen looked broken. It also hides the real capacity from
+ * you while you tune, because everything appears to fit.
+ *
+ * So the line breaks are data. Every line below is six characters or fewer,
+ * every answer is at most two lines, and the font is fixed: nothing measures,
+ * nothing shrinks, and every answer is exactly as big as every other one.
+ * Adding an answer means counting its characters.
+ */
 const ANSWERS = [
-  'IT IS CERTAIN',
-  'WITHOUT A DOUBT',
-  'YES — DEFINITELY',
-  'YOU MAY RELY ON IT',
-  'MOST LIKELY',
-  'OUTLOOK GOOD',
   'YES',
-  'SIGNS POINT TO YES',
-  'REPLY HAZY, TRY AGAIN',
-  'ASK AGAIN LATER',
-  'BETTER NOT TELL YOU NOW',
-  'CANNOT PREDICT NOW',
-  'CONCENTRATE AND ASK AGAIN',
-  "DON'T COUNT ON IT",
-  'MY REPLY IS NO',
-  'MY SOURCES SAY NO',
-  'OUTLOOK NOT SO GOOD',
-  'VERY DOUBTFUL',
+  'YES\nINDEED',
+  'NO\nDOUBT',
+  'FOR\nSURE',
+  'OF\nCOURSE',
+  'LIKELY',
+  'LOOKS\nGOOD',
+  'GOOD\nSIGNS',
+  'REPLY\nHAZY',
+  'ASK\nLATER',
+  'ASK\nAGAIN',
+  "CAN'T\nSAY",
+  'NO',
+  'NOT\nNOW',
+  'DOUBT\nIT',
+  'NO\nCHANCE',
+  'FORGET\nIT',
+  'NO WAY',
+  'BAD\nSIGNS',
+  'NOT\nSURE',
 ];
 
 /**
@@ -86,9 +110,8 @@ export default function Magic8BallScreen() {
     setAnswer(others[Math.floor(Math.random() * others.length)] as string);
   }, []);
 
-  const { paramsSynchronizable, shake, rise, drift } = useMagic8BallPhysics({
-    onSubmerged,
-  });
+  const { paramsSynchronizable, shake, rise, drift, spinDeg } =
+    useMagic8BallPhysics({ onSubmerged });
 
   // Radius is a fraction of the height, but a short wide screen has to cap it
   // on width or the ball runs off the sides.
@@ -112,6 +135,9 @@ export default function Magic8BallScreen() {
       wrPt,
       centerX: 0.5 * width,
       centerY: (1 - (CENTER_Y + WINDOW_Y * radius)) * height,
+      // From the middle of the text box down to the middle of the window,
+      // which is the point the shader turns and scales the die about.
+      dieOriginDy: (TEXT_TOP - TEXT_HEIGHT / 2) * wrPt,
     };
   }, [radius, width, height]);
 
@@ -120,11 +146,18 @@ export default function Magic8BallScreen() {
     return {
       // Deep in the ink the shader shows a blurred triangle and no text at
       // all; text only makes sense once the die is close to the glass.
-      opacity: interpolate(r, [0.45, 0.92], [0, 1], Extrapolation.CLAMP),
+      opacity: interpolate(r, [0.55, 0.95], [0, 1], Extrapolation.CLAMP),
       transform: [
         { translateX: drift.value.x * geom.wrPt },
         { translateY: drift.value.y * geom.wrPt },
-        { scale: interpolate(r, [0.45, 1], [0.76, 1], Extrapolation.CLAMP) },
+        // The shader turns and scales the die about the middle of the window,
+        // not about this box — so step the origin down there, turn, scale, and
+        // step back. Rotating about the text's own centre instead would slide
+        // the words off the face they are printed on.
+        { translateY: geom.dieOriginDy },
+        { rotate: `${spinDeg.value}deg` },
+        { scale: interpolate(r, [0.55, 1], [0.92, 1], Extrapolation.CLAMP) },
+        { translateY: -geom.dieOriginDy },
       ],
     };
   });
@@ -159,9 +192,8 @@ export default function Magic8BallScreen() {
               lineHeight: FONT_SCALE * geom.wrPt * 1.15,
             },
           ]}
-          numberOfLines={4}
-          adjustsFontSizeToFit
-          minimumFontScale={0.6}
+          numberOfLines={2}
+          allowFontScaling={false}
         >
           {answer}
         </Text>
@@ -177,11 +209,14 @@ export default function Magic8BallScreen() {
         accessibilityLabel="Shake the ball"
       />
 
-      <Header
-        title="Magic 8-ball"
-        subtitle="Shake the phone — the answer floats up through the ink"
-        transparent
-      />
+      {/* No title block: the object is the screen, and a heading over it
+          only competes with the ball for the same dark space. */}
+      <View
+        style={[styles.backWrap, { top: insets.top + 6 }]}
+        pointerEvents="box-none"
+      >
+        <BackButton />
+      </View>
       <Text style={[styles.caption, { bottom: insets.bottom + 28, width }]}>
         Ask something, then shake it
       </Text>
@@ -194,6 +229,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#08090c',
   },
+  backWrap: {
+    position: 'absolute',
+    left: 22,
+    zIndex: 100,
+  },
   answerBox: {
     position: 'absolute',
     alignItems: 'center',
@@ -204,6 +244,11 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 0.6,
     textAlign: 'center',
+    // The lettering on a real answer die is raised, and the shader's key comes
+    // from up and to the left — so it casts down and to the right.
+    textShadowColor: 'rgba(2, 6, 26, 0.85)',
+    textShadowOffset: { width: 1, height: 1.2 },
+    textShadowRadius: 1.5,
   },
   caption: {
     position: 'absolute',

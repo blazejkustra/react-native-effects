@@ -27,39 +27,85 @@ const CHURN_RELEASE = 1.45;
 
 /** Churn that knocks a settled answer back off the window. */
 const SHAKE_TRIGGER = 0.3;
-/** Churn the fluid has to fall below before the die can float back up. */
-const CALM = 0.12;
+/**
+ * Churn the fluid has to fall below before the die can float back up. Set by
+ * pacing, not by physics: the fluid is still visibly moving at 0.2, and
+ * waiting for it to go properly still leaves three seconds of staring at murk.
+ */
+const CALM = 0.2;
 
 /** How fast a churning fluid drags the die back down, in rise units per second. */
-const SINK_RATE = 2.4;
+const SINK_RATE = 1.5;
 
 /**
- * Buoyancy. The die is lighter than the fluid, so it accelerates up and then
- * bumps the glass — a light damping leaves one visible bounce, which is the
- * detail that reads as "something floated up and touched the window".
+ * Buoyancy: a CONSTANT push, against linear drag — not a spring pulling the
+ * die toward the window.
+ *
+ * This is the difference between the answer floating up and the answer popping
+ * up. A spring is slowest where it starts and fastest where it arrives, so it
+ * covers the whole window in the last third of a second however soft you make
+ * it; softening it only adds dead time at the bottom. A light object in a
+ * viscous fluid instead reaches terminal velocity (BUOYANCY / RISE_DRAG) in
+ * the first few frames and then simply travels, at one steady speed, for as
+ * long as the trip takes. Currently about 0.85 window radii per second, so the
+ * climb reads over roughly a second and a half.
  */
-const RISE_STIFFNESS = 26;
-const RISE_DAMPING = 5.4;
+const BUOYANCY = 2.2;
+const RISE_DRAG = 2.6;
 /** Fraction of the speed kept when it hits the glass. */
 const GLASS_BOUNCE = 0.45;
+/** Under this arrival speed it has nothing left to bounce with, so it rests. */
+const GLASS_SETTLE = 0.18;
 
 /** Sideways wobble as it rises: a soft spring, kicked once per trip. */
 const SWAY_STIFFNESS = 30;
 const SWAY_DAMPING = 3.2;
 const SWAY_KICK = 2.1;
 
+/**
+ * How far off square the die is when it starts its climb (rad), and the spring
+ * that turns it back. A die arriving already flat to the window is the single
+ * most artificial thing this screen can do: it has been tumbling in the fluid,
+ * so it has to come up turned and rotate the last few degrees into place.
+ *
+ * Under-damped on purpose — it overshoots square by a couple of degrees and
+ * comes back, which is what a face settling against glass in a thick fluid
+ * does. Softer than the rise spring, so the turn is still finishing after the
+ * die has touched: two motions ending together read as one scripted move.
+ */
+const SPIN_MIN = 0.34;
+const SPIN_MAX = 0.72;
+const SPIN_STIFFNESS = 5;
+const SPIN_DAMPING = 1.9;
+
+/**
+ * A second, much softer spring that carries the die's ORIENTATION to world-up.
+ *
+ * It cannot be the tilt spring. That one is stiff because it IS the hand — the
+ * rise axis has to answer the phone immediately — but tilt comes from atan2 of
+ * a raw accelerometer, which carries a degree or so of noise plus whatever the
+ * hand is doing. Rotating the die (and the answer printed on it) straight off
+ * that makes the text tremble while the phone is held still.
+ *
+ * Half a second to follow, well damped: noise never survives it, and a die
+ * that heavy in a fluid that thick should lag the phone anyway.
+ */
+const ORIENT_STIFFNESS = 20;
+const ORIENT_DAMPING = 7;
+
 /** Swirl phase rate at rest and fully churned; amplitude is `churn`. */
 const SWIRL_REST = 0.11;
 const SWIRL_CHURNED = 2.2;
-/** Bubble rise rate, in window radii per second. */
-const BUBBLE_REST = 0.05;
-const BUBBLE_CHURNED = 0.85;
 
 /** Only push a new value at the UI thread once it has moved this far. */
 const SYNC_EPSILON = 0.004;
 
-/** Where the die sits when it is still deep in the murk, in window radii. */
-const SUBMERGED_DEPTH = 0.55;
+/**
+ * Where the die sits when it is still deep in the murk, in window radii.
+ * Hard-coded to the same number in the shader, which draws the die this text
+ * sits on — change one and you change both.
+ */
+const SUBMERGED_DEPTH = 1.2;
 /** How far the sway pushes it off the rise axis, in window radii. */
 const SWAY_REACH = 0.1;
 
@@ -87,9 +133,14 @@ type BallSim = {
   /** Signed sideways wobble of the die, in window radii-ish. */
   sway: number;
   swayVel: number;
-  /** Integrated phases — never time x a speed that varies at runtime. */
+  /** How far the die is turned off square (rad), and how fast. */
+  spin: number;
+  spinVel: number;
+  /** The die's heading, lagging world-up (rad). */
+  orient: number;
+  orientVel: number;
+  /** Integrated phase — never time x a speed that varies at runtime. */
   swirlPhase: number;
-  bubblePhase: number;
 };
 
 export type Magic8BallPhysics = {
@@ -106,6 +157,12 @@ export type Magic8BallPhysics = {
    * transform.
    */
   drift: SharedValue<{ x: number; y: number }>;
+  /**
+   * How the die is turned, in DEGREES and in the screen's sense (positive =
+   * clockwise), so the answer text turns with the face it is printed on. Both
+   * the world-up alignment and the spin left over from the climb.
+   */
+  spinDeg: SharedValue<number>;
 };
 
 /**
@@ -120,7 +177,7 @@ export type Magic8BallPhysics = {
  *
  * Writes the live channel every frame:
  * `u.live = (tilt rad, churn 0..1, rise 0..1, swirlPhase)`,
- * `u.liveData[0] = (bubblePhase, sway, 0, 0)`.
+ * `u.liveData[0] = (sway, die rotation rad, 0, 0)`.
  */
 export function useMagic8BallPhysics({
   onSubmerged,
@@ -136,6 +193,7 @@ export function useMagic8BallPhysics({
 
   const rise = useSharedValue(1);
   const drift = useSharedValue({ x: 0, y: 0 });
+  const spinDeg = useSharedValue(0);
 
   // Held in a ref so the simulation effect never re-runs when the screen
   // re-renders with a new answer.
@@ -158,8 +216,11 @@ export function useMagic8BallPhysics({
       riseVel: 0,
       sway: 0,
       swayVel: 0,
+      spin: 0,
+      spinVel: 0,
+      orient: 0,
+      orientVel: 0,
       swirlPhase: 0,
-      bubblePhase: 0,
     };
   }
 
@@ -246,6 +307,8 @@ export function useMagic8BallPhysics({
           rise: s.rise,
           riseVel: s.riseVel,
           sway: s.sway,
+          spin: s.spin,
+          orient: s.orient,
           jerk: s.jerk,
           kick: s.kick,
         };
@@ -278,6 +341,7 @@ export function useMagic8BallPhysics({
     let syncedRise = -1;
     let syncedX = Number.NaN;
     let syncedY = Number.NaN;
+    let syncedSpin = Number.NaN;
 
     const step = (now: number) => {
       const s = simRef.current as BallSim;
@@ -320,23 +384,26 @@ export function useMagic8BallPhysics({
           s.phase = 'rising';
           s.riseVel = 0;
           s.swayVel = (Math.random() * 2 - 1) * SWAY_KICK;
+          // Which way it is turned is as random as which answer came up.
+          s.spin =
+            (Math.random() < 0.5 ? -1 : 1) *
+            (SPIN_MIN + Math.random() * (SPIN_MAX - SPIN_MIN));
+          s.spinVel = 0;
         }
       } else if (s.phase === 'rising') {
-        s.riseVel += (1 - s.rise) * RISE_STIFFNESS * dt;
-        s.riseVel -= s.riseVel * RISE_DAMPING * dt;
+        s.riseVel += BUOYANCY * dt;
+        s.riseVel -= s.riseVel * RISE_DRAG * dt;
         s.rise += s.riseVel * dt;
-        if (s.rise > 1) {
+        if (s.rise >= 1) {
           // It has met the glass; it cannot go further, and most of the
           // energy goes into the fluid rather than back into the die.
           s.rise = 1;
-          if (s.riseVel > 0) {
+          if (s.riseVel > GLASS_SETTLE) {
             s.riseVel = -s.riseVel * GLASS_BOUNCE;
+          } else {
+            s.riseVel = 0;
+            s.phase = 'settled';
           }
-        }
-        if (Math.abs(1 - s.rise) < 0.004 && Math.abs(s.riseVel) < 0.03) {
-          s.rise = 1;
-          s.riseVel = 0;
-          s.phase = 'settled';
         }
       }
 
@@ -344,18 +411,26 @@ export function useMagic8BallPhysics({
       s.swayVel -= s.swayVel * SWAY_DAMPING * dt;
       s.sway += s.swayVel * dt;
 
+      s.spinVel += (0 - s.spin) * SPIN_STIFFNESS * dt;
+      s.spinVel -= s.spinVel * SPIN_DAMPING * dt;
+      s.spin += s.spinVel * dt;
+
+      s.orientVel += (s.tilt - s.orient) * ORIENT_STIFFNESS * dt;
+      s.orientVel -= s.orientVel * ORIENT_DAMPING * dt;
+      s.orient += s.orientVel * dt;
+
       s.swirlPhase +=
         dt * (SWIRL_REST + (SWIRL_CHURNED - SWIRL_REST) * s.churn);
-      s.bubblePhase +=
-        dt * (BUBBLE_REST + (BUBBLE_CHURNED - BUBBLE_REST) * s.churn);
 
       setParamsSynchronizable(
         s.tilt,
         s.churn,
         s.rise,
         s.swirlPhase,
-        s.bubblePhase,
         s.sway,
+        // One slot carries the die's whole rotation: the heading it is settling
+        // to, plus the spin the climb left behind.
+        s.spin + s.orient,
         0,
         0
       );
@@ -368,6 +443,15 @@ export function useMagic8BallPhysics({
         rise.value = s.rise;
         syncedRise = s.rise;
       }
+      // The text is printed on the die, so it takes the die's whole rotation:
+      // world-up alignment plus whatever spin the climb has left. uv rotates
+      // counter-clockwise, a transform clockwise.
+      const turn = s.spin + s.orient;
+      if (!(Math.abs(turn - syncedSpin) < SYNC_EPSILON)) {
+        syncedSpin = turn;
+        spinDeg.value = (-turn * 180) / Math.PI;
+      }
+
       const upX = -Math.sin(s.tilt);
       const upY = Math.cos(s.tilt);
       const depth = SUBMERGED_DEPTH * (1 - s.rise);
@@ -388,7 +472,7 @@ export function useMagic8BallPhysics({
 
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [setParamsSynchronizable, rise, drift]);
+  }, [setParamsSynchronizable, rise, drift, spinDeg]);
 
-  return { paramsSynchronizable, shake, rise, drift };
+  return { paramsSynchronizable, shake, rise, drift, spinDeg };
 }
