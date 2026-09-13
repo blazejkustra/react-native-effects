@@ -28,7 +28,7 @@ type DandelionProps = Omit<
 /**
  * A photographed dandelion clock whose seeds blow away.
  *
- * The head is cut into ~11pt cells; each cell over the head is one tuft.
+ * The head is cut into ~12pt cells; each cell over the head is one tuft.
  * While attached, the fragment simply shows the photo (leaning a few px into
  * the breath). Once the detached fraction passes a cell's place in the order
  * (downwind rim first, centre last), that patch of the photo lifts off: the
@@ -80,11 +80,11 @@ struct Uniforms {
 @group(0) @binding(2) var tex: texture_2d<f32>;
 
 const BANDS: f32 = 64.0;
-const CELL: f32 = 9.0;       // tuft grid, logical px
+const CELL: f32 = 12.0;      // tuft grid, logical px — a loose seed is a patch this size, so it reads as a parachute, not a speck
 const GATHER: i32 = 2;       // neighbourhood half-width in cells
-const TUFT: f32 = 0.6;       // nominal tuft radius, in cells — smaller than the grid, so tufts read as separate
+const TUFT: f32 = 0.65;      // nominal tuft radius, in cells — smaller than the grid, so tufts read as separate
 const SPREAD: f32 = 4.0;     // per-tuft random offset, logical px (well under GATHER*CELL)
-const DROP: f32 = 0.35;      // share of cells that simply vanish rather than fly
+const DROP: f32 = 0.3;       // share of cells that simply vanish rather than fly
 const LIFE: f32 = 4.4;       // seconds a loose seed stays visible
 const LIFT: f32 = 30.0;      // upward drift of a loose seed, logical px/s
 const KICK: f32 = 75.0;      // the breath that frees a seed also throws it: launch travel, logical px
@@ -141,19 +141,28 @@ fn baldAt(pp: vec2<f32>) -> vec3<f32> { return panelAt(pp, 1.0); }
 fn dataAt(pp: vec2<f32>) -> vec3<f32> { return panelAt(pp, 2.0); }
 
 // Where in the release order a point of the head sits, 0 (first to go) .. 1.
-// The downwind rim goes first and the near side last. On the real thing the
+// The downwind side goes first and the near side last. On the real thing the
 // near side lets go first and streams over the top — but this is a flat
 // photo, and a white seed crossing a white head is invisible until it is
 // spent, so a near-side-first order reads as "nothing happened". Letting the
-// far rim go first sends every seed straight off the silhouette into the sky.
-// The centre holds longest, and two octaves of noise keep the front ragged
-// rather than a clean bite.
+// far side go first sends every seed straight off the silhouette into the sky.
+//
+// The outer ring goes before the centre, but the ring, not the fringe: the
+// outermost wisps beyond ~0.9 R carry no tuft in the matte, so an order that
+// started right at the rim spent the first tenth of the breath stripping
+// nothing visible. The range is normalised over the cells that do carry a
+// tuft, so a gentle puff frees a few real seeds and the last of the energy
+// still has seeds left to take; the divisor keeps the analytic maximum of
+// raw (0.83, near side at 0.35 R with the noise at 1) under 1, since a cell
+// past 1 would never let go and its patch of photo would stay on the bald
+// head. Two octaves of noise keep the front ragged rather than a clean bite.
 fn headOrder(pp: vec2<f32>) -> f32 {
   let d = (pp - u.params0.zw) / u.params1.x;
-  let downwind = dot(d, WIND_DIR);
-  let rim = clamp(1.0 - length(d), 0.0, 1.0);
+  let downwind = clamp(dot(d, WIND_DIR), -1.0, 1.0);
+  let centre = 1.0 - smoothstep(0.35, 0.9, length(d));
   let n = 0.6 * vnoise(pp * 0.02) + 0.4 * vnoise(pp * 0.05 + 3.7);
-  return ((0.5 - 0.3 * downwind) + 0.14 * rim + 0.14 * n - 0.2) / 0.88;
+  let raw = 0.52 * (0.5 - 0.5 * downwind) + 0.30 * centre + 0.18 * n;
+  return (raw - 0.14) / 0.72;
 }
 
 // (time, wind distance) at which band k let go; time < 0 while attached.
@@ -240,12 +249,18 @@ fn gatherClass(q: vec2<f32>, cls: f32, detached: f32, nowT: f32, windW: f32, s: 
       if (info.x < 0.0) {
         continue;
       }
-      let age = nowT - info.x - h.y * 0.25;
+      // The stagger is only for when a tuft appears and fades; its travel
+      // uses the band's own clock, the same one the inversion above used, so
+      // the tuft is where its fragment expects it. Staggering the travel too
+      // moved tufts ~10 px off the inverted field, out of the gather window,
+      // and they came back sliced along a cell boundary.
+      let bandAge = nowT - info.x;
+      let age = bandAge - h.y * 0.08;
       if (age <= 0.0 || age >= LIFE) {
         continue;
       }
       let dW = max(0.0, windW - info.y);
-      let pos = c + drift(c, age, dW, h, cls);
+      let pos = c + drift(c, bandAge, dW, h, cls);
       let rel = q - pos;
       let dist = length(rel);
       // Tufts come in sizes; a soft gaussian body with a faint starburst
@@ -259,7 +274,11 @@ fn gatherClass(q: vec2<f32>, cls: f32, detached: f32, nowT: f32, windW: f32, s: 
       // through the hair matte so only the white hairs fly.
       let spin = (h.x - 0.5) * age * 1.6;
       let spp = cpp + rot2(rel, spin) / s;
-      let hair = smoothstep(0.1, 0.85, dataAt(spp).g);
+      let pc = photoAt(spp);
+      // The matte lets grey between-hair pixels through at low weight; only
+      // the bright hairs fly, or a tuft carries a green-grey smudge with it.
+      let hair = smoothstep(0.1, 0.85, dataAt(spp).g)
+               * smoothstep(0.5, 0.7, dot(pc, vec3<f32>(0.3, 0.59, 0.11)));
       let ang = atan2(rel.y, rel.x);
       let spokes = 0.7 + 0.3 * cos(ang * 7.0 + h2.y * 6.2831 + spin * 3.0);
       let body = exp(-(dist * dist) / (0.55 * rr * rr));
@@ -269,7 +288,7 @@ fn gatherClass(q: vec2<f32>, cls: f32, detached: f32, nowT: f32, windW: f32, s: 
       if (w <= 0.003) {
         continue;
       }
-      let col = mix(photoAt(spp), vec3<f32>(0.97, 0.97, 0.94), 0.25);
+      let col = mix(pc, vec3<f32>(0.97, 0.97, 0.94), 0.15);
       acc = acc + vec4<f32>(col * w, w);
     }
   }
@@ -292,12 +311,22 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let headW = dataAt(pp).r;
 
   // The head leans a few px into the breath and sways on its stem; the
-  // background does not. Sample the photo shifted where the head is.
-  let shift = (WIND_DIR * lean + vec2<f32>(sway * 0.35, sway)) * headW / s;
+  // background does not. Sample the photo shifted where the head is. The
+  // weight is a smooth radial falloff, not the head mask: the mask edge is
+  // the jagged silhouette from Vision, and a displacement that jumps across
+  // it tears a sliver of photo along that edge on every gust.
+  let headSoft = 1.0 - smoothstep(0.85, 1.15, length((pp - u.params0.zw) / u.params1.x));
+  let shift = (WIND_DIR * lean + vec2<f32>(sway * 0.35, sway)) * headSoft / s;
   let photo = photoAt(pp - shift);
   let bald = baldAt(pp);
+  // The front is ragged where there is head to bite into. Outside the head
+  // the two panels differ only in tone (the inpaint against the real bokeh,
+  // out to where the fill feathers off), and a ragged front through that
+  // showed up as sharp-edged blotches of darker green; there the cross-fade
+  // is slow, spread over a good part of the strip, so it reads as nothing.
   let orderQ = headOrder(pp);
-  let attached = 1.0 - smoothstep(orderQ - FRONT_SOFT, orderQ + FRONT_SOFT, detached);
+  let soft = mix(0.25, FRONT_SOFT, smoothstep(0.0, 0.5, headW));
+  let attached = 1.0 - smoothstep(orderQ - soft, orderQ + soft, detached);
   var base = mix(bald, photo, attached);
 
   // Loose tufts, one gather per cell class.

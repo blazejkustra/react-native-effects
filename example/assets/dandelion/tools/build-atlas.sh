@@ -2,8 +2,11 @@
 # Builds dandelion-atlas.jpg from the source photo. Needs ImageMagick 7 and Xcode
 # (Vision, for the foreground mask). Run from this directory with the photo as $1:
 #
-#   curl -A 'rn-effects-example/1.0' -o source.jpg "<thumb.wikimedia.org url from the Commons API, iiurlwidth=2000>"
+#   curl -A 'rn-effects-example/1.0' -o source.jpg "<thumb.wikimedia.org url from the Commons API, iiurlwidth=3840>"
 #   sh build-atlas.sh source.jpg
+#
+# The committed atlas was built from the 3840x5120 thumb; the output is
+# byte-identical on a rebuild from that source.
 #
 # Photo: "Taraxacum seedhead Paslieres 2013-05-09 n01.jpg", Marie-Lan Nguyen,
 # CC BY 2.5, https://commons.wikimedia.org/wiki/File:Taraxacum_seedhead_Paslieres_2013-05-09_n01.jpg
@@ -56,8 +59,15 @@ magick "$T/satkey.png" "$T/lumkey.png" -compose Multiply -composite "$T/head.png
 #    the previous one reached — pulls the surrounding bokeh inward with its
 #    gradient instead of averaging it into one flat disc. Then the stem is
 #    extended up to the centre (it was hidden behind the seeds) and a small
-#    receptacle knob, the photo's own centre gone pale, sits on top.
-magick -size ${PW}x${PH} xc:black -fill white -draw "circle $CX,$CY $((CX + R + 22)),$CY" -blur 0x10 \
+#    receptacle sits on top. A bare receptacle is a pale pitted dome, so it is
+#    the photo's own centre with the hairs blurred away and shrunk down: the
+#    achene bases become the pits. Pasting the centre in at full size left a
+#    dandelion in miniature on the stem.
+# The fill reaches well past the disc and feathers out over ~50 px: the fringe
+# hairs run ~40 px beyond R, and a fill that stopped short of them pulled
+# their white into the estimate; a hard-edged fill, however far out, read as
+# a smooth pale disc set into the mottled bokeh.
+magick -size ${PW}x${PH} xc:black -fill white -draw "circle $CX,$CY $((CX + R + 70)),$CY" -blur 0x25 \
   \( "$T/stem.png" -negate \) -compose Multiply -composite -alpha off "$T/fill.png"
 # Masks must be plain grayscale: a stray alpha channel turns Multiply into a blend.
 magick "$T/fill.png" -negate -threshold 50% -alpha off "$T/known.png"
@@ -84,9 +94,15 @@ magick "$T/stem.png" -crop $((STEM_X1 - STEM_X0))x1+${STEM_X0}+$((STEM_TOP + 20)
 magick "$T/stemseg.png" "$T/stemseg_m.png" -alpha off -compose CopyOpacity -composite "$T/stemseg_a.png"
 magick "$T/bald.png" "$T/stemseg_a.png" -geometry +${STEM_X0}+$((CY - 12)) -compose Over -composite "$T/bald.png"
 KR=$((R / 7))
-magick -size ${PW}x${PH} xc:black -fill white -draw "circle $CX,$CY $((CX + KR)),$CY" -blur 0x3 "$T/knobmask.png"
-magick "$T/canvas.png" -modulate 112,38,100 "$T/knobmask.png" -alpha off -compose CopyOpacity -composite "$T/knob_a.png"
-magick "$T/bald.png" "$T/knob_a.png" -compose Over -composite "$T/bald.png"
+SRC_R=$((R / 3))
+magick "$T/canvas.png" -crop $((2 * SRC_R))x$((2 * SRC_R))+$((CX - SRC_R))+$((CY - SRC_R)) +repage \
+  -blur 0x6 -resize $((2 * KR))x$((2 * KR))! -modulate 118,45,100 "$T/knob.png"
+# Dome shading: bright at the crown, falling off toward the rim.
+magick -size $((2 * KR))x$((2 * KR)) radial-gradient:white-gray55 "$T/dome.png"
+magick "$T/knob.png" "$T/dome.png" -compose Multiply -composite "$T/knob.png"
+magick -size $((2 * KR))x$((2 * KR)) xc:black -fill white -draw "circle $KR,$KR $((2 * KR - 2)),$KR" -blur 0x2 "$T/knobmask.png"
+magick "$T/knob.png" "$T/knobmask.png" -alpha off -compose CopyOpacity -composite "$T/knob_a.png"
+magick "$T/bald.png" "$T/knob_a.png" -geometry +$((CX - KR))+$((CY - KR)) -compose Over -composite "$T/bald.png"
 
 # 5. Data panel and atlas.
 magick "$T/head.png" "$T/hair.png" -size ${PW}x${PH} xc:black -channel RGB -combine "$T/data.png"

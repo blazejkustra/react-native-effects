@@ -111,7 +111,7 @@ function makeSim(): DandelionSim {
  * the wind distance since its own release.
  *
  * Writes the live channel every frame:
- * `u.live = (detached 0..1, gust 0..1, time s, wind px)`,
+ * `u.live = (detached 0..1, 0, time s, wind px)`,
  * `u.liveData[0] = (lean px, sway px, 0, 0)`,
  * `u.liveData[1 + k/2]` = `(time, wind)` of bands `k` and `k+1`, -1 while attached.
  */
@@ -227,8 +227,14 @@ export function useDandelionPhysics(): {
       }
       // The front sweeps once a wave's worth of energy is banked (or the head is
       // nearly gone), and keeps sweeping until it has caught the energy up.
+      // Whatever is banked below a wave when the breath stops is released
+      // then, so a puff ends with its last few seeds letting go rather than
+      // holding on until the next one.
       const behind = s.energy - s.detached;
-      if (behind > 0 && (s.sweeping || behind >= WAVE || s.energy >= 1)) {
+      if (
+        behind > 0 &&
+        (s.sweeping || behind >= WAVE || s.energy >= 1 || push === 0)
+      ) {
         s.sweeping = true;
         s.detached = Math.min(s.energy, s.detached + FRONT_RATE * dt);
         if (s.detached >= s.energy) {
@@ -254,7 +260,7 @@ export function useDandelionPhysics(): {
 
       const f = frame.current;
       f[0] = s.detached;
-      f[1] = s.gust;
+      f[1] = 0; // spare
       f[2] = s.time;
       f[3] = s.wind;
       f[4] = s.lean;
