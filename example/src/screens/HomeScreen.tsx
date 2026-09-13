@@ -12,6 +12,22 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'magic-8-ball',
+    title: 'Magic 8-ball',
+    description: 'Shake your phone and the answer floats up through the ink',
+    screen: 'Magic8BallExample',
+    color: '#2b3f8f',
+    image: require('../../assets/components/magic-8-ball.png'),
+  },
+  {
+    id: 'snow-globe',
+    title: 'Snow Globe',
+    description: 'Shake your phone and the snow falls with real gravity',
+    screen: 'SnowGlobeExample',
+    color: '#8fb7e8',
+    image: require('../../assets/components/snow-globe.png'),
+  },
+  {
     id: 'voice-delete',
     title: 'Voice Delete',
     description: 'Instagram DM — delete a voice message',
