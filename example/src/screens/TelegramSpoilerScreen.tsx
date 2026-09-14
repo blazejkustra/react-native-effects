@@ -80,7 +80,7 @@ const MESSAGES: Message[] = [
       'not for sale. ',
       {
         spoiler:
-          'we asked ourselves, we laughed, then shipped another reanimated release instead',
+          'someone tried once. we laughed and shipped another reanimated release instead',
       },
     ],
     time: '10:43',
