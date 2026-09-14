@@ -59,7 +59,7 @@ import {
 // button posts the next line with that effect and Kacper answers a beat
 // later. Long-press the send arrow for the full effects sheet.
 
-const CONTACT = 'Kacper Kapuściak';
+const CONTACT = 'Kacper';
 const STARTED = '12 Sep 2026 at 09:41';
 // Header: avatar + gap + name pill, measured from the reference.
 const HEADER_H = 60 + 6 + 30;

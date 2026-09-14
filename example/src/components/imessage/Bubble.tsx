@@ -1,6 +1,7 @@
 import { useCallback, useRef, type ComponentRef } from 'react';
 import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
+import Animated, { Easing, withTiming } from 'react-native-reanimated';
 import type { BubbleTarget, Message, Rect } from './types';
 
 // Colours sampled from a real Messages thread in the dark appearance.
@@ -12,6 +13,26 @@ export const IM_CHROME = '#181818';
 const RADIUS = 20;
 
 type ViewHandle = ComponentRef<typeof View>;
+
+// Incoming bubbles ease in from their tail corner, the way Messages lands a
+// reply: a short fade with a slight rise and grow, no overshoot.
+const EASE_OUT = Easing.out(Easing.cubic);
+const popIn = () => {
+  'worklet';
+  return {
+    initialValues: {
+      opacity: 0,
+      transform: [{ scale: 0.94 }, { translateY: 8 }],
+    },
+    animations: {
+      opacity: withTiming(1, { duration: 200, easing: EASE_OUT }),
+      transform: [
+        { scale: withTiming(1, { duration: 260, easing: EASE_OUT }) },
+        { translateY: withTiming(0, { duration: 260, easing: EASE_OUT }) },
+      ],
+    },
+  };
+};
 
 // Layout settles a beat after the row mounts (the thread scrolls to the end);
 // measuring before that reports where the bubble was, not where it is.
@@ -78,9 +99,12 @@ export default function Bubble({
   );
 
   const bg = mine ? IM_BLUE : IM_GREY;
+  // Only replies animate: an outgoing bubble is measured and snapshotted for
+  // its effect right after layout, and a transform in flight would skew that.
+  const Wrap = mine ? View : Animated.View;
   return (
     <View style={[styles.row, mine ? styles.rowMine : styles.rowThem]}>
-      <View style={styles.wrap}>
+      <Wrap style={styles.wrap} entering={mine ? undefined : popIn}>
         {tail && (
           <>
             <View
@@ -103,7 +127,7 @@ export default function Bubble({
         >
           <Text style={styles.text}>{msg.text}</Text>
         </View>
-      </View>
+      </Wrap>
     </View>
   );
 }
@@ -123,6 +147,7 @@ const styles = StyleSheet.create({
   wrap: {
     // Messages caps a bubble at about two thirds of the screen.
     maxWidth: '68%',
+    transformOrigin: 'left bottom',
   },
   bubble: {
     borderRadius: RADIUS,

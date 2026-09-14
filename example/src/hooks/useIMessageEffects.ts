@@ -23,11 +23,11 @@ const STEPS: Step[] = [
   {
     effect: 'echo',
     me: 'back to native? from what, react NATIVE?',
-    reply: 'they let the robots rewrite the app twice',
+    reply: 'they let the agents rewrite the app twice',
   },
   {
     effect: 'lasers',
-    me: 'we deleted the bridge. they added two codebases and a robot',
+    me: 'we deleted the bridge. they added two codebases and an agent',
     reply: 'they rebuilt shop in 12 weeks though',
   },
   {
@@ -50,8 +50,10 @@ const STEPS: Step[] = [
 /** The effects in the order the demo means them to be used. */
 export const DEMO_ORDER: ScreenEffectId[] = STEPS.map((s) => s.effect);
 
-/** How long Kacper takes to type his reply. */
-export const REPLY_DELAY_MS = 1000;
+/** The beat between the effect ending and Kacper's reply landing. */
+export const REPLY_DELAY_MS = 450;
+/** If an effect never reports finishing, reply anyway after this long. */
+const REPLY_FALLBACK_MS = 8000;
 
 /** What a button or the debug hook sends once the script has run out. */
 export const DEFAULT_TEXT: Record<EffectId, string> = {
@@ -109,7 +111,13 @@ function waitForTarget(
   });
 }
 
+// Message ids carry the mount time so that a Fast Refresh, which re-evaluates
+// this module, cannot hand out an id that a bubble already holds.
 let nextId = 1;
+const MOUNT = Date.now().toString(36);
+function newId() {
+  return `m${MOUNT}-${nextId++}`;
+}
 function stamp() {
   const d = new Date();
   const h = d.getHours() % 12 || 12;
@@ -131,71 +139,103 @@ export function useIMessageEffects() {
   // Steps already spoken; a second press of the same effect falls back to
   // the default line and gets no reply.
   const spoken = useRef(new Set<ScreenEffectId>());
-  const replyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // True while Kacper is "typing": presses are ignored so a quick run of taps
-  // cannot post three lines before his first answer lands.
+  // Kacper's next line, held until the effect has finished playing. While it
+  // is held, presses are ignored so a quick run of taps cannot post three
+  // lines before his first answer lands.
+  const pendingReply = useRef<{
+    text: string;
+    timer: ReturnType<typeof setTimeout>;
+  } | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const send = useCallback((effect: EffectId, text?: string) => {
-    if (replyTimer.current !== null) {
-      return null;
+  const deliverReply = useCallback(() => {
+    const pending = pendingReply.current;
+    if (!pending) {
+      return;
     }
-    let body = text?.trim();
-    let reply: string | null = null;
-    if (!body) {
-      const step = STEPS.find((st) => st.effect === effect);
-      if (step && !spoken.current.has(step.effect)) {
-        spoken.current.add(step.effect);
-        body = step.me;
-        reply = step.reply;
-      } else {
-        body = DEFAULT_TEXT[effect];
-      }
-    }
-    if (!body) {
-      return null;
-    }
-    const id = `m${nextId++}`;
-    const msg: Message = { id, from: 'me', text: body, effect, time: stamp() };
-    setMessages((prev) => [...prev, msg]);
-    if (isScreenEffect(effect)) {
-      const startedAt = Date.now();
-      waitForTarget(id, effect === 'echo').then(() => {
-        const wait = Math.max(
-          0,
-          EFFECT_START_DELAY_MS - (Date.now() - startedAt)
-        );
-        setTimeout(() => {
-          playKey.current += 1;
-          setPlaying({ key: playKey.current, effect, messageId: id });
-        }, wait);
-      });
-    }
-    // Kacper answers a beat later; nothing else can be sent until he has.
-    if (reply !== null) {
-      const line = reply;
-      setBusy(true);
-      replyTimer.current = setTimeout(() => {
-        replyTimer.current = null;
-        setBusy(false);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `m${nextId++}`,
-            from: 'them',
-            text: line,
-            effect: 'none',
-            time: stamp(),
-          },
-        ]);
-      }, REPLY_DELAY_MS);
-    }
-    return id;
+    clearTimeout(pending.timer);
+    pendingReply.current = null;
+    setBusy(false);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: newId(),
+        from: 'them',
+        text: pending.text,
+        effect: 'none',
+        time: stamp(),
+      },
+    ]);
   }, []);
 
-  const finishPlaying = useCallback((key: number) => {
-    setPlaying((p) => (p && p.key === key ? null : p));
-  }, []);
+  const send = useCallback(
+    (effect: EffectId, text?: string) => {
+      if (pendingReply.current !== null) {
+        return null;
+      }
+      let body = text?.trim();
+      let reply: string | null = null;
+      if (!body) {
+        const step = STEPS.find((st) => st.effect === effect);
+        if (step && !spoken.current.has(step.effect)) {
+          spoken.current.add(step.effect);
+          body = step.me;
+          reply = step.reply;
+        } else {
+          body = DEFAULT_TEXT[effect];
+        }
+      }
+      if (!body) {
+        return null;
+      }
+      const id = newId();
+      const msg: Message = {
+        id,
+        from: 'me',
+        text: body,
+        effect,
+        time: stamp(),
+      };
+      setMessages((prev) => [...prev, msg]);
+      if (isScreenEffect(effect)) {
+        const startedAt = Date.now();
+        waitForTarget(id, effect === 'echo').then(() => {
+          const wait = Math.max(
+            0,
+            EFFECT_START_DELAY_MS - (Date.now() - startedAt)
+          );
+          setTimeout(() => {
+            playKey.current += 1;
+            setPlaying({ key: playKey.current, effect, messageId: id });
+          }, wait);
+        });
+      }
+      // Kacper waits for the effect to end (finishPlaying schedules the
+      // delivery), with a fallback in case it never reports back.
+      if (reply !== null) {
+        setBusy(true);
+        pendingReply.current = {
+          text: reply,
+          timer: setTimeout(deliverReply, REPLY_FALLBACK_MS),
+        };
+        if (!isScreenEffect(effect)) {
+          setTimeout(deliverReply, REPLY_DELAY_MS);
+        }
+      }
+      return id;
+    },
+    [deliverReply]
+  );
+
+  const finishPlaying = useCallback(
+    (key: number) => {
+      setPlaying((p) => (p && p.key === key ? null : p));
+      if (pendingReply.current !== null) {
+        setTimeout(deliverReply, REPLY_DELAY_MS);
+      }
+    },
+    [deliverReply]
+  );
 
   const getTarget = useCallback((id: string) => targets.get(id) ?? null, []);
 
@@ -203,8 +243,8 @@ export function useIMessageEffects() {
     () => () => {
       targets.clear();
       targetWaiters.clear();
-      if (replyTimer.current !== null) {
-        clearTimeout(replyTimer.current);
+      if (pendingReply.current !== null) {
+        clearTimeout(pendingReply.current.timer);
       }
     },
     []
