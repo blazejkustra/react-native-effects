@@ -15,8 +15,8 @@ type Props = {
 
 /**
  * iMessage's Echo: the bubble is copied a couple of dozen times and the
- * copies burst out of it along a loose spiral, shrinking and fading as they
- * go, while the real bubble stays put. The copies are the bubble's own
+ * copies swirl out of it across the whole screen, shrinking a little and
+ * fading at the end of their flight, while the real bubble stays put. The copies are the bubble's own
  * pixels: for every fragment each copy's transform is undone and the
  * snapshot sampled where it lands inside the rect.
  */
@@ -51,9 +51,8 @@ struct Uniforms {
 
 const COPIES: i32 = 22;
 const STAGGER: f32 = 0.38;     // share of the play spent launching copies
-const GOLDEN: f32 = 2.39996;   // radians between neighbouring copies
-const NEAR: f32 = 110.0;       // shortest flight, logical px
-const FAR: f32 = 300.0;        // longest flight, logical px
+const GOLDEN: f32 = 2.39996;   // sunflower angle between neighbouring slots
+const SWIRL: f32 = 1.2;        // radians a copy swings about the bubble in flight
 
 fn hash21(p: vec2<f32>) -> f32 {
   var p3 = fract(vec3<f32>(p.xyx) * 0.1031);
@@ -69,7 +68,8 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   }
   // Window logical px, y-down: the space the bubble rect was measured in.
   let uv = ndc * 0.5 + 0.5;
-  let q = vec2<f32>(uv.x, 1.0 - uv.y) * u.resolution.xy / u.resolution.w;
+  let res = u.resolution.xy / u.resolution.w;
+  let q = vec2<f32>(uv.x, 1.0 - uv.y) * res;
 
   let origin = u.params0.xy;
   let size = u.params0.zw;
@@ -79,7 +79,6 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   var a = 0.0;
   for (var i = 0; i < COPIES; i = i + 1) {
     let fi = f32(i);
-    let h1 = hash21(vec2<f32>(fi, 1.3));
     let h2 = hash21(vec2<f32>(fi, 7.9));
     // Copies leave one after another, then all fly on the same clock.
     let ti = clamp((p - STAGGER * fi / f32(COPIES)) / (1.0 - STAGGER), 0.0, 1.0);
@@ -87,15 +86,26 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
       continue;
     }
     let ease = 1.0 - pow(1.0 - ti, 2.4);
-    let ang = fi * GOLDEN + ease * 0.9;
-    let dir = vec2<f32>(cos(ang), sin(ang));
-    let flight = mix(NEAR, FAR, h1) * ease;
-    let scale = mix(1.0, 0.28, ease);
-    let alpha = pow(1.0 - ti, 1.5);
+    // Each copy owns a slot in a sunflower laid over the whole screen, so
+    // the swarm fills it evenly the way iMessage does, and swings into its
+    // slot about the bubble rather than flying straight, so the flight
+    // reads as a spiral.
+    let slot = vec2<f32>(cos(fi * GOLDEN), sin(fi * GOLDEN))
+      * sqrt((fi + 0.5) / f32(COPIES));
+    let dest = res * 0.5 + slot * res * vec2<f32>(0.44, 0.46);
+    let arm = dest - centre;
+    let turn = SWIRL * (1.0 - ease);
+    let ct = cos(turn);
+    let st = sin(turn);
+    let c = centre
+      + vec2<f32>(ct * arm.x - st * arm.y, st * arm.x + ct * arm.y) * ease;
+    let scale = mix(1.0, 0.7, ease);
+    // The swarm holds together and each copy thins only at the end of its
+    // flight, so the screen is full before anything is gone.
+    let alpha = 1.0 - smoothstep(0.65, 1.0, ti);
     let rot = (h2 - 0.5) * 0.9 * ease;
 
     // Undo this copy's transform: where in the bubble does q come from?
-    let c = centre + dir * flight;
     let d = q - c;
     let cr = cos(rot);
     let sr = sin(rot);

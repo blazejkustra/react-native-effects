@@ -48,8 +48,8 @@ const BEAM: f32 = 0.5;         // how much of the dim the beam lifts
 const HOLE_PAD: f32 = 10.0;    // px around the bubble left fully lit
 const HOLE_SOFT: f32 = 26.0;   // px over which the hole's edge fades
 
-fn sdRoundRect(p: vec2<f32>, half: vec2<f32>, r: f32) -> f32 {
-  let d = abs(p) - half + vec2<f32>(r);
+fn sdRoundRect(p: vec2<f32>, ext: vec2<f32>, r: f32) -> f32 {
+  let d = abs(p) - ext + vec2<f32>(r);
   return length(max(d, vec2<f32>(0.0))) + min(max(d.x, d.y), 0.0) - r;
 }
 

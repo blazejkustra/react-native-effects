@@ -43,7 +43,7 @@ struct Uniforms {
 @group(0) @binding(0) var<uniform> u: Uniforms;
 
 const COL: f32 = 26.0;         // column width, logical px
-const PER_COL: i32 = 7;        // pieces per column per layer
+const PER_COL: i32 = 9;        // pieces per column per layer
 const SPAWN: f32 = 1.7;        // seconds over which a column's pieces drop
 const SWAY: f32 = 15.0;        // sideways drift amplitude, px
 const PIECE: vec2<f32> = vec2<f32>(5.6, 3.3); // half size of a front piece, px
@@ -83,7 +83,9 @@ fn layer(q: vec2<f32>, t: f32, res: vec2<f32>, scale: f32, seed: f32)
       let h2 = hash21(id + 1.7);
       let h3 = hash21(id + 4.3);
       let h4 = hash21(id + 9.1);
-      let tt = t - h1 * SPAWN;
+      // Most pieces drop in the first half second (a dense front), the rest
+      // trail out over the spawn window.
+      let tt = t - pow(h1, 2.2) * SPAWN;
       if (tt <= 0.0) {
         continue;
       }
@@ -100,10 +102,10 @@ fn layer(q: vec2<f32>, t: f32, res: vec2<f32>, scale: f32, seed: f32)
       let sa = sin(ang);
       let r = vec2<f32>(ca * d.x + sa * d.y, -sa * d.x + ca * d.y);
       let tumble = sin(tt * (3.0 + 3.0 * h2) + h1 * 6.2831853);
-      let half = PIECE * scale * vec2<f32>(1.0, 0.25 + 0.75 * abs(tumble));
+      let ext = PIECE * scale * vec2<f32>(1.0, 0.25 + 0.75 * abs(tumble));
       let edge = 0.7;
-      let cov = (1.0 - smoothstep(half.x - edge, half.x + edge, abs(r.x)))
-              * (1.0 - smoothstep(half.y - edge, half.y + edge, abs(r.y)));
+      let cov = (1.0 - smoothstep(ext.x - edge, ext.x + edge, abs(r.x)))
+              * (1.0 - smoothstep(ext.y - edge, ext.y + edge, abs(r.y)));
       if (cov <= 0.0) {
         continue;
       }

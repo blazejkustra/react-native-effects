@@ -115,8 +115,6 @@ export function useIMessageEffects() {
   const [messages, setMessages] = useState<Message[]>(SEED);
   const [playing, setPlaying] = useState<Playing | null>(null);
   const playKey = useRef(0);
-  const playingRef = useRef<Playing | null>(null);
-  playingRef.current = playing;
 
   const send = useCallback((effect: EffectId, text?: string) => {
     const body = (text ?? DEFAULT_TEXT[effect]).trim();

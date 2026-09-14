@@ -24,6 +24,7 @@ import EffectsSheet from '../components/imessage/EffectsSheet';
 import ScreenEffectPlayer from '../components/imessage/ScreenEffectPlayer';
 import {
   EFFECT_LABEL,
+  SCREEN_EFFECTS,
   isScreenEffect,
   type BubbleTarget,
   type EffectId,
@@ -43,13 +44,6 @@ import {
 // thread fires each effect with one tap.
 
 const CONTACT = 'Kacper';
-const DEV_EFFECTS: EffectId[] = [
-  'echo',
-  'spotlight',
-  'confetti',
-  'fireworks',
-  'lasers',
-];
 
 export default function IMessageScreen() {
   const insets = useSafeAreaInsets();
@@ -185,7 +179,7 @@ export default function IMessageScreen() {
       {__DEV__ && (
         <View style={styles.devRow}>
           <Text style={styles.devLabel}>Send with…</Text>
-          {DEV_EFFECTS.map((e) => (
+          {SCREEN_EFFECTS.map((e) => (
             <Pressable
               key={e}
               onPress={() => send(e)}
