@@ -43,6 +43,7 @@ export type RootStackParamList = {
   DandelionExample: undefined;
   HourglassExample: undefined;
   TelegramSpoilerExample: undefined;
+  IMessageExample: undefined;
 };
 
 export type HomeScreenNavigationProp =

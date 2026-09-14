@@ -12,6 +12,15 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'imessage',
+    title: 'iMessage Effects',
+    description:
+      'Hold send to pick an effect — lasers, confetti, fireworks and more',
+    screen: 'IMessageExample',
+    color: '#0A84FF',
+    image: require('../../assets/components/imessage.png'),
+  },
+  {
     id: 'telegram-spoiler',
     title: 'Telegram Spoiler',
     description:

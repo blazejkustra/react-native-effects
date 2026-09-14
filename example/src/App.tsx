@@ -43,6 +43,7 @@ import CigaretteScreen from './screens/CigaretteScreen';
 import DandelionScreen from './screens/DandelionScreen';
 import HourglassScreen from './screens/HourglassScreen';
 import TelegramSpoilerScreen from './screens/TelegramSpoilerScreen';
+import IMessageScreen from './screens/IMessageScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -147,6 +148,7 @@ export default function App() {
             name="TelegramSpoilerExample"
             component={TelegramSpoilerScreen}
           />
+          <Stack.Screen name="IMessageExample" component={IMessageScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
