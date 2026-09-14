@@ -11,62 +11,62 @@ import {
 // has something to anchor the effect to.
 export const EFFECT_START_DELAY_MS = 150;
 
-// Two React Native people reading Shopify's "back to native" post together.
-// Fond, not bitter: the jokes are about the reasoning, not the people.
+// Two React Native people reading Shopify's back-to-native post together.
+// Short, fond, a little smug: the jokes are about the reasoning, not the people.
 const SEED: Message[] = [
   {
     id: 's1',
     from: 'them',
-    text: 'did you see shopify is going back to native',
+    text: 'shopify is going back to native 💀',
     effect: 'none',
     time: '9:41',
   },
   {
     id: 's2',
     from: 'me',
-    text: 'back to native? react native is native. the clue is in the name',
+    text: 'back to native? from what. react native',
     effect: 'none',
     time: '9:41',
   },
   {
     id: 's3',
     from: 'them',
-    text: 'january: react native is the future. september: we don\u2019t hold on to a decision just because it was successful',
+    text: 'they let the robots rewrite the app twice',
     effect: 'none',
     time: '9:42',
   },
   {
     id: 's4',
     from: 'me',
-    text: 'so the plan is writing every screen twice again, but this time a robot does the typing',
+    text: 'cross platform: write once, then write again',
     effect: 'none',
     time: '9:42',
   },
   {
     id: 's5',
     from: 'them',
-    text: '\u201cfewer layers between us and the platform\u201d says the team adding an agent layer',
+    text: 'fewer layers, he says, from behind three agents',
     effect: 'none',
     time: '9:43',
   },
   {
     id: 's6',
     from: 'me',
-    text: 'rebuilt shop in 12 weeks. that is 12 weeks nobody had to run pod install',
+    text: '12 weeks and zero pod installs. jealous honestly',
     effect: 'none',
     time: '9:43',
   },
   {
     id: 's7',
     from: 'them',
-    text: 'they are still shipping flashlist fixes though. 2M downloads a week will do that to you',
+    text: 'still shipping flashlist fixes though',
     effect: 'none',
     time: '9:44',
   },
   {
     id: 's8',
     from: 'me',
-    text: 'love them for it honestly. we will keep the lights on',
+    text: "2M downloads a week. you don't just leave that",
     effect: 'none',
     time: '9:44',
   },
