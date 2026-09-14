@@ -5,8 +5,7 @@ import {
   type ShaderViewProps,
 } from 'react-native-effects';
 import { useMemo } from 'react';
-
-export type SpoilerRect = { x: number; y: number; w: number; h: number };
+import type { SpoilerRect } from '../../hooks/useSpoiler';
 
 type SpoilerParticlesProps = Omit<
   ShaderViewProps,

@@ -36,8 +36,6 @@ import { useSpoiler, useSpoilerDebugHooks } from '../hooks/useSpoiler';
 // a spoiler span is covered by a cloud of drifting sparks, a tap blows the
 // cloud open and shows the real text, and after a few seconds it hides again.
 
-// Canvas margin around a bubble so the burst is not clipped at its edge.
-const PAD = 40;
 const BUBBLE_RADIUS = 17;
 const TG_INCOMING = '#232323';
 const SENDER_COLORS = ['#5BC8FA', '#F5A54A'];
@@ -204,7 +202,7 @@ function SpoilerBubble({ msg, order }: { msg: Message; order: number }) {
       if (mask || !maskRef.current) {
         return;
       }
-      spoiler.setCanvasSize(width + 2 * PAD, height + 2 * PAD);
+      spoiler.setCanvasSize(width, height);
       bubbleRef.current?.measureInWindow((x, y, w, h) =>
         spoiler.setRect({ x, y, w, h })
       );
@@ -236,7 +234,7 @@ function SpoilerBubble({ msg, order }: { msg: Message; order: number }) {
     (e: GestureResponderEvent) => {
       const { pageX, pageY } = e.nativeEvent;
       bubbleRef.current?.measureInWindow((x, y) => {
-        spoiler.reveal(pageX - x + PAD, pageY - y + PAD);
+        spoiler.reveal(pageX - x, pageY - y);
       });
     },
     [spoiler]
@@ -267,20 +265,13 @@ function SpoilerBubble({ msg, order }: { msg: Message; order: number }) {
         <Body msg={msg} mode="text" />
       </Animated.View>
       {mask && (
-        <View
+        <SpoilerParticles
+          style={StyleSheet.absoluteFill}
           pointerEvents="none"
-          style={[
-            styles.canvas,
-            { width: mask.w + 2 * PAD, height: mask.h + 2 * PAD },
-          ]}
-        >
-          <SpoilerParticles
-            style={StyleSheet.absoluteFill}
-            paramsSynchronizable={spoiler.paramsSynchronizable}
-            texture={{ uri: mask.uri }}
-            maskRect={{ x: PAD, y: PAD, w: mask.w, h: mask.h }}
-          />
-        </View>
+          paramsSynchronizable={spoiler.paramsSynchronizable}
+          texture={{ uri: mask.uri }}
+          maskRect={{ x: 0, y: 0, w: mask.w, h: mask.h }}
+        />
       )}
     </Frame>
   );
@@ -396,11 +387,13 @@ const styles = StyleSheet.create({
   bubbleRowIn: {
     justifyContent: 'flex-start',
   },
+  // The canvas fills the bubble and is clipped by it, so the burst never
+  // spills sparks onto the wallpaper; Telegram keeps them inside the bubble.
   bubble: {
     maxWidth: '78%',
     borderRadius: BUBBLE_RADIUS,
     borderBottomRightRadius: 4,
-    overflow: 'visible',
+    overflow: 'hidden',
   },
   bubbleIn: {
     borderBottomRightRadius: BUBBLE_RADIUS,
@@ -457,11 +450,6 @@ const styles = StyleSheet.create({
   time: {
     color: 'rgba(255,255,255,0.7)',
     fontSize: 11,
-  },
-  canvas: {
-    position: 'absolute',
-    left: -PAD,
-    top: -PAD,
   },
 
   // Header

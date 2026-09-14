@@ -39,8 +39,8 @@ export type SpoilerDebugState = {
 type Entry = {
   order: number;
   /** Reveal as if tapped at a normalised point of the bubble rect. */
-  revealAt: (nx: number, ny: number) => void;
-  hide: () => void;
+  revealAt: (nx: number, ny: number) => boolean;
+  hide: () => boolean;
   getState: () => SpoilerDebugState;
 };
 
@@ -60,9 +60,11 @@ const registry = new Map<string, Entry>();
 export function useSpoiler({ id, order }: { id: string; order: number }): {
   paramsSynchronizable: ParamsSynchronizable;
   textOpacity: SharedValue<number>;
-  /** Reveal from a tap at canvas-local logical px. */
-  reveal: (x?: number, y?: number) => void;
-  hide: () => void;
+  /**
+   * Reveal from a tap at canvas-local logical px. Returns false when the
+   * span is not hidden, since a tap on revealed text does nothing.
+   */
+  reveal: (x?: number, y?: number) => boolean;
   /** Canvas size, so a reveal with no tap point can start from the centre. */
   setCanvasSize: (w: number, h: number) => void;
   /** Bubble's window rect, for the debug state. */
@@ -108,7 +110,7 @@ export function useSpoiler({ id, order }: { id: string; order: number }): {
 
   const hide = useCallback(() => {
     if (phase.current === 'hidden' || phase.current === 'hiding') {
-      return;
+      return false;
     }
     clearHold();
     phase.current = 'hiding';
@@ -125,13 +127,14 @@ export function useSpoiler({ id, order }: { id: string; order: number }): {
         }
       }
     );
+    return true;
   }, [burst, clearHold, cover, settleHidden, textOpacity]);
 
   const reveal = useCallback(
     (x?: number, y?: number) => {
       // Tapping revealed text does nothing; it hides again on its own.
       if (phase.current !== 'hidden') {
-        return;
+        return false;
       }
       phase.current = 'revealing';
       revealedAt.current = Date.now();
@@ -157,6 +160,7 @@ export function useSpoiler({ id, order }: { id: string; order: number }): {
         easing: Easing.in(Easing.cubic),
       });
       holdTimer.current = setTimeout(hide, REVEAL_HOLD_MS);
+      return true;
     },
     [burst, cover, hide, settleRevealed, tapX, tapY, textOpacity]
   );
@@ -196,7 +200,6 @@ export function useSpoiler({ id, order }: { id: string; order: number }): {
     paramsSynchronizable,
     textOpacity,
     reveal,
-    hide,
     setCanvasSize,
     setRect,
   };
@@ -207,8 +210,8 @@ export function useSpoiler({ id, order }: { id: string; order: number }): {
  * precision, can drive the spoilers:
  *  - `__spoilerReveal(index = 0, x = 0.5, y = 0.5)` — reveal spoiler `index`
  *    (in conversation order) as if tapped at that normalised point of its
- *    bubble.
- *  - `__spoilerHide(index = 0)` — hide it now.
+ *    bubble. Returns whether it took effect; false while already revealed.
+ *  - `__spoilerHide(index = 0)` — hide it now; false if it was not revealed.
  *  - `__spoilerState()` — every spoiler's phase, time since reveal and rect.
  */
 export function useSpoilerDebugHooks() {
@@ -220,20 +223,10 @@ export function useSpoilerDebugHooks() {
     const ordered = () =>
       [...registry.values()].sort((a, b) => a.order - b.order);
     g.__spoilerReveal = (index = 0, x = 0.5, y = 0.5) => {
-      const entry = ordered()[index];
-      if (!entry) {
-        return false;
-      }
-      entry.revealAt(x, y);
-      return true;
+      return ordered()[index]?.revealAt(x, y) ?? false;
     };
     g.__spoilerHide = (index = 0) => {
-      const entry = ordered()[index];
-      if (!entry) {
-        return false;
-      }
-      entry.hide();
-      return true;
+      return ordered()[index]?.hide() ?? false;
     };
     g.__spoilerState = () => ({
       spoilers: ordered().map((e) => e.getState()),
