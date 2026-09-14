@@ -14,8 +14,14 @@ const RADIUS = 20;
 
 type ViewHandle = ComponentRef<typeof View>;
 
-// Incoming bubbles ease in from their tail corner, the way Messages lands a
-// reply: a short fade with a slight rise and grow, no overshoot.
+// Measure and snapshot only once the entrance animation has finished and the
+// thread has scrolled to the end; earlier, the snapshot would catch the
+// bubble mid-fade and the rect would be where it was, not where it is.
+const ENTER_MS = 260;
+const MEASURE_DELAY_MS = ENTER_MS + 60;
+
+// Bubbles ease in from their tail corner, the way Messages lands them: a
+// short fade with a slight rise and grow, no overshoot.
 const EASE_OUT = Easing.out(Easing.cubic);
 const popIn = () => {
   'worklet';
@@ -27,16 +33,12 @@ const popIn = () => {
     animations: {
       opacity: withTiming(1, { duration: 200, easing: EASE_OUT }),
       transform: [
-        { scale: withTiming(1, { duration: 260, easing: EASE_OUT }) },
-        { translateY: withTiming(0, { duration: 260, easing: EASE_OUT }) },
+        { scale: withTiming(1, { duration: ENTER_MS, easing: EASE_OUT }) },
+        { translateY: withTiming(0, { duration: ENTER_MS, easing: EASE_OUT }) },
       ],
     },
   };
 };
-
-// Layout settles a beat after the row mounts (the thread scrolls to the end);
-// measuring before that reports where the bubble was, not where it is.
-const MEASURE_DELAY_MS = 60;
 
 type Props = {
   msg: Message;
@@ -99,12 +101,12 @@ export default function Bubble({
   );
 
   const bg = mine ? IM_BLUE : IM_GREY;
-  // Only replies animate: an outgoing bubble is measured and snapshotted for
-  // its effect right after layout, and a transform in flight would skew that.
-  const Wrap = mine ? View : Animated.View;
   return (
     <View style={[styles.row, mine ? styles.rowMine : styles.rowThem]}>
-      <Wrap style={styles.wrap} entering={mine ? undefined : popIn}>
+      <Animated.View
+        style={[styles.wrap, mine ? styles.wrapMine : styles.wrapThem]}
+        entering={popIn}
+      >
         {tail && (
           <>
             <View
@@ -127,7 +129,7 @@ export default function Bubble({
         >
           <Text style={styles.text}>{msg.text}</Text>
         </View>
-      </Wrap>
+      </Animated.View>
     </View>
   );
 }
@@ -147,6 +149,11 @@ const styles = StyleSheet.create({
   wrap: {
     // Messages caps a bubble at about two thirds of the screen.
     maxWidth: '68%',
+  },
+  wrapMine: {
+    transformOrigin: 'right bottom',
+  },
+  wrapThem: {
     transformOrigin: 'left bottom',
   },
   bubble: {

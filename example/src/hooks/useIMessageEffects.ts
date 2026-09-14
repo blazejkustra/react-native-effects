@@ -23,11 +23,11 @@ const STEPS: Step[] = [
   {
     effect: 'echo',
     me: 'back to native? from what, react NATIVE?',
-    reply: 'they let the agents rewrite the app twice',
+    reply: 'their whole point is agents can port anything now',
   },
   {
     effect: 'lasers',
-    me: 'we deleted the bridge. they added two codebases and an agent',
+    me: 'great. tell the agents to port it back',
     reply: 'they rebuilt shop in 12 weeks though',
   },
   {
