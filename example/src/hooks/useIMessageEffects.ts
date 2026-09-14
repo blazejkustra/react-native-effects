@@ -11,68 +11,33 @@ import {
 // has something to anchor the effect to.
 export const EFFECT_START_DELAY_MS = 150;
 
-// Two React Native people reading Shopify's back-to-native post together.
-// Short, fond, a little smug: the jokes are about the reasoning, not the people.
-const SEED: Message[] = [
-  {
-    id: 's1',
-    from: 'them',
-    text: 'shopify is going back to native 💀',
-    effect: 'none',
-    time: '9:41',
-  },
-  {
-    id: 's2',
-    from: 'me',
-    text: 'back to native? from what. react native',
-    effect: 'none',
-    time: '9:41',
-  },
-  {
-    id: 's3',
-    from: 'them',
-    text: 'they let the robots rewrite the app twice',
-    effect: 'none',
-    time: '9:42',
-  },
-  {
-    id: 's4',
-    from: 'me',
-    text: 'cross platform: write once, then write again',
-    effect: 'none',
-    time: '9:42',
-  },
-  {
-    id: 's5',
-    from: 'them',
-    text: 'fewer layers, he says, from behind three agents',
-    effect: 'none',
-    time: '9:43',
-  },
-  {
-    id: 's6',
-    from: 'me',
-    text: '12 weeks and zero pod installs. jealous honestly',
-    effect: 'none',
-    time: '9:43',
-  },
-  {
-    id: 's7',
-    from: 'them',
-    text: 'still shipping flashlist fixes though',
-    effect: 'none',
-    time: '9:44',
-  },
-  {
-    id: 's8',
-    from: 'me',
-    text: "2M downloads a week. you don't just leave that",
-    effect: 'none',
-    time: '9:44',
-  },
+// A scripted demo: it opens with one text from Kacper, every effect button
+// posts the next line from "me" with that effect, and Kacper answers a beat
+// later, until the script runs out. Fond, not bitter: the jokes are about the
+// reasoning, not the people.
+type Line = { from: Message['from']; text: string };
+const OPENER: Line = {
+  from: 'them',
+  text: 'shopify is going back to native 💀',
+};
+const SCRIPT: Line[] = [
+  OPENER,
+  { from: 'me', text: 'back to native? from what. react native' },
+  { from: 'them', text: 'they let the robots rewrite the app twice' },
+  { from: 'me', text: 'cross platform: write once, then write again' },
+  { from: 'them', text: 'fewer layers, he says, from behind three agents' },
+  { from: 'me', text: '12 weeks and zero pod installs. jealous honestly' },
+  { from: 'them', text: 'still shipping flashlist fixes though' },
+  { from: 'me', text: "2M downloads a week. you don't just leave that" },
+  { from: 'them', text: 'so what do we do' },
+  { from: 'me', text: 'keep shipping. react native is native btw' },
+  { from: 'them', text: 'hermes go brrr 🔥' },
 ];
 
-/** What the dev row and the debug hook send when no text is given. */
+/** How long Kacper takes to type his reply. */
+export const REPLY_DELAY_MS = 1000;
+
+/** What a button or the debug hook sends once the script has run out. */
 export const DEFAULT_TEXT: Record<EffectId, string> = {
   none: 'hello from the new architecture',
   echo: 'back to native',
@@ -142,12 +107,32 @@ function stamp() {
  * been snapshotted), never sooner than the iMessage beat.
  */
 export function useIMessageEffects() {
-  const [messages, setMessages] = useState<Message[]>(SEED);
+  const [messages, setMessages] = useState<Message[]>(() => [
+    {
+      id: 's0',
+      from: 'them',
+      text: OPENER.text,
+      effect: 'none',
+      time: stamp(),
+    },
+  ]);
   const [playing, setPlaying] = useState<Playing | null>(null);
   const playKey = useRef(0);
+  // Next unspoken line of the script.
+  const scriptPos = useRef(1);
+  const replyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const send = useCallback((effect: EffectId, text?: string) => {
-    const body = (text ?? DEFAULT_TEXT[effect]).trim();
+    let body = text?.trim();
+    if (!body) {
+      const line = SCRIPT[scriptPos.current];
+      if (line?.from === 'me') {
+        body = line.text;
+        scriptPos.current += 1;
+      } else {
+        body = DEFAULT_TEXT[effect];
+      }
+    }
     if (!body) {
       return null;
     }
@@ -167,6 +152,25 @@ export function useIMessageEffects() {
         }, wait);
       });
     }
+    // Kacper answers a beat later, if the script has a line for him. One
+    // pending reply at a time, so mashing buttons does not queue a monologue.
+    const reply = SCRIPT[scriptPos.current];
+    if (reply?.from === 'them' && replyTimer.current === null) {
+      scriptPos.current += 1;
+      replyTimer.current = setTimeout(() => {
+        replyTimer.current = null;
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `m${nextId++}`,
+            from: 'them',
+            text: reply.text,
+            effect: 'none',
+            time: stamp(),
+          },
+        ]);
+      }, REPLY_DELAY_MS);
+    }
     return id;
   }, []);
 
@@ -180,6 +184,9 @@ export function useIMessageEffects() {
     () => () => {
       targets.clear();
       targetWaiters.clear();
+      if (replyTimer.current !== null) {
+        clearTimeout(replyTimer.current);
+      }
     },
     []
   );

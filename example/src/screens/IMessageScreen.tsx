@@ -55,8 +55,9 @@ import {
 // composer is a translucent pill whose mic becomes the send arrow once there
 // is text. Sending can carry a screen effect (echo, spotlight, confetti,
 // fireworks, lasers) that plays once over the chat.
-// Long-press the send arrow for the effects sheet; the dev row above the
-// composer fires each effect with one tap.
+// The demo is scripted: it opens with one text from Kacper, each effect
+// button posts the next line with that effect and Kacper answers a beat
+// later. Long-press the send arrow for the full effects sheet.
 
 const CONTACT = 'Kacper Kapuściak';
 const STARTED = '12 Sep 2026 at 09:41';
@@ -134,6 +135,9 @@ export default function IMessageScreen() {
     ) : null;
 
   const lastMine = [...messages].reverse().find((m) => m.from === 'me');
+  const usedEffects = new Set(
+    messages.filter((m) => m.from === 'me').map((m) => m.effect)
+  );
 
   return (
     <KeyboardAvoidingView
@@ -217,21 +221,51 @@ export default function IMessageScreen() {
           { paddingBottom: Math.max(insets.bottom - 6, 8) },
         ]}
       >
-        {__DEV__ && (
-          <View style={styles.devRow}>
-            {SCREEN_EFFECTS.map((e) => (
+        <View style={styles.effectRow}>
+          {SCREEN_EFFECTS.map((e) => {
+            const used = usedEffects.has(e);
+            return (
               <Pressable
                 key={e}
                 onPress={() => send(e)}
-                style={styles.devChip}
+                style={({ pressed }) => [
+                  styles.effectChip,
+                  used && styles.effectChipUsed,
+                  pressed && styles.effectChipPressed,
+                ]}
                 accessibilityRole="button"
+                accessibilityState={{ selected: used }}
                 accessibilityLabel={`Send with ${EFFECT_LABEL[e]}`}
               >
-                <Text style={styles.devChipText}>{EFFECT_LABEL[e]}</Text>
+                {({ pressed }) => (
+                  <View style={styles.effectChipInner}>
+                    {/* The check always takes its slot, so chips never
+                        reflow when one gets used. */}
+                    <Text
+                      style={[
+                        styles.effectChipCheck,
+                        used && styles.effectChipTextUsed,
+                        pressed && styles.effectChipTextPressed,
+                        !used && styles.effectChipCheckHidden,
+                      ]}
+                    >
+                      ✓
+                    </Text>
+                    <Text
+                      style={[
+                        styles.effectChipText,
+                        used && styles.effectChipTextUsed,
+                        pressed && styles.effectChipTextPressed,
+                      ]}
+                    >
+                      {EFFECT_LABEL[e]}
+                    </Text>
+                  </View>
+                )}
               </Pressable>
-            ))}
-          </View>
-        )}
+            );
+          })}
+        </View>
         <View style={styles.composer}>
           <View style={styles.plus}>
             <Plus />
@@ -383,23 +417,54 @@ const styles = StyleSheet.create({
   bottom: {
     backgroundColor: IM_BG,
   },
-  devRow: {
+  effectRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 6,
+    gap: 8,
     paddingHorizontal: 16,
-    paddingBottom: 6,
+    paddingBottom: 8,
   },
-  devChip: {
-    paddingHorizontal: 9,
-    paddingVertical: 3,
-    borderRadius: 10,
+  effectChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.18)',
     backgroundColor: 'rgba(255,255,255,0.06)',
   },
-  devChipText: {
-    color: '#6E6E73',
-    fontSize: 11,
+  effectChipUsed: {
+    borderColor: 'rgba(76,149,247,0.45)',
+    backgroundColor: 'rgba(76,149,247,0.12)',
+  },
+  effectChipPressed: {
+    borderColor: IM_BLUE,
+    backgroundColor: IM_BLUE,
+    transform: [{ scale: 0.94 }],
+  },
+  effectChipInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  effectChipCheck: {
+    color: '#D1D1D6',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  effectChipCheckHidden: {
+    opacity: 0,
+  },
+  effectChipText: {
+    color: '#D1D1D6',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  effectChipTextUsed: {
+    color: IM_BLUE,
+  },
+  effectChipTextPressed: {
+    color: '#fff',
   },
 
   composer: {
