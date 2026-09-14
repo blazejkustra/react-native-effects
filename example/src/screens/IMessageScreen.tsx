@@ -36,13 +36,13 @@ import EffectsSheet from '../components/imessage/EffectsSheet';
 import ScreenEffectPlayer from '../components/imessage/ScreenEffectPlayer';
 import {
   EFFECT_LABEL,
-  SCREEN_EFFECTS,
   isScreenEffect,
   type BubbleTarget,
   type EffectId,
 } from '../components/imessage/types';
 import {
   DEFAULT_TEXT,
+  DEMO_ORDER,
   forgetTarget,
   reportTarget,
   useIMessageDebugHooks,
@@ -222,7 +222,7 @@ export default function IMessageScreen() {
         ]}
       >
         <View style={styles.effectRow}>
-          {SCREEN_EFFECTS.map((e) => {
+          {DEMO_ORDER.map((e) => {
             const used = usedEffects.has(e);
             return (
               <Pressable
@@ -238,29 +238,16 @@ export default function IMessageScreen() {
                 accessibilityLabel={`Send with ${EFFECT_LABEL[e]}`}
               >
                 {({ pressed }) => (
-                  <View style={styles.effectChipInner}>
-                    {/* The check always takes its slot, so chips never
-                        reflow when one gets used. */}
-                    <Text
-                      style={[
-                        styles.effectChipCheck,
-                        used && styles.effectChipTextUsed,
-                        pressed && styles.effectChipTextPressed,
-                        !used && styles.effectChipCheckHidden,
-                      ]}
-                    >
-                      ✓
-                    </Text>
-                    <Text
-                      style={[
-                        styles.effectChipText,
-                        used && styles.effectChipTextUsed,
-                        pressed && styles.effectChipTextPressed,
-                      ]}
-                    >
-                      {EFFECT_LABEL[e]}
-                    </Text>
-                  </View>
+                  <Text
+                    numberOfLines={1}
+                    style={[
+                      styles.effectChipText,
+                      used && styles.effectChipTextUsed,
+                      pressed && styles.effectChipTextPressed,
+                    ]}
+                  >
+                    {EFFECT_LABEL[e]}
+                  </Text>
                 )}
               </Pressable>
             );
@@ -417,16 +404,17 @@ const styles = StyleSheet.create({
   bottom: {
     backgroundColor: IM_BG,
   },
+  // One row, in the order the demo means them to be pressed.
   effectRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 8,
-    paddingHorizontal: 16,
+    gap: 5,
+    paddingHorizontal: 12,
     paddingBottom: 8,
   },
   effectChip: {
-    paddingHorizontal: 12,
+    flexShrink: 1,
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 14,
     borderWidth: 1,
@@ -442,22 +430,9 @@ const styles = StyleSheet.create({
     backgroundColor: IM_BLUE,
     transform: [{ scale: 0.94 }],
   },
-  effectChipInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  effectChipCheck: {
-    color: '#D1D1D6',
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  effectChipCheckHidden: {
-    opacity: 0,
-  },
   effectChipText: {
     color: '#D1D1D6',
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
   },
   effectChipTextUsed: {

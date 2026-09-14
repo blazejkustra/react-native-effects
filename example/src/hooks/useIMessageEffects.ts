@@ -5,34 +5,50 @@ import {
   type BubbleTarget,
   type EffectId,
   type Message,
+  type ScreenEffectId,
 } from '../components/imessage/types';
 
 // iMessage starts the screen effect a beat after the bubble lands, so the eye
 // has something to anchor the effect to.
 export const EFFECT_START_DELAY_MS = 150;
 
-// A scripted demo: it opens with one text from Kacper, every effect button
-// posts the next line from "me" with that effect, and Kacper answers a beat
-// later, until the script runs out. Fond, not bitter: the jokes are about the
-// reasoning, not the people.
-type Line = { from: Message['from']; text: string };
-const OPENER: Line = {
-  from: 'them',
-  text: 'shopify is going back to native 💀',
-};
-const SCRIPT: Line[] = [
-  OPENER,
-  { from: 'me', text: 'back to native? from what. react native' },
-  { from: 'them', text: 'they let the robots rewrite the app twice' },
-  { from: 'me', text: 'cross platform: write once, then write again' },
-  { from: 'them', text: 'fewer layers, he says, from behind three agents' },
-  { from: 'me', text: '12 weeks and zero pod installs. jealous honestly' },
-  { from: 'them', text: 'still shipping flashlist fixes though' },
-  { from: 'me', text: "2M downloads a week. you don't just leave that" },
-  { from: 'them', text: 'so what do we do' },
-  { from: 'me', text: 'keep shipping. react native is native btw' },
-  { from: 'them', text: 'hermes go brrr 🔥' },
+// A scripted demo. It opens with one text from Kacper; each effect has its
+// own line from "me" written to match the effect's energy, and Kacper answers
+// a beat later, except after the spotlight, which needs the last word.
+// Fond, not bitter: the jokes are about the reasoning, not the people.
+const OPENER = 'shopify is going back to native 💀';
+
+type Step = { effect: ScreenEffectId; me: string; reply: string | null };
+const STEPS: Step[] = [
+  {
+    effect: 'echo',
+    me: 'back to native? from what, react NATIVE?',
+    reply: 'they let the robots rewrite the app twice',
+  },
+  {
+    effect: 'lasers',
+    me: 'we deleted the bridge. they added two codebases and a robot',
+    reply: 'they rebuilt shop in 12 weeks though',
+  },
+  {
+    effect: 'fireworks',
+    me: '12 weeks and zero pod installs. jealous honestly',
+    reply: 'still shipping flashlist fixes though',
+  },
+  {
+    effect: 'confetti',
+    me: "flashlist does 1M a week. you don't just leave that",
+    reply: 'so what do we do',
+  },
+  {
+    effect: 'spotlight',
+    me: 'keep shipping. react native for the win',
+    reply: null,
+  },
 ];
+
+/** The effects in the order the demo means them to be used. */
+export const DEMO_ORDER: ScreenEffectId[] = STEPS.map((s) => s.effect);
 
 /** How long Kacper takes to type his reply. */
 export const REPLY_DELAY_MS = 1000;
@@ -108,27 +124,24 @@ function stamp() {
  */
 export function useIMessageEffects() {
   const [messages, setMessages] = useState<Message[]>(() => [
-    {
-      id: 's0',
-      from: 'them',
-      text: OPENER.text,
-      effect: 'none',
-      time: stamp(),
-    },
+    { id: 's0', from: 'them', text: OPENER, effect: 'none', time: stamp() },
   ]);
   const [playing, setPlaying] = useState<Playing | null>(null);
   const playKey = useRef(0);
-  // Next unspoken line of the script.
-  const scriptPos = useRef(1);
+  // Steps already spoken; a second press of the same effect falls back to
+  // the default line and gets no reply.
+  const spoken = useRef(new Set<ScreenEffectId>());
   const replyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const send = useCallback((effect: EffectId, text?: string) => {
     let body = text?.trim();
+    let reply: string | null = null;
     if (!body) {
-      const line = SCRIPT[scriptPos.current];
-      if (line?.from === 'me') {
-        body = line.text;
-        scriptPos.current += 1;
+      const step = STEPS.find((st) => st.effect === effect);
+      if (step && !spoken.current.has(step.effect)) {
+        spoken.current.add(step.effect);
+        body = step.me;
+        reply = step.reply;
       } else {
         body = DEFAULT_TEXT[effect];
       }
@@ -152,11 +165,10 @@ export function useIMessageEffects() {
         }, wait);
       });
     }
-    // Kacper answers a beat later, if the script has a line for him. One
-    // pending reply at a time, so mashing buttons does not queue a monologue.
-    const reply = SCRIPT[scriptPos.current];
-    if (reply?.from === 'them' && replyTimer.current === null) {
-      scriptPos.current += 1;
+    // Kacper answers a beat later. One pending reply at a time, so mashing
+    // buttons does not queue a monologue.
+    if (reply !== null && replyTimer.current === null) {
+      const line = reply;
       replyTimer.current = setTimeout(() => {
         replyTimer.current = null;
         setMessages((prev) => [
@@ -164,7 +176,7 @@ export function useIMessageEffects() {
           {
             id: `m${nextId++}`,
             from: 'them',
-            text: reply.text,
+            text: line,
             effect: 'none',
             time: stamp(),
           },
