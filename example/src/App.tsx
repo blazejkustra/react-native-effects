@@ -41,6 +41,8 @@ import VoiceDeleteScreen from './screens/VoiceDeleteScreen';
 import Magic8BallScreen from './screens/Magic8BallScreen';
 import CigaretteScreen from './screens/CigaretteScreen';
 import DandelionScreen from './screens/DandelionScreen';
+import HourglassScreen from './screens/HourglassScreen';
+import TelegramSpoilerScreen from './screens/TelegramSpoilerScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -140,6 +142,11 @@ export default function App() {
           <Stack.Screen name="Magic8BallExample" component={Magic8BallScreen} />
           <Stack.Screen name="CigaretteExample" component={CigaretteScreen} />
           <Stack.Screen name="DandelionExample" component={DandelionScreen} />
+          <Stack.Screen name="HourglassExample" component={HourglassScreen} />
+          <Stack.Screen
+            name="TelegramSpoilerExample"
+            component={TelegramSpoilerScreen}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
