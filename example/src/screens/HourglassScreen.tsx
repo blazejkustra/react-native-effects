@@ -27,8 +27,12 @@ const PANEL_W = 967;
 const PANEL_H = 2102;
 /** The neck's centre, canvas px. */
 const NECK = { x: 487, y: 1072 };
-/** A rectangle inside the photo's lower pile, canvas px: the grain texture. */
-const GRAIN = { x: 395, y: 1520, w: 180, h: 120 };
+/**
+ * A rectangle of the photo's upper sand body, canvas px: the grain texture.
+ * It is the flattest-lit sand in the photo (the lower pile's flanks carry the
+ * cone's shading, which tiled into visible bands).
+ */
+const GRAIN = { x: 400, y: 760, w: 180, h: 140 };
 /**
  * Where the wooden cap and base sit on the canvas, as fractions of its height:
  * the timer sits on the cap, the duration chips on the base.

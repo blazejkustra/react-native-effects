@@ -184,6 +184,11 @@ function solveGeometry(f: number, psi: number): Geometry {
   const vDst = SAND_VOLUME - vSrc;
   const gx = Math.sin(psi);
   const gy = Math.cos(psi);
+  // The sand frame only turns once the glass is past repose, and then the
+  // slope is all the sand can hold: a funnel or a pile on top of it would
+  // avalanche downhill. So both flatten as the frame turns, their volume
+  // going back into the flat fill.
+  const coneK = 1 - smoothstep(0.08, 0.42, Math.abs(gx));
   // Turned over, the lower bulb is the source and the upper the floor.
   const over = gy < 0;
   const srcPts = over ? DST_PTS : SRC_PTS;
@@ -216,7 +221,8 @@ function solveGeometry(f: number, psi: number): Geometry {
       }
       lu = 0.5 * (lo + hi);
       wu = widthAt(WALL.neckY - lu * gy);
-      depth = Math.max(0, Math.min(TAN_REPOSE * wu * FUNNEL_REACH, lu - 6));
+      depth =
+        Math.max(0, Math.min(TAN_REPOSE * wu * FUNNEL_REACH, lu - 6)) * coneK;
       vCone = coneVolume(depth / TAN_REPOSE, depth);
     }
   }
@@ -229,7 +235,7 @@ function solveGeometry(f: number, psi: number): Geometry {
   let wl = floorW;
   if (vDst > 0) {
     const rFree = Math.cbrt((3 * vDst) / (Math.PI * TAN_REPOSE));
-    if (rFree <= floorW) {
+    if (rFree <= floorW && coneK > 0.999) {
       // A cone on the floor: the floor itself is round, so the level sits a
       // little below where the cone's base would meet a flat one.
       peak = rFree * TAN_REPOSE;
@@ -241,8 +247,11 @@ function solveGeometry(f: number, psi: number): Geometry {
       for (let i = 0; i < 22; i++) {
         const mid = 0.5 * (lo + hi);
         const w = widthAt(WALL.neckY + mid * gy);
-        const h = Math.min(w * TAN_REPOSE, mid - 30);
-        const total = volumeBeyond(dstPts, gx, gy, mid) + coneVolume(w, h);
+        const h = Math.min(w * TAN_REPOSE, mid - 30) * coneK;
+        // The cone drawn on top is at repose slope whatever its height, so
+        // its base is h / tan, not the full width at the level.
+        const total =
+          volumeBeyond(dstPts, gx, gy, mid) + coneVolume(h / TAN_REPOSE, h);
         if (total > vDst) {
           lo = mid;
         } else {
@@ -251,11 +260,16 @@ function solveGeometry(f: number, psi: number): Geometry {
       }
       ld = 0.5 * (lo + hi);
       wl = widthAt(WALL.neckY + ld * gy);
-      peak = Math.max(0, Math.min(wl * TAN_REPOSE, ld - 30));
+      peak = Math.max(0, Math.min(wl * TAN_REPOSE, ld - 30)) * coneK;
     }
   }
 
   return { lu, depth, ld, peak, wu, wl };
+}
+
+function smoothstep(e0: number, e1: number, x: number): number {
+  const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0)));
+  return t * t * (3 - 2 * t);
 }
 
 function wrapAngle(a: number): number {
@@ -501,8 +515,14 @@ export function useHourglassPhysics(): HourglassPhysics {
         Math.min(1, s.totalS > 0 ? s.remainingS / s.totalS : 0)
       );
       // The solve walks a few thousand points; only redo it once the fraction
-      // or the frame has moved enough to show.
-      if (Math.abs(f - geoF) > 0.0008 || Math.abs(psi - geoPsi) > 0.003) {
+      // or the frame has moved enough to show. The ends are always solved
+      // exactly, or a run could finish with the last sliver still up top.
+      const atEnd = (f === 0 || f === 1) && f !== geoF;
+      if (
+        atEnd ||
+        Math.abs(f - geoF) > 0.0008 ||
+        Math.abs(psi - geoPsi) > 0.003
+      ) {
         s.geo = solveGeometry(f, psi);
         geoF = f;
         geoPsi = psi;

@@ -40,9 +40,10 @@ magick -size ${PW}x${PH} xc:black -fill white -draw "polygon $(P upper)" -blur 0
 magick -size ${PW}x${PH} xc:black -fill white -draw "polygon $(P lower)" -blur 0x1.5 "$T/lower.png"
 magick -size ${PW}x${PH} xc:black -fill white -draw "polygon $(P neck)" -blur 0x1 "$T/neck.png"
 magick "$T/upper.png" "$T/lower.png" -compose Lighten -composite "$T/neck.png" -compose Lighten -composite "$T/inside.png"
-# Distance to the wall, inside: 100 raw units per px, 48 px -> full scale.
+# Distance to the wall, inside. The Euclidean kernel writes 100 raw units per px
+# of a 16-bit quantum, so 48 px = 4800 units; x 65535/4800 puts 48 px at full scale.
 magick "$T/inside.png" -threshold 50% -morphology Distance Euclidean:4,100 -depth 16 \
-  -evaluate Multiply 0.01356 -depth 8 "$T/dist.png"
+  -evaluate Multiply 13.653 -depth 8 "$T/dist.png"
 
 # 3. Empty-glass panel: paint the sand out.
 #    a) The falling stream and the sand in the neck: a thin column, filled

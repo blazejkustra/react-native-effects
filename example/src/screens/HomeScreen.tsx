@@ -14,7 +14,7 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
     id: 'hourglass',
     title: 'Hourglass',
-    description: 'A Pomodoro timer — tilt the sand, flip your phone to restart',
+    description: 'Run a Pomodoro — tilt the sand, flip your phone to restart',
     screen: 'HourglassExample',
     color: '#8a6a3c',
     image: require('../../assets/components/hourglass.png'),

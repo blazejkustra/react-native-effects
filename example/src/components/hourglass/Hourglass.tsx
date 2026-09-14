@@ -103,7 +103,10 @@ const TAN_REPOSE: f32 = 0.684;   // tan(34 deg): the slope dry sand holds
 // half-width.
 const ELLIPSE: f32 = 0.16;
 const EDGE: f32 = 1.4;            // px of anti-aliasing on every sand edge
-const STREAM_W: f32 = 3.2;        // half-width of the falling stream, px
+const STREAM_W: f32 = 4.5;        // half-width of the falling stream, px (the neck is 16)
+// The cone's crease is not a knife edge: grains round it off over this many
+// px of radius, so the lit and shadowed faces meet softly.
+const CREASE: f32 = 14.0;
 const LIGHT: vec2<f32> = vec2<f32>(-0.62, -0.78); // from the upper left, gravity frame
 
 fn hash21(p: vec2<f32>) -> f32 {
@@ -141,11 +144,14 @@ fn shotAt(pp: vec2<f32>) -> vec3<f32> { return panelAt(pp, 1.0); }
 fn dataAt(pp: vec2<f32>) -> vec3<f32> { return panelAt(pp, 2.0); }
 
 // The photo's own sand, tiled without a seam: the grain rectangle is walked
-// with a triangle wave in each axis, so it mirrors at every edge.
-fn grainAt(g: vec2<f32>) -> vec3<f32> {
+// with a triangle wave in each axis, so it mirrors at every edge. The tile
+// frame is turned a little and shifted half a tile, or the mirror lines run
+// straight down the glass's own axis of symmetry and read as a fold.
+fn grainAt(g0: vec2<f32>) -> vec3<f32> {
   let r = u.params1;
-  let px = r.x + tri(g.x / r.z) * r.z;
-  let py = r.y + tri(g.y / r.w) * r.w;
+  let g = vec2<f32>(g0.x * 0.94 - g0.y * 0.34, g0.x * 0.34 + g0.y * 0.94);
+  let px = r.x + tri(g.x / r.z + 0.5) * r.z;
+  let py = r.y + tri(g.y / r.w + 0.5) * r.w;
   return shotAt(vec2<f32>(px, py));
 }
 
@@ -182,12 +188,16 @@ fn solveZ(t: f32, s: f32, base: f32, k: f32, sgn: f32, ek: f32, z0: f32, z1: f32
 // Lambert shading of the surface at (t, z): its normal leans along the cone.
 fn surfShade(t: f32, z: f32, k: f32, sgn: f32) -> f32 {
   let rho = max(sqrt(t * t + z * z), 0.001);
-  let onCone = step(rho * TAN_REPOSE, k);
+  let onCone = 1.0 - smoothstep(-CREASE, CREASE, rho * TAN_REPOSE - k);
   let lean = sgn * onCone * TAN_REPOSE / rho;
   let n = normalize(vec3<f32>(lean * t, 1.0, lean * z));
-  let l = normalize(vec3<f32>(-0.45, 0.72, 0.53));
+  // Mostly from above, a little from the left and the camera: the photo's
+  // pile shows its near and far flanks at almost the same tone.
+  let l = normalize(vec3<f32>(-0.5, 0.85, 0.25));
   let diff = max(0.0, dot(n, l));
-  return 0.62 + 0.58 * diff;
+  // Dry sand scatters most of its light back, so a slope only shifts its
+  // brightness a little: the photo's own pile is nearly flat in tone.
+  return 0.74 + 0.40 * diff;
 }
 
 @fragment
@@ -264,7 +274,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
     disc = 1.0;
   } else if (s >= backLo && s <= backHi) {
     let z = solveZ(t, s, base, k, sgn, ek, -zmax, 0.0);
-    shade = surfShade(t, z, k, sgn) * 0.92;
+    shade = surfShade(t, z, k, sgn) * 0.96;
     disc = 1.0;
   } else if (s > bottomOfSurface) {
     // The fill's side: darker toward the walls, where the glass thickens,
@@ -292,18 +302,24 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
 
   var col = mix(empty, sand, sandMask);
 
-  // The stream: a thin column of grain from the neck to the pile, only while
-  // the sand runs. Grain scrolls with the integrated phase, never time x speed.
-  // It falls from the neck until it meets sand, so it is drawn wherever the
-  // fragment is not already sand.
-  let inStream = smoothstep(STREAM_W + 1.0, STREAM_W - 0.5, abs(tg))
-               * smoothstep(-2.0, 4.0, sg)
-               * clamp(inside + data.z, 0.0, 1.0) * (1.0 - sandMask);
-  if (inStream > 0.001 && streamOn > 0.001) {
-    let cell = vec2<f32>(floor(tg / 2.2), floor((sg - streamPhase) / 2.6));
-    let dots = smoothstep(0.35, 0.65, hash21(cell)) * 0.8 + 0.2;
-    let sCol = grainAt(vec2<f32>(tg * 3.0, sg * 0.5 - streamPhase * 0.3)) * 0.92 * dots;
-    col = mix(col, sCol, inStream * streamOn * (0.85 + 0.15 * dots));
+  // The stream: a thin column of grain falling from the neck until it meets
+  // sand, only while the sand runs. Seen from a phone's width away a sand
+  // stream is a soft translucent thread, not separate grains: a gaussian
+  // across, the glass showing through its edges, a few bright grains catching
+  // the light, and a little wider just before it lands where the grains
+  // scatter. Grain scrolls with the integrated phase, never time x speed.
+  let inGlass = max(inside, smoothstep(0.0, 0.1, wallD));
+  let landing = ld - peak;
+  let w = STREAM_W * (1.0 + 0.5 * smoothstep(landing - 50.0, landing, sg));
+  let across = exp(-(tg * tg) / (w * w));
+  let inStream = across * smoothstep(-2.0, 4.0, sg) * inGlass * (1.0 - sandMask);
+  if (inStream > 0.002 && streamOn > 0.001) {
+    let fall = sg - streamPhase;
+    let cell = vec2<f32>(floor(tg / 1.8), floor(fall / 2.4));
+    let sparkle = smoothstep(0.94, 0.995, hash21(cell));
+    // A falling column is denser than a lit surface, so a shade darker.
+    let sCol = grainAt(vec2<f32>(tg * 2.0, fall * 0.6)) * 0.9 + vec3<f32>(0.22) * sparkle;
+    col = mix(col, sCol, inStream * streamOn * 0.85);
   }
 
   return vec4<f32>(col, 1.0);
