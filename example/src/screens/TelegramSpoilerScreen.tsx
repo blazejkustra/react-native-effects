@@ -51,33 +51,54 @@ type Message = {
 const MESSAGES: Message[] = [
   {
     id: 'm1',
-    from: { name: 'Kacper', color: SENDER_COLORS[0]! },
-    parts: ['ok who broke main again'],
+    from: { name: 'Mike', color: SENDER_COLORS[1]! },
+    parts: ['big news. ', { spoiler: 'callstack just bought margelo' }],
     time: '10:41',
   },
   {
     id: 'm2',
-    from: 'me',
-    parts: ['not me. it was ', { spoiler: 'the one who force-pushed at 2am' }],
+    from: { name: 'Marc', color: SENDER_COLORS[0]! },
+    parts: ['can confirm. ', { spoiler: 'i work for mike now' }],
     time: '10:41',
   },
   {
     id: 'm3',
-    from: { name: 'Mateusz', color: SENDER_COLORS[1]! },
-    parts: [
-      'spoiler for the release notes: ',
-      {
-        spoiler:
-          'the New Architecture is now the only architecture, the Bridge is gone and there is no flag to bring it back',
-      },
-    ],
+    from: 'me',
+    parts: ['congrats lol. so who is next'],
     time: '10:42',
   },
   {
     id: 'm4',
+    from: { name: 'Mike', color: SENDER_COLORS[1]! },
+    parts: ['software mansion?'],
+    time: '10:42',
+  },
+  {
+    id: 'm5',
     from: 'me',
-    parts: ['pod install is fixing it as we speak'],
+    parts: [
+      'not for sale. ',
+      {
+        spoiler:
+          'someone tried once. we laughed and shipped another reanimated release instead',
+      },
+    ],
     time: '10:43',
+  },
+  {
+    id: 'm6',
+    from: { name: 'Marc', color: SENDER_COLORS[0]! },
+    parts: ['marc, marcin, mike. anyone else noticed'],
+    time: '10:44',
+  },
+  {
+    id: 'm7',
+    from: 'me',
+    parts: [
+      'yep. want to found an rn agency? ',
+      { spoiler: 'your name has to start with M. no exceptions' },
+    ],
+    time: '10:44',
   },
 ];
 
@@ -329,7 +350,7 @@ export default function TelegramSpoilerScreen() {
             <Icon source={ICONS.back} size={22} />
           </Pressable>
           <View style={styles.titlePill}>
-            <Text style={styles.title}>RN Core Team (unofficial)</Text>
+            <Text style={styles.title}>RN Agencies (unofficial)</Text>
             <Text style={styles.subtitle}>3 members</Text>
           </View>
           <Image source={TG_AVATAR_PHOTO} style={styles.avatar} />
