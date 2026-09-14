@@ -38,9 +38,9 @@ import BirthdayCandleScreen from './screens/BirthdayCandleScreen';
 import ParticleDispersionScreen from './screens/ParticleDispersionScreen';
 import FoamLabScreen from './screens/FoamLabScreen';
 import VoiceDeleteScreen from './screens/VoiceDeleteScreen';
-import SnowGlobeScreen from './screens/SnowGlobeScreen';
 import Magic8BallScreen from './screens/Magic8BallScreen';
 import CigaretteScreen from './screens/CigaretteScreen';
+import DandelionScreen from './screens/DandelionScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -137,9 +137,9 @@ export default function App() {
             name="VoiceDeleteExample"
             component={VoiceDeleteScreen}
           />
-          <Stack.Screen name="SnowGlobeExample" component={SnowGlobeScreen} />
           <Stack.Screen name="Magic8BallExample" component={Magic8BallScreen} />
           <Stack.Screen name="CigaretteExample" component={CigaretteScreen} />
+          <Stack.Screen name="DandelionExample" component={DandelionScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

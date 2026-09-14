@@ -38,9 +38,9 @@ export type RootStackParamList = {
   ParticleDispersionExample: undefined;
   FoamLabExample: undefined;
   VoiceDeleteExample: undefined;
-  SnowGlobeExample: undefined;
   Magic8BallExample: undefined;
   CigaretteExample: undefined;
+  DandelionExample: undefined;
 };
 
 export type HomeScreenNavigationProp =

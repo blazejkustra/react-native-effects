@@ -12,6 +12,14 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'dandelion',
+    title: 'Dandelion',
+    description: 'Blow on your phone and the seeds drift away',
+    screen: 'DandelionExample',
+    color: '#7fae4a',
+    image: require('../../assets/components/dandelion.png'),
+  },
+  {
     id: 'cigarette',
     title: 'Cigarette',
     description: 'Hold to drag, tap to flick the ash, tilt the smoke',
@@ -26,14 +34,6 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     screen: 'Magic8BallExample',
     color: '#2b3f8f',
     image: require('../../assets/components/magic-8-ball.png'),
-  },
-  {
-    id: 'snow-globe',
-    title: 'Snow Globe',
-    description: 'Shake your phone and the snow falls with real gravity',
-    screen: 'SnowGlobeExample',
-    color: '#8fb7e8',
-    image: require('../../assets/components/snow-globe.png'),
   },
   {
     id: 'voice-delete',
