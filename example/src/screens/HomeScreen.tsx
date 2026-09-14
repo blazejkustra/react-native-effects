@@ -12,6 +12,15 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'telegram-spoiler',
+    title: 'Telegram Spoiler',
+    description:
+      'Tap the hidden text to reveal it, it hides again after a moment',
+    screen: 'TelegramSpoilerExample',
+    color: '#7C40FB',
+    image: require('../../assets/components/telegram-spoiler.png'),
+  },
+  {
     id: 'hourglass',
     title: 'Hourglass',
     description: 'Run a Pomodoro — tilt the sand, flip your phone to restart',
