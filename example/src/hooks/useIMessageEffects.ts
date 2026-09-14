@@ -11,43 +11,73 @@ import {
 // has something to anchor the effect to.
 export const EFFECT_START_DELAY_MS = 150;
 
+// Two React Native people reading Shopify's "back to native" post together.
+// Fond, not bitter: the jokes are about the reasoning, not the people.
 const SEED: Message[] = [
   {
     id: 's1',
     from: 'them',
-    text: 'did you read the 0.85 release notes',
+    text: 'did you see shopify is going back to native',
     effect: 'none',
     time: '9:41',
   },
   {
     id: 's2',
     from: 'me',
-    text: 'yes. the bridge is gone',
+    text: 'back to native? react native is native. the clue is in the name',
     effect: 'none',
     time: '9:41',
   },
   {
     id: 's3',
     from: 'them',
-    text: 'my app still has 14 NativeModules',
+    text: 'january: react native is the future. september: we don\u2019t hold on to a decision just because it was successful',
     effect: 'none',
     time: '9:42',
   },
   {
     id: 's4',
     from: 'me',
-    text: 'we ship on friday. nobody has run pod install yet',
+    text: 'so the plan is writing every screen twice again, but this time a robot does the typing',
     effect: 'none',
     time: '9:42',
+  },
+  {
+    id: 's5',
+    from: 'them',
+    text: '\u201cfewer layers between us and the platform\u201d says the team adding an agent layer',
+    effect: 'none',
+    time: '9:43',
+  },
+  {
+    id: 's6',
+    from: 'me',
+    text: 'rebuilt shop in 12 weeks. that is 12 weeks nobody had to run pod install',
+    effect: 'none',
+    time: '9:43',
+  },
+  {
+    id: 's7',
+    from: 'them',
+    text: 'they are still shipping flashlist fixes though. 2M downloads a week will do that to you',
+    effect: 'none',
+    time: '9:44',
+  },
+  {
+    id: 's8',
+    from: 'me',
+    text: 'love them for it honestly. we will keep the lights on',
+    effect: 'none',
+    time: '9:44',
   },
 ];
 
 /** What the dev row and the debug hook send when no text is given. */
 export const DEFAULT_TEXT: Record<EffectId, string> = {
   none: 'hello from the new architecture',
-  echo: 'pod install',
-  spotlight: 'look at this one',
-  confetti: '0.85 shipped 🎉',
+  echo: 'back to native',
+  spotlight: 'read the january post again',
+  confetti: 'skia hit 2M downloads a week 🎉',
   fireworks: 'new arch is the default now',
   lasers: 'hermes go brrr',
 };

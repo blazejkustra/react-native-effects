@@ -3,10 +3,13 @@ import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import { captureRef } from 'react-native-view-shot';
 import type { BubbleTarget, Message, Rect } from './types';
 
-export const IM_BLUE = '#0A84FF';
-export const IM_GREY = '#26252A';
+// Colours sampled from a real Messages thread in the dark appearance.
+export const IM_BLUE = '#4C95F7';
+export const IM_GREY = '#262629';
 export const IM_BG = '#000';
-const RADIUS = 18;
+export const IM_MUTED = '#8E8E93';
+export const IM_CHROME = '#181818';
+const RADIUS = 20;
 
 type ViewHandle = ComponentRef<typeof View>;
 
@@ -108,8 +111,8 @@ export default function Bubble({
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    marginTop: 2,
-    paddingHorizontal: 14,
+    marginTop: 5,
+    paddingHorizontal: 16,
   },
   rowMine: {
     justifyContent: 'flex-end',
@@ -118,18 +121,19 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   wrap: {
-    maxWidth: '76%',
+    // Messages caps a bubble at about two thirds of the screen.
+    maxWidth: '68%',
   },
   bubble: {
     borderRadius: RADIUS,
-    paddingHorizontal: 13,
-    paddingVertical: 7,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
     overflow: 'hidden',
   },
   text: {
     color: '#fff',
     fontSize: 17,
-    lineHeight: 22,
+    lineHeight: 21,
   },
   // The tail is the CSS two-shape trick: a filled corner under the bubble,
   // cut by a ground-coloured shape beside it.

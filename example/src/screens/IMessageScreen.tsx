@@ -19,7 +19,19 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Bubble, { IM_BG, IM_BLUE } from '../components/imessage/Bubble';
+import Bubble, {
+  IM_BG,
+  IM_BLUE,
+  IM_CHROME,
+  IM_MUTED,
+} from '../components/imessage/Bubble';
+import {
+  Chevron,
+  Lock,
+  Microphone,
+  Plus,
+  VideoCamera,
+} from '../components/imessage/glyphs';
 import EffectsSheet from '../components/imessage/EffectsSheet';
 import ScreenEffectPlayer from '../components/imessage/ScreenEffectPlayer';
 import {
@@ -37,13 +49,19 @@ import {
   useIMessageEffects,
 } from '../hooks/useIMessageEffects';
 
-// iMessage clone, dark appearance. Sending a message can carry a screen
-// effect (echo, spotlight, confetti, fireworks, lasers) that plays once over
-// the chat.
-// Long-press the send arrow for the effects sheet; the dev row below the
-// thread fires each effect with one tap.
+// iMessage clone, dark appearance, laid out from a real Messages thread:
+// circular back and video buttons flank a large avatar over the name pill,
+// the conversation opens with the iMessage / Encrypted / date block, and the
+// composer is a translucent pill whose mic becomes the send arrow once there
+// is text. Sending can carry a screen effect (echo, spotlight, confetti,
+// fireworks, lasers) that plays once over the chat.
+// Long-press the send arrow for the effects sheet; the dev row above the
+// composer fires each effect with one tap.
 
-const CONTACT = 'Kacper';
+const CONTACT = 'Kacper Kapuściak';
+const STARTED = '12 Sep 2026 at 09:41';
+// Header: avatar + gap + name pill, measured from the reference.
+const HEADER_H = 60 + 6 + 30;
 
 export default function IMessageScreen() {
   const insets = useSafeAreaInsets();
@@ -129,11 +147,19 @@ export default function IMessageScreen() {
         style={styles.thread}
         contentContainerStyle={[
           styles.threadContent,
-          { paddingTop: insets.top + 70 },
+          { paddingTop: insets.top + HEADER_H + 12 },
         ]}
         showsVerticalScrollIndicator={false}
         keyboardDismissMode="interactive"
       >
+        <View style={styles.intro}>
+          <Text style={styles.introText}>iMessage</Text>
+          <View style={styles.introRow}>
+            <Lock color={IM_MUTED} />
+            <Text style={styles.introText}>Encrypted</Text>
+          </View>
+          <Text style={styles.introDate}>{STARTED}</Text>
+        </View>
         {messages.map((m, i) => {
           const next = messages[i + 1];
           const tail = !next || next.from !== m.from;
@@ -161,64 +187,84 @@ export default function IMessageScreen() {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <Pressable
           onPress={() => navigation.goBack()}
-          style={styles.back}
+          style={styles.circle}
           accessibilityRole="button"
           accessibilityLabel="Back"
         >
-          <Text style={styles.backChevron}>‹</Text>
+          <Chevron />
         </Pressable>
         <View style={styles.contact}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{CONTACT[0]}</Text>
           </View>
-          <Text style={styles.contactName}>{CONTACT} ›</Text>
+          <View style={styles.namePill}>
+            <Text style={styles.contactName}>{CONTACT}</Text>
+            <Chevron color="#8E8E93" size={7} direction="right" />
+          </View>
         </View>
-        <View style={styles.back} />
+        <View
+          style={styles.circle}
+          accessibilityRole="button"
+          accessibilityLabel="FaceTime"
+        >
+          <VideoCamera />
+        </View>
       </View>
 
-      {__DEV__ && (
-        <View style={styles.devRow}>
-          <Text style={styles.devLabel}>Send with…</Text>
-          {SCREEN_EFFECTS.map((e) => (
-            <Pressable
-              key={e}
-              onPress={() => send(e)}
-              style={styles.devChip}
-              accessibilityRole="button"
-              accessibilityLabel={`Send with ${EFFECT_LABEL[e]}`}
-            >
-              <Text style={styles.devChipText}>{EFFECT_LABEL[e]}</Text>
-            </Pressable>
-          ))}
-        </View>
-      )}
-
-      <View style={[styles.composer, { paddingBottom: insets.bottom + 8 }]}>
-        <View style={styles.plus}>
-          <Text style={styles.plusText}>+</Text>
-        </View>
-        <View style={styles.inputWrap}>
-          <TextInput
-            value={draft}
-            onChangeText={setDraft}
-            placeholder="iMessage"
-            placeholderTextColor="#6e6e73"
-            style={styles.input}
-            multiline
-            keyboardAppearance="dark"
-            accessibilityLabel="Message"
-          />
-          <Pressable
-            onPress={sendPlain}
-            onLongPress={openSheet}
-            delayLongPress={350}
-            style={[styles.send, !draft.trim() && styles.sendIdle]}
-            accessibilityRole="button"
-            accessibilityLabel="Send"
-            accessibilityHint="Hold to send with an effect"
-          >
-            <Text style={styles.sendArrow}>↑</Text>
-          </Pressable>
+      <View
+        style={[
+          styles.bottom,
+          { paddingBottom: Math.max(insets.bottom - 6, 8) },
+        ]}
+      >
+        {__DEV__ && (
+          <View style={styles.devRow}>
+            {SCREEN_EFFECTS.map((e) => (
+              <Pressable
+                key={e}
+                onPress={() => send(e)}
+                style={styles.devChip}
+                accessibilityRole="button"
+                accessibilityLabel={`Send with ${EFFECT_LABEL[e]}`}
+              >
+                <Text style={styles.devChipText}>{EFFECT_LABEL[e]}</Text>
+              </Pressable>
+            ))}
+          </View>
+        )}
+        <View style={styles.composer}>
+          <View style={styles.plus}>
+            <Plus />
+          </View>
+          <View style={styles.inputWrap}>
+            <TextInput
+              value={draft}
+              onChangeText={setDraft}
+              placeholder="iMessage"
+              placeholderTextColor="#6E6E73"
+              style={styles.input}
+              multiline
+              keyboardAppearance="dark"
+              accessibilityLabel="Message"
+            />
+            {draft.trim() ? (
+              <Pressable
+                onPress={sendPlain}
+                onLongPress={openSheet}
+                delayLongPress={350}
+                style={styles.send}
+                accessibilityRole="button"
+                accessibilityLabel="Send"
+                accessibilityHint="Hold to send with an effect"
+              >
+                <Text style={styles.sendArrow}>↑</Text>
+              </Pressable>
+            ) : (
+              <View style={styles.micWrap}>
+                <Microphone color="#8E8E93" />
+              </View>
+            )}
+          </View>
         </View>
       </View>
 
@@ -246,17 +292,37 @@ const styles = StyleSheet.create({
   threadContent: {
     flexGrow: 1,
     justifyContent: 'flex-end',
-    paddingBottom: 10,
+    paddingBottom: 8,
+  },
+  intro: {
+    alignItems: 'center',
+    gap: 2,
+    marginBottom: 14,
+  },
+  introRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  introText: {
+    color: IM_MUTED,
+    fontSize: 14,
+  },
+  introDate: {
+    color: IM_MUTED,
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 18,
   },
   runGap: {
-    marginBottom: 8,
+    marginBottom: 4,
   },
   delivered: {
     alignSelf: 'flex-end',
-    color: '#8e8e93',
-    fontSize: 12,
+    color: IM_MUTED,
+    fontSize: 11,
     fontWeight: '600',
-    marginRight: 16,
+    marginRight: 18,
     marginTop: 3,
   },
 
@@ -266,102 +332,103 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(22,22,24,0.94)',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(255,255,255,0.14)',
-    paddingBottom: 6,
+    paddingHorizontal: 15,
+    backgroundColor: IM_BG,
   },
-  back: {
-    width: 56,
-    height: 44,
-    justifyContent: 'center',
-    paddingLeft: 10,
-  },
-  backChevron: {
-    color: IM_BLUE,
-    fontSize: 36,
-    lineHeight: 40,
-    marginTop: -4,
-  },
-  contact: {
-    alignItems: 'center',
-    gap: 2,
-  },
-  avatar: {
+  circle: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#8e8e93',
+    backgroundColor: IM_CHROME,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+  },
+  contact: {
+    alignItems: 'center',
+    gap: 6,
+    paddingBottom: 6,
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#4A465D',
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
     color: '#fff',
-    fontSize: 20,
-    fontWeight: '600',
+    fontSize: 27,
+    fontWeight: '700',
+  },
+  namePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    height: 30,
+    paddingLeft: 14,
+    paddingRight: 12,
+    borderRadius: 15,
+    backgroundColor: IM_CHROME,
   },
   contactName: {
     color: '#fff',
-    fontSize: 11,
+    fontSize: 17,
+    fontWeight: '600',
   },
 
+  bottom: {
+    backgroundColor: IM_BG,
+  },
   devRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  devLabel: {
-    color: '#6e6e73',
-    fontSize: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 6,
   },
   devChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    backgroundColor: '#1c1c1e',
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.06)',
   },
   devChipText: {
-    color: '#d1d1d6',
-    fontSize: 12,
+    color: '#6E6E73',
+    fontSize: 11,
   },
 
   composer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: 10,
-    paddingHorizontal: 12,
+    gap: 11,
+    paddingLeft: 16,
+    paddingRight: 16,
     paddingTop: 6,
-    backgroundColor: IM_BG,
   },
   plus: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: '#1c1c1e',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: IM_CHROME,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 1,
-  },
-  plusText: {
-    color: '#8e8e93',
-    fontSize: 22,
-    marginTop: -2,
   },
   inputWrap: {
     flex: 1,
-    minHeight: 36,
-    borderRadius: 18,
+    minHeight: 40,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.22)',
+    borderColor: 'rgba(255,255,255,0.14)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingLeft: 14,
-    paddingRight: 4,
+    paddingLeft: 18,
+    paddingRight: 6,
     paddingVertical: 3,
   },
   input: {
@@ -369,24 +436,28 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 17,
     maxHeight: 110,
-    paddingTop: 5,
-    paddingBottom: 5,
+    paddingTop: 7,
+    paddingBottom: 7,
+  },
+  micWrap: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 1,
   },
   send: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: IM_BLUE,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 1,
   },
-  sendIdle: {
-    backgroundColor: '#48484a',
-  },
   sendArrow: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '700',
     marginTop: -2,
   },
