@@ -12,6 +12,14 @@ import type { ExampleCategory, HomeScreenNavigationProp } from '../types';
 
 const EXAMPLE_CATEGORIES: ExampleCategory[] = [
   {
+    id: 'hourglass',
+    title: 'Hourglass',
+    description: 'A Pomodoro timer — tilt the sand, flip your phone to restart',
+    screen: 'HourglassExample',
+    color: '#8a6a3c',
+    image: require('../../assets/components/hourglass.png'),
+  },
+  {
     id: 'dandelion',
     title: 'Dandelion',
     description: 'Blow on your phone and the seeds drift away',

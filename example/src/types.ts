@@ -41,6 +41,7 @@ export type RootStackParamList = {
   Magic8BallExample: undefined;
   CigaretteExample: undefined;
   DandelionExample: undefined;
+  HourglassExample: undefined;
 };
 
 export type HomeScreenNavigationProp =
