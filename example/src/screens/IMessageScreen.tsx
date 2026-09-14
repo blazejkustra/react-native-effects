@@ -67,7 +67,7 @@ const HEADER_H = 60 + 6 + 30;
 export default function IMessageScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
-  const { messages, playing, send, finishPlaying, getTarget } =
+  const { messages, playing, busy, send, finishPlaying, getTarget } =
     useIMessageEffects();
   const [draft, setDraft] = useState('');
   const [sheet, setSheet] = useState<string | null>(null);
@@ -228,13 +228,15 @@ export default function IMessageScreen() {
               <Pressable
                 key={e}
                 onPress={() => send(e)}
+                disabled={busy}
                 style={({ pressed }) => [
                   styles.effectChip,
                   used && styles.effectChipUsed,
                   pressed && styles.effectChipPressed,
+                  busy && styles.effectChipBusy,
                 ]}
                 accessibilityRole="button"
-                accessibilityState={{ selected: used }}
+                accessibilityState={{ selected: used, disabled: busy }}
                 accessibilityLabel={`Send with ${EFFECT_LABEL[e]}`}
               >
                 {({ pressed }) => (
@@ -429,6 +431,10 @@ const styles = StyleSheet.create({
     borderColor: IM_BLUE,
     backgroundColor: IM_BLUE,
     transform: [{ scale: 0.94 }],
+  },
+  // Kacper is typing: hold the row until his reply lands.
+  effectChipBusy: {
+    opacity: 0.4,
   },
   effectChipText: {
     color: '#D1D1D6',

@@ -132,8 +132,14 @@ export function useIMessageEffects() {
   // the default line and gets no reply.
   const spoken = useRef(new Set<ScreenEffectId>());
   const replyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // True while Kacper is "typing": presses are ignored so a quick run of taps
+  // cannot post three lines before his first answer lands.
+  const [busy, setBusy] = useState(false);
 
   const send = useCallback((effect: EffectId, text?: string) => {
+    if (replyTimer.current !== null) {
+      return null;
+    }
     let body = text?.trim();
     let reply: string | null = null;
     if (!body) {
@@ -165,12 +171,13 @@ export function useIMessageEffects() {
         }, wait);
       });
     }
-    // Kacper answers a beat later. One pending reply at a time, so mashing
-    // buttons does not queue a monologue.
-    if (reply !== null && replyTimer.current === null) {
+    // Kacper answers a beat later; nothing else can be sent until he has.
+    if (reply !== null) {
       const line = reply;
+      setBusy(true);
       replyTimer.current = setTimeout(() => {
         replyTimer.current = null;
+        setBusy(false);
         setMessages((prev) => [
           ...prev,
           {
@@ -203,7 +210,7 @@ export function useIMessageEffects() {
     []
   );
 
-  return { messages, playing, send, finishPlaying, getTarget };
+  return { messages, playing, busy, send, finishPlaying, getTarget };
 }
 
 /**

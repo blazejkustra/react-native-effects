@@ -1,7 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
-// Messages' chrome glyphs drawn from plain views so they stay crisp at any
-// scale without an icon font: chevron, video camera, plus, microphone, lock.
+// Messages' chrome glyphs. Most are drawn from plain views so they stay crisp
+// at any scale without an icon font; the video camera is the SF Symbol
+// "video" rendered to a white mask (assets/imessage/video.png) and tinted,
+// because its flared lens does not draw well from rectangles.
 
 const WHITE = '#fff';
 
@@ -29,12 +31,15 @@ export function Chevron({
   );
 }
 
+const VIDEO_GLYPH = require('../../../assets/imessage/video.png');
+
 export function VideoCamera({ color = WHITE }: { color?: string }) {
   return (
-    <View style={styles.camera}>
-      <View style={[styles.cameraBody, { borderColor: color }]} />
-      <View style={[styles.cameraLens, { borderColor: color }]} />
-    </View>
+    <Image
+      source={VIDEO_GLYPH}
+      resizeMode="contain"
+      style={[styles.camera, { tintColor: color }]}
+    />
   );
 }
 
@@ -69,23 +74,7 @@ const styles = StyleSheet.create({
   },
   camera: {
     width: 26,
-    height: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cameraBody: {
-    width: 18,
-    height: 14,
-    borderRadius: 4,
-    borderWidth: 2,
-  },
-  cameraLens: {
-    width: 8,
-    height: 8,
-    borderTopWidth: 2,
-    borderRightWidth: 2,
-    marginLeft: -3,
-    transform: [{ rotate: '45deg' }],
+    height: 18,
   },
   plus: {
     fontSize: 28,
