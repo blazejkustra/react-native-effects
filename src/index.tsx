@@ -8,6 +8,7 @@ import Silk from './components/Silk';
 import Campfire from './components/Campfire';
 import CalicoSwirl from './components/CalicoSwirl';
 import Aurora from './components/Aurora';
+import Nebula from './components/Nebula';
 import { useParamsSynchronizable } from './hooks/useParamsSynchronizable';
 
 export type {
@@ -28,5 +29,6 @@ export {
   Campfire,
   CalicoSwirl,
   Aurora,
+  Nebula,
   useParamsSynchronizable,
 };

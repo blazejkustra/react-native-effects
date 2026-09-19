@@ -258,6 +258,14 @@ const EXAMPLE_CATEGORIES: ExampleCategory[] = [
     image: require('../../assets/components/aurora.png'),
   },
   {
+    id: 'nebula',
+    title: 'Nebula',
+    description: 'Swirling clouds of cosmic dust',
+    screen: 'NebulaStatic',
+    color: '#a855f7',
+    image: require('../../assets/components/aurora.png'),
+  },
+  {
     id: 'siri-orb',
     title: 'Siri Orb',
     description: 'Luminous breathing sphere with swirling colors',

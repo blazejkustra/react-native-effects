@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/blazejkustra/softlint/main/softlint.schema.json",
+  "rules": [
+    {
+      "rule": "WGSL shader loops must have a fixed upper bound. A loop whose iteration count comes from a user param or uniform (for example `i32(u.params0.y)`) without a constant cap can hang the GPU.",
+      "files": ["src/**"]
+    },
+    {
+      "rule": "Effects must animate inside the shader using `u.time`, not on the JS thread: driving animation with setInterval, requestAnimationFrame or React state that updates every frame breaks this rule.",
+      "files": ["src/**"]
+    },
+    {
+      "rule": "Public props of an effect component must be named after the visual result a user wants (like `intensity`, `layers`, `speed`), not after shader internals (like `fbmOctaves`, `uvScale`, `params0`).",
+      "files": ["src/components/**"]
+    }
+  ]
+}

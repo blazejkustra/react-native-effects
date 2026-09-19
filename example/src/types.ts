@@ -15,6 +15,7 @@ export type RootStackParamList = {
   CampfireStatic: undefined;
   CalicoSwirlStatic: undefined;
   AuroraStatic: undefined;
+  NebulaStatic: undefined;
   DesertStatic: undefined;
   HoloStatic: undefined;
   GlitterStatic: undefined;

@@ -1,0 +1,13 @@
+name: softlint
+on: pull_request
+
+permissions:
+  contents: read
+
+jobs:
+  softlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: blazejkustra/softlint@v1
+        with:
+          jev-api-key: ${{ secrets.JEV_API_KEY }}

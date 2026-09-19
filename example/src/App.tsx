@@ -17,6 +17,7 @@ import SilkScreen from './screens/SilkScreen';
 import CampfireScreen from './screens/CampfireScreen';
 import CalicoSwirlScreen from './screens/CalicoSwirlScreen';
 import AuroraScreen from './screens/AuroraScreen';
+import NebulaScreen from './screens/NebulaScreen';
 import CircularGradientScreen from './screens/CircularGradientScreen';
 import SiriOrbScreen from './screens/SiriOrbScreen';
 import HoloCardScreen from './screens/HoloCardScreen';
@@ -101,6 +102,7 @@ export default function App() {
             component={CalicoSwirlScreen}
           />
           <Stack.Screen name="AuroraStatic" component={AuroraScreen} />
+          <Stack.Screen name="NebulaStatic" component={NebulaScreen} />
           <Stack.Screen
             name="CircularGradientList"
             component={CircularGradientScreen}
