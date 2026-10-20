@@ -75,11 +75,7 @@ export default function ScrollReactiveScreen() {
         pointerEvents="none"
       />
 
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent
-      />
+      <StatusBar barStyle="light-content" />
 
       <View
         style={[styles.backWrap, { top: insets.top + 6 }]}

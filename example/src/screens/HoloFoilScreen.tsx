@@ -11,7 +11,7 @@ export default function HoloFoilScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" translucent />
+      <StatusBar barStyle="light-content" />
 
       <View style={styles.center}>
         <GestureDetector gesture={pan}>

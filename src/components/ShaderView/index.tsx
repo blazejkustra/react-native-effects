@@ -401,7 +401,14 @@ export default function ShaderView({
   return (
     <Canvas
       ref={canvasRef}
-      transparent={transparent}
+      // Android only: a translucent canvas needs a TextureView to blend with
+      // the views beneath it; an opaque one uses the faster SurfaceView (the
+      // mapping the old `transparent` Canvas prop did). Fixed at mount.
+      android={
+        transparent
+          ? { backingView: 'TextureView' }
+          : { backingView: 'SurfaceView' }
+      }
       style={[styles.canvas, style]}
       {...viewProps}
       onLayout={(event) => {

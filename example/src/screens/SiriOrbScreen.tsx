@@ -21,7 +21,7 @@ export default function SiriOrbScreen() {
         resizeMode="contain"
       />
 
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
 
       <TouchableOpacity
         style={styles.backButton}

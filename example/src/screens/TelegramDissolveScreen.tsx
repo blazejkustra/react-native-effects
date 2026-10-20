@@ -383,17 +383,14 @@ export default function TelegramDissolveScreen() {
       )
     : 0;
   const menuRectY = menu?.rect.y ?? 0;
-  const cloneStyle = useAnimatedStyle(
-    () => ({
-      transform: [{ translateY: (menuTop - menuRectY) * lift.value }],
-    }),
-    [menuTop, menuRectY]
-  );
+  const cloneStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: (menuTop - menuRectY) * lift.value }],
+  }));
   const dimStyle = useAnimatedStyle(() => ({ opacity: lift.value }));
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" translucent />
+      <StatusBar barStyle="light-content" />
 
       {/* Chat wallpaper */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">

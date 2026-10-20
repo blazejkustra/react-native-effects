@@ -286,7 +286,7 @@ export default function TelegramSpoilerScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" translucent />
+      <StatusBar barStyle="light-content" />
 
       <View style={StyleSheet.absoluteFill} pointerEvents="none">
         <Image

@@ -7,7 +7,7 @@ export default function LiquidChromeScreen() {
     <View style={styles.container}>
       <LiquidChrome style={StyleSheet.absoluteFill} />
 
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
 
       <Header
         title="Liquid Chrome"

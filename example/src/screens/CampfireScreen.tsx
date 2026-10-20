@@ -5,7 +5,7 @@ import { Header } from '../components/Header';
 export default function CampfireScreen() {
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
 
       <Header
         title="Campfire"

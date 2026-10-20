@@ -7,7 +7,7 @@ export default function CalicoSwirlScreen() {
     <View style={styles.container}>
       <CalicoSwirl style={styles.calicoSwirl} />
 
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
 
       <Header
         title="Calico Swirl"
