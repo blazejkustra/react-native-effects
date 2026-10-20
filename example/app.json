@@ -19,7 +19,10 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.blazejkustra.rneffects"
+      "package": "com.blazejkustra.rneffects",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       [

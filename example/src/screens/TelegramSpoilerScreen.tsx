@@ -427,8 +427,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 15,
   },
+  // Not 'transparent': Android's renderer reads colour 0 as "unset", so a
+  // nested span would inherit the parent's white. Alpha 1/255 never shows.
   clear: {
-    color: 'transparent',
+    color: 'rgba(255,255,255,0.004)',
   },
   spanText: {
     color: '#fff',
