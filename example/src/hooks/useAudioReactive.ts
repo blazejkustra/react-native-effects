@@ -72,7 +72,7 @@ export function useAudioReactive(options: AudioReactiveOptions = {}): {
     try {
       ctxRef.current?.suspend();
     } catch {}
-    AudioManager.setAudioSessionActivity(false);
+    AudioManager.setAudioSessionActivity(false).catch(() => {});
     smooth.current = { level: 0, bass: 0, treble: 0 };
     setParamsSynchronizable(0, 0, 0, 0);
     setListening(false);
@@ -92,8 +92,9 @@ export function useAudioReactive(options: AudioReactiveOptions = {}): {
         setError('Microphone permission denied');
         return;
       }
-      const active = await AudioManager.setAudioSessionActivity(true);
-      if (!active) {
+      try {
+        await AudioManager.setAudioSessionActivity(true);
+      } catch {
         setError('Could not activate the audio session');
         return;
       }

@@ -97,7 +97,7 @@ export default function HourglassScreen() {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="dark-content" translucent backgroundColor="#0000" />
+      <StatusBar barStyle="dark-content" />
       <Hourglass
         style={StyleSheet.absoluteFill}
         paramsSynchronizable={paramsSynchronizable}

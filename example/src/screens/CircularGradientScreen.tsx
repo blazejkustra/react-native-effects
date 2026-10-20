@@ -71,7 +71,7 @@ const GRADIENT_PRESETS: GradientConfig[] = [
 export default function CircularGradientScreen() {
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
+      <StatusBar barStyle="light-content" />
 
       <Header
         title="Circular Gradients"

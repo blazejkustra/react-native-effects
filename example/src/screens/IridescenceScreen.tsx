@@ -7,7 +7,7 @@ export default function IridescenceScreen() {
     <View style={styles.container}>
       <Iridescence style={StyleSheet.absoluteFill} />
 
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
 
       <Header
         title="Iridescence"

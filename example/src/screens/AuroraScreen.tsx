@@ -7,7 +7,7 @@ export default function AuroraScreen() {
     <View style={styles.container}>
       <Aurora style={StyleSheet.absoluteFill} />
 
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
 
       <Header title="Aurora" subtitle="Northern lights curtains" transparent />
 

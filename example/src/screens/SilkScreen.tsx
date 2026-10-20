@@ -7,7 +7,7 @@ export default function SilkScreen() {
     <View style={styles.container}>
       <Silk style={StyleSheet.absoluteFill} />
 
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
 
       <Header title="Silk" subtitle="Smooth flowing fabric" transparent />
 

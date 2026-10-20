@@ -102,7 +102,7 @@ export default function VoiceDeleteScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={BG} translucent />
+      <StatusBar barStyle="light-content" />
 
       <ScrollView
         contentContainerStyle={[

@@ -37,7 +37,7 @@ export default function FoamLabScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" translucent />
+      <StatusBar barStyle="light-content" />
       {VARIANTS.map((name, i) => (
         <View key={name} style={{ height: tileH }}>
           <ShaderView

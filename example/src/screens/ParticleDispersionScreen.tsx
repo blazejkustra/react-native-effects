@@ -137,7 +137,7 @@ export default function ParticleDispersionScreen() {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" translucent backgroundColor="#0000" />
+      <StatusBar barStyle="light-content" />
       <ParticleDispersion
         style={StyleSheet.absoluteFill}
         paramsSynchronizable={paramsSynchronizable}

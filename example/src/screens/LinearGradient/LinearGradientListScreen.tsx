@@ -39,7 +39,7 @@ export default function LinearGradientListScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
+      <StatusBar barStyle="light-content" />
 
       <Header
         title="Linear Gradients"

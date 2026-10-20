@@ -15,11 +15,7 @@ export default function TouchFieldScreen() {
         style={StyleSheet.absoluteFill}
       />
 
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent
-      />
+      <StatusBar barStyle="light-content" />
 
       <View
         style={[styles.backWrap, { top: insets.top + 6 }]}
