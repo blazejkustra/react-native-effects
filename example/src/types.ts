@@ -44,6 +44,17 @@ export type RootStackParamList = {
   HourglassExample: undefined;
   TelegramSpoilerExample: undefined;
   IMessageExample: undefined;
+  CrackedScreenExample: undefined;
+  DuoCrackgateExample: undefined;
+  PolaroidExample: undefined;
+  ScratchOffExample: undefined;
+  BubbleWrapExample: undefined;
+  LavaLampExample: undefined;
+  FerrofluidExample: undefined;
+  CrtOffExample: undefined;
+  FlashlightExample: undefined;
+  WalletPayExample: undefined;
+  NameDropExample: undefined;
 };
 
 export type HomeScreenNavigationProp =

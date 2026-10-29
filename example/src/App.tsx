@@ -44,6 +44,17 @@ import DandelionScreen from './screens/DandelionScreen';
 import HourglassScreen from './screens/HourglassScreen';
 import TelegramSpoilerScreen from './screens/TelegramSpoilerScreen';
 import IMessageScreen from './screens/IMessageScreen';
+import CrackedScreenScreen from './screens/CrackedScreenScreen';
+import DuoCrackgateScreen from './screens/DuoCrackgateScreen';
+import PolaroidScreen from './screens/PolaroidScreen';
+import ScratchOffScreen from './screens/ScratchOffScreen';
+import BubbleWrapScreen from './screens/BubbleWrapScreen';
+import LavaLampScreen from './screens/LavaLampScreen';
+import FerrofluidScreen from './screens/FerrofluidScreen';
+import CrtOffScreen from './screens/CrtOffScreen';
+import FlashlightScreen from './screens/FlashlightScreen';
+import WalletPayScreen from './screens/WalletPayScreen';
+import NameDropScreen from './screens/NameDropScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -149,6 +160,23 @@ export default function App() {
             component={TelegramSpoilerScreen}
           />
           <Stack.Screen name="IMessageExample" component={IMessageScreen} />
+          <Stack.Screen
+            name="CrackedScreenExample"
+            component={CrackedScreenScreen}
+          />
+          <Stack.Screen
+            name="DuoCrackgateExample"
+            component={DuoCrackgateScreen}
+          />
+          <Stack.Screen name="PolaroidExample" component={PolaroidScreen} />
+          <Stack.Screen name="ScratchOffExample" component={ScratchOffScreen} />
+          <Stack.Screen name="BubbleWrapExample" component={BubbleWrapScreen} />
+          <Stack.Screen name="LavaLampExample" component={LavaLampScreen} />
+          <Stack.Screen name="FerrofluidExample" component={FerrofluidScreen} />
+          <Stack.Screen name="CrtOffExample" component={CrtOffScreen} />
+          <Stack.Screen name="FlashlightExample" component={FlashlightScreen} />
+          <Stack.Screen name="WalletPayExample" component={WalletPayScreen} />
+          <Stack.Screen name="NameDropExample" component={NameDropScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>
