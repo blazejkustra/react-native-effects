@@ -28,7 +28,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BackButton } from '../components/BackButton';
 import LeatherMaterial from '../components/materials/LeatherMaterial';
 import WoodMaterial from '../components/materials/WoodMaterial';
 import SandMaterial from '../components/materials/SandMaterial';
@@ -89,7 +88,7 @@ const MATERIALS: MaterialDef[] = [
     key: 'metal',
     caption: 'Brushed stainless, wet',
     title: 'Metal',
-    hint: 'Hold to pool water — it runs',
+    hint: 'Hold to pool water, then let it run',
     Component: MetalMaterial,
   },
 ];
@@ -237,13 +236,6 @@ export default function MaterialsScreen() {
         ))}
       </ScrollView>
 
-      <View
-        style={[styles.backWrap, { top: insets.top + 6 }]}
-        pointerEvents="box-none"
-      >
-        <BackButton />
-      </View>
-
       {expanded && rect && (
         <Animated.View style={[styles.overlay, containerStyle]}>
           <Animated.View
@@ -320,11 +312,6 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.62)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 9,
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
   overlay: {
     position: 'absolute',

@@ -6,7 +6,6 @@ import {
   StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'react-native-effects';
-import { BackButton } from '../../components/BackButton';
 import { useState, useCallback } from 'react';
 
 type ColorScheme = {
@@ -50,16 +49,8 @@ export default function LinearGradientAnimatedScreen() {
 
       <StatusBar barStyle="light-content" />
 
-      <View style={styles.header}>
-        <BackButton />
-      </View>
-
       <View style={styles.content}>
         <View style={styles.infoCard}>
-          <Text style={styles.title}>Animated Linear Gradient</Text>
-          <Text style={styles.subtitle}>
-            Watch the gradient rotate continuously
-          </Text>
           <Text style={styles.schemeName}>{currentScheme.name}</Text>
         </View>
 
@@ -68,13 +59,13 @@ export default function LinearGradientAnimatedScreen() {
             style={styles.controlButton}
             onPress={handlePreviousScheme}
           >
-            <Text style={styles.controlButtonText}>← Previous</Text>
+            <Text style={styles.controlButtonText}>Previous</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.controlButton}
             onPress={handleNextScheme}
           >
-            <Text style={styles.controlButtonText}>Next →</Text>
+            <Text style={styles.controlButtonText}>Next</Text>
           </TouchableOpacity>
         </View>
 
@@ -108,11 +99,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  header: {
-    paddingTop: 60,
-    paddingHorizontal: 28,
-    paddingBottom: 20,
-  },
   content: {
     flex: 1,
     justifyContent: 'center',
@@ -127,21 +113,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
     marginBottom: 40,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#fff',
-    marginBottom: 12,
-    textAlign: 'center',
-    letterSpacing: -0.5,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
-    textAlign: 'center',
-    marginBottom: 24,
-    fontWeight: '400',
   },
   schemeName: {
     fontSize: 24,

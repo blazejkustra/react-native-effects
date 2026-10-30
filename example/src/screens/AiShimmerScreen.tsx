@@ -10,12 +10,11 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ShimmerSweep from '../components/ShimmerSweep';
-import { BackButton } from '../components/BackButton';
 
 const THINK_MS = 2600;
 
 const ANSWER =
-  'react-native-effects renders procedural WGSL shaders on WebGPU — off the JS thread, at 60fps. Aurora, liquid chrome, holographic foil, a card that snaps to dust… all generated in real time, no images or video. Just drop in a <ShaderView />.';
+  'react-native-effects renders procedural WGSL shaders on WebGPU, off the JS thread, at 60fps. Aurora, liquid chrome, holographic foil, a card that snaps to dust… all generated in real time, no images or video. Just drop in a <ShaderView />.';
 
 /** Grey placeholder lines that the iridescent shimmer sweeps across. */
 function Skeleton() {
@@ -55,10 +54,9 @@ export default function AiShimmerScreen() {
       <StatusBar barStyle="light-content" />
 
       <View style={[styles.header, { paddingTop: insets.top + 6 }]}>
-        <BackButton />
         <Text style={styles.title}>Assistant</Text>
         <Text style={styles.subtitle}>
-          {thinking ? 'Generating…' : 'react-native-effects ✦'}
+          {thinking ? 'Generating…' : 'react-native-effects'}
         </Text>
       </View>
 

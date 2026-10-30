@@ -6,8 +6,11 @@ import {
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform, StyleSheet } from 'react-native';
+import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import HomeScreen from './screens/HomeScreen';
+import SearchScreen from './screens/SearchScreen';
+import AboutScreen from './screens/AboutScreen';
 import LinearGradientListScreen from './screens/LinearGradient/LinearGradientListScreen';
 import LinearGradientAnimatedScreen from './screens/LinearGradient/LinearGradientAnimatedScreen';
 import LinearGradientStaticScreen from './screens/LinearGradient/LinearGradientStaticScreen';
@@ -39,18 +42,27 @@ import ParticleDispersionScreen from './screens/ParticleDispersionScreen';
 import FoamLabScreen from './screens/FoamLabScreen';
 import VoiceDeleteScreen from './screens/VoiceDeleteScreen';
 import Magic8BallScreen from './screens/Magic8BallScreen';
-import CigaretteScreen from './screens/CigaretteScreen';
 import DandelionScreen from './screens/DandelionScreen';
 import HourglassScreen from './screens/HourglassScreen';
 import TelegramSpoilerScreen from './screens/TelegramSpoilerScreen';
 import IMessageScreen from './screens/IMessageScreen';
+import CrackedScreenScreen from './screens/CrackedScreenScreen';
+import DuoCrackgateScreen from './screens/DuoCrackgateScreen';
+import PolaroidScreen from './screens/PolaroidScreen';
+import ScratchOffScreen from './screens/ScratchOffScreen';
+import BubbleWrapScreen from './screens/BubbleWrapScreen';
+import LavaLampScreen from './screens/LavaLampScreen';
+import FerrofluidScreen from './screens/FerrofluidScreen';
+import CrtOffScreen from './screens/CrtOffScreen';
+import FlashlightScreen from './screens/FlashlightScreen';
+import WalletPayScreen from './screens/WalletPayScreen';
+import NameDropScreen from './screens/NameDropScreen';
 import type { RootStackParamList } from './types';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-// Dark theme so the surface revealed behind/around the cards during a stack
-// transition is black, not React Navigation's default light grey (which flashed
-// white at the screen edges while sliding).
+// Dark theme so the surface revealed during a stack transition stays black,
+// not React Navigation's default light grey.
 const navTheme: Theme = {
   ...DefaultTheme,
   dark: true,
@@ -61,6 +73,16 @@ const navTheme: Theme = {
   },
 };
 
+const listHeader = (title: string): NativeStackNavigationOptions => ({
+  title,
+  headerShown: true,
+  headerTintColor: '#fff',
+  headerShadowVisible: false,
+  headerBackButtonDisplayMode: 'minimal',
+  headerStyle: { backgroundColor: '#000' },
+  headerTitleStyle: { color: '#fff' },
+});
+
 export default function App() {
   return (
     <GestureHandlerRootView style={styles.root}>
@@ -68,15 +90,29 @@ export default function App() {
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
-            animation: Platform.OS === 'web' ? 'none' : 'slide_from_right',
+            animation: Platform.OS === 'web' ? 'none' : 'default',
             contentStyle: { backgroundColor: '#000' },
             presentation: 'card',
           }}
         >
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen
+            name="Search"
+            component={SearchScreen}
+            options={{ animation: 'fade' }}
+          />
+          <Stack.Screen
+            name="About"
+            component={AboutScreen}
+            options={{
+              presentation: 'pageSheet',
+              contentStyle: { backgroundColor: '#121212' },
+            }}
+          />
+          <Stack.Screen
             name="LinearGradientList"
             component={LinearGradientListScreen}
+            options={listHeader('Linear Gradient')}
           />
           <Stack.Screen
             name="LinearGradientAnimated"
@@ -85,6 +121,7 @@ export default function App() {
           <Stack.Screen
             name="LinearGradientStatic"
             component={LinearGradientStaticScreen}
+            options={listHeader('Static')}
           />
           <Stack.Screen
             name="IridescenceStatic"
@@ -104,6 +141,7 @@ export default function App() {
           <Stack.Screen
             name="CircularGradientList"
             component={CircularGradientScreen}
+            options={listHeader('Circular Gradient')}
           />
           <Stack.Screen name="SiriOrbStatic" component={SiriOrbScreen} />
           <Stack.Screen name="HoloCardExample" component={HoloCardScreen} />
@@ -141,7 +179,6 @@ export default function App() {
             component={VoiceDeleteScreen}
           />
           <Stack.Screen name="Magic8BallExample" component={Magic8BallScreen} />
-          <Stack.Screen name="CigaretteExample" component={CigaretteScreen} />
           <Stack.Screen name="DandelionExample" component={DandelionScreen} />
           <Stack.Screen name="HourglassExample" component={HourglassScreen} />
           <Stack.Screen
@@ -149,6 +186,23 @@ export default function App() {
             component={TelegramSpoilerScreen}
           />
           <Stack.Screen name="IMessageExample" component={IMessageScreen} />
+          <Stack.Screen
+            name="CrackedScreenExample"
+            component={CrackedScreenScreen}
+          />
+          <Stack.Screen
+            name="DuoCrackgateExample"
+            component={DuoCrackgateScreen}
+          />
+          <Stack.Screen name="PolaroidExample" component={PolaroidScreen} />
+          <Stack.Screen name="ScratchOffExample" component={ScratchOffScreen} />
+          <Stack.Screen name="BubbleWrapExample" component={BubbleWrapScreen} />
+          <Stack.Screen name="LavaLampExample" component={LavaLampScreen} />
+          <Stack.Screen name="FerrofluidExample" component={FerrofluidScreen} />
+          <Stack.Screen name="CrtOffExample" component={CrtOffScreen} />
+          <Stack.Screen name="FlashlightExample" component={FlashlightScreen} />
+          <Stack.Screen name="WalletPayExample" component={WalletPayScreen} />
+          <Stack.Screen name="NameDropExample" component={NameDropScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

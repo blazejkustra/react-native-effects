@@ -12,7 +12,6 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useParamsSynchronizable } from 'react-native-effects';
 import ScrollReactive from '../components/ScrollReactive';
-import { BackButton } from '../components/BackButton';
 
 // A serif face does most of the work of escaping the generic glassy-SaaS look.
 // System serifs only — no font loading required.
@@ -58,8 +57,6 @@ export default function ScrollReactiveScreen() {
     [setParamsSynchronizable]
   );
 
-  console.log('render ScrollReactiveScreen'); // Should only log once per page, never every frame.
-
   return (
     <View style={styles.container}>
       <ScrollReactive
@@ -76,13 +73,6 @@ export default function ScrollReactiveScreen() {
       />
 
       <StatusBar barStyle="light-content" />
-
-      <View
-        style={[styles.backWrap, { top: insets.top + 6 }]}
-        pointerEvents="box-none"
-      >
-        <BackButton />
-      </View>
 
       <ScrollView
         style={styles.scroll}
@@ -148,12 +138,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 26,
-  },
-
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
 
   /* Masthead */

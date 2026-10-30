@@ -7,7 +7,6 @@ import {
   Dimensions,
 } from 'react-native';
 import { CircularGradient } from 'react-native-effects';
-import { Header } from '../components/Header';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 80;
@@ -73,11 +72,6 @@ export default function CircularGradientScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      <Header
-        title="Circular Gradients"
-        subtitle="Customizable radial gradients"
-      />
-
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -121,12 +115,6 @@ export default function CircularGradientScreen() {
             </View>
           </View>
         ))}
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            All gradients rendered with WebGPU
-          </Text>
-        </View>
       </ScrollView>
     </View>
   );
@@ -142,7 +130,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 40,
-    paddingTop: 40,
+    paddingTop: 16,
     paddingBottom: 80,
     alignItems: 'center',
   },
@@ -154,14 +142,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#252525',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-    elevation: 10,
   },
   gradientWrapper: {
     width: '100%',
@@ -204,16 +184,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'monospace',
     color: '#aaa',
-    fontWeight: '500',
-  },
-  footer: {
-    marginTop: 20,
-    paddingVertical: 20,
-  },
-  footerText: {
-    fontSize: 14,
-    color: '#555',
-    textAlign: 'center',
     fontWeight: '500',
   },
 });

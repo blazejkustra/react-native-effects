@@ -1,18 +1,53 @@
 {
   "expo": {
-    "name": "RN Effects",
+    "name": "Effects",
     "slug": "react-native-effects-example",
     "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
     "scheme": "react-native-effects-example",
     "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000000"
-    },
     "ios": {
       "bundleIdentifier": "com.blazejkustra.rneffects",
-      "supportsTablet": true
+      "buildNumber": "1",
+      "supportsTablet": false,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "privacyManifests": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyCollectedDataTypes": [],
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1",
+              "0A2A.1",
+              "3B52.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "35F9.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryDiskSpace",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "E174.1",
+              "85F4.1"
+            ]
+          }
+        ]
+      },
+      "appleTeamId": "9S2Q77K6U6"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,7 +68,30 @@
       [
         "react-native-audio-api",
         {
-          "iosMicrophonePermission": "RN Effects uses the microphone so the shaders react to your voice."
+          "iosMicrophonePermission": "Effects listens to the microphone so effects can react to your voice and to you blowing on the screen. Audio is analysed live on your iPhone and is never recorded or sent anywhere.",
+          "iosBackgroundMode": false
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Effects uses the camera to take a photo for the instant camera effect. The photo stays on your iPhone and is never uploaded.",
+          "microphonePermission": "Effects listens to the microphone so effects can react to your voice and to you blowing on the screen. Audio is analysed live on your iPhone and is never recorded or sent anywhere."
+        }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Effects reads device motion so effects respond when you tilt, shake or flip your iPhone. Motion data stays on your iPhone."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 300,
+          "resizeMode": "contain",
+          "backgroundColor": "#000000"
         }
       ]
     ]

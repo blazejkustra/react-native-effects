@@ -7,7 +7,6 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Dandelion from '../components/dandelion/Dandelion';
 import { useAudioReactive } from '../hooks/useAudioReactive';
@@ -47,7 +46,6 @@ const MIC_WARMUP_MS = 400;
 export default function DandelionScreen() {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
   const { paramsSynchronizable, setBreath, reset, getDetached } =
     useDandelionPhysics();
   // Coarse view of the sim for the caption: 'full', 'some', or 'bald'.
@@ -123,21 +121,12 @@ export default function DandelionScreen() {
         head={HEAD}
       />
       {/* Tap anywhere to grow it back. A layer rather than a wrapping Pressable,
-          so Back and the caption stay separate accessibility nodes. */}
+          so the caption stays a separate accessibility node. */}
       <Pressable
         style={StyleSheet.absoluteFill}
         onPress={onPress}
         accessibilityLabel="Grow the dandelion back"
       />
-      <Pressable
-        onPress={() => navigation.goBack()}
-        hitSlop={12}
-        accessibilityRole="button"
-        accessibilityLabel="Back"
-        style={[styles.back, { top: insets.top + 6 }]}
-      >
-        <Text style={styles.backGlyph}>‹</Text>
-      </Pressable>
       <Text
         style={[
           styles.caption,
@@ -155,22 +144,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#3f6a2a',
-  },
-  back: {
-    position: 'absolute',
-    left: 14,
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backGlyph: {
-    color: '#fff',
-    fontSize: 34,
-    lineHeight: 36,
-    marginTop: -4,
-    textShadowColor: 'rgba(0,0,0,0.4)',
-    textShadowRadius: 6,
   },
   caption: {
     position: 'absolute',

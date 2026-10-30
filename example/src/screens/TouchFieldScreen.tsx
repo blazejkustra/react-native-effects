@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TouchField from '../components/TouchField';
-import { BackButton } from '../components/BackButton';
 
 export default function TouchFieldScreen() {
   const insets = useSafeAreaInsets();
@@ -15,14 +14,10 @@ export default function TouchFieldScreen() {
         style={StyleSheet.absoluteFill}
       />
 
-      <StatusBar barStyle="light-content" />
+      {/* Keeps the left edge free of the pan so the back swipe still works. */}
+      <View style={styles.backSwipeEdge} collapsable={false} />
 
-      <View
-        style={[styles.backWrap, { top: insets.top + 6 }]}
-        pointerEvents="box-none"
-      >
-        <BackButton />
-      </View>
+      <StatusBar barStyle="light-content" />
 
       {/* Hint pill. `pointerEvents="none"` so it never eats the drag gesture. */}
       <View
@@ -30,7 +25,7 @@ export default function TouchFieldScreen() {
         pointerEvents="none"
       >
         <View style={styles.hintPill}>
-          <Text style={styles.hintText}>Drag anywhere ✦</Text>
+          <Text style={styles.hintText}>Drag anywhere</Text>
         </View>
       </View>
     </View>
@@ -42,10 +37,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  backWrap: {
+  backSwipeEdge: {
     position: 'absolute',
-    left: 22,
-    zIndex: 100,
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: 24,
   },
   hintWrap: {
     position: 'absolute',
