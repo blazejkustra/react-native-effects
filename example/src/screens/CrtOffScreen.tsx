@@ -18,8 +18,11 @@ import { useParamsSynchronizable } from 'react-native-effects';
 import CrtTube from '../components/crt/CrtTube';
 import { playPowerOff, playPowerOn } from '../components/crt/tubeSound';
 
-/** A real iPhone home screen screenshot, its status bar painted out. */
-const HOME_SCREEN = require('../../assets/crt/home-screen.jpg');
+/**
+ * A real iOS home screen at device resolution. Its status bar and Dynamic
+ * Island are painted out because the live ones stay on top.
+ */
+const HOME_SCREEN = require('../../assets/crt/home-screen-ios.jpg');
 /** Seconds after a toggle during which the tube is still animating. */
 const SETTLE_S = 2.2;
 
@@ -112,7 +115,7 @@ export default function CrtOffScreen() {
 
   return (
     <View style={styles.root}>
-      <StatusBar hidden />
+      <StatusBar barStyle="light-content" />
       <View
         ref={contentRef}
         collapsable={false}

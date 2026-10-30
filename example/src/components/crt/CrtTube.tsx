@@ -47,7 +47,10 @@ struct Uniforms {
 @group(0) @binding(1) var samp: sampler;
 @group(0) @binding(2) var tex: texture_2d<f32>;
 
-const CURVE: f32 = 0.12;
+// Barrel curvature at rest and at full squash: at rest the tube shows the
+// phone screen almost untouched, the glass bulges as the picture collapses.
+const CURVE_REST: f32 = 0.0;
+const CURVE_SQUASH: f32 = 0.16;
 const PHOSPHOR: vec3<f32> = vec3<f32>(0.86, 0.93, 1.0);
 
 // Picture scale (x, y), the collapsed dot's brightness and the degauss
@@ -139,25 +142,28 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
     var local = p / box;
     local.x = local.x + b.wobble * 0.035 * sin(local.y * 9.0 + e * 38.0);
     var c = local * 0.5;
-    c = c * (1.0 + CURVE * (dot(c, c) - 0.25));
+    let curve = mix(CURVE_REST, CURVE_SQUASH, smoothstep(0.0, 0.5, compress + b.wobble));
+    c = c * (1.0 + curve * (dot(c, c) - 0.25));
     let cuv = c + 0.5;
     let edge = smoothstep(0.0, 0.006, cuv.x) * smoothstep(1.0, 0.994, cuv.x)
       * smoothstep(0.0, 0.004, cuv.y) * smoothstep(1.0, 0.996, cuv.y);
 
     var img = screen(clamp(cuv, vec2<f32>(0.0), vec2<f32>(1.0)), b.wobble);
     let t = u.time.x;
-    let scan = 0.94 + 0.06 * sin(cuv.y * res.y * 2.0944);
+    let crt = smoothstep(0.0, 0.4, compress + b.wobble);
+    let scan = 1.0 - mix(0.025, 0.06, crt) * (0.5 - 0.5 * sin(cuv.y * res.y * 2.0944));
     let flick = 1.0 + 0.012 * sin(t * 9.0) * sin(t * 2.3);
-    let band = 0.035 * exp(-pow((fract(cuv.y - t * 0.11) - 0.5) * 9.0, 2.0));
-    let vign = 1.0 - 0.35 * dot(c, c);
-    img = img * phosphorMask(uv.x * res.x) * scan * flick * vign + band;
+    let band = mix(0.015, 0.035, crt) * exp(-pow((fract(cuv.y - t * 0.11) - 0.5) * 9.0, 2.0));
+    let vign = 1.0 - mix(0.1, 0.35, crt) * dot(c, c);
+    let mask = mix(vec3<f32>(1.0), phosphorMask(uv.x * res.x), mix(0.35, 1.0, crt));
+    img = img * mask * scan * flick * vign + band;
     img = img * (1.0 + b.wobble * 0.22 * vec3<f32>(sin(e * 21.0), sin(e * 21.0 + 2.1), sin(e * 21.0 + 4.2)));
 
     let boost = 1.0 + 2.2 * compress * compress;
     let hot = vec3<f32>(1.0) - exp(-img * boost * 1.5);
     img = mix(img, hot, smoothstep(0.0, 0.3, compress));
     img = mix(img, PHOSPHOR * 1.4, smoothstep(0.09, 0.005, b.scale.y));
-    col = img * edge;
+    col = img * mix(1.0, edge, crt);
   }
 
   let glowR = (6.0 + 10.0 * compress) * dpr;
