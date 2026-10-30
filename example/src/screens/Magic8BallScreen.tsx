@@ -13,7 +13,6 @@ import Animated, {
   useAnimatedStyle,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BackButton } from '../components/BackButton';
 import Magic8Ball from '../components/magic8ball/Magic8Ball';
 import { useMagic8BallPhysics } from '../hooks/useMagic8BallPhysics';
 
@@ -211,12 +210,6 @@ export default function Magic8BallScreen() {
 
       {/* No title block: the object is the screen, and a heading over it
           only competes with the ball for the same dark space. */}
-      <View
-        style={[styles.backWrap, { top: insets.top + 6 }]}
-        pointerEvents="box-none"
-      >
-        <BackButton />
-      </View>
       <Text style={[styles.caption, { bottom: insets.bottom + 28, width }]}>
         Ask something, then shake it
       </Text>
@@ -228,11 +221,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#08090c',
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
   answerBox: {
     position: 'absolute',

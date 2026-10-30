@@ -1,12 +1,9 @@
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import { GestureDetector } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import HoloFoilCard from '../components/HoloFoilCard';
 import { useTilt } from '../hooks/useTilt';
-import { BackButton } from '../components/BackButton';
 
 export default function HoloFoilScreen() {
-  const insets = useSafeAreaInsets();
   const { paramsSynchronizable, pan, source } = useTilt();
 
   return (
@@ -40,13 +37,6 @@ export default function HoloFoilScreen() {
           {source === 'motion' ? 'Tilt your phone 🌈' : 'Drag the card 🌈'}
         </Text>
       </View>
-
-      <View
-        style={[styles.backWrap, { top: insets.top + 6 }]}
-        pointerEvents="box-none"
-      >
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -61,11 +51,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
   cardWrap: {
     width: '100%',

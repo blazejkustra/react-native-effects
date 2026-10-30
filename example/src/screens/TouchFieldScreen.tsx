@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, StatusBar } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import TouchField from '../components/TouchField';
-import { BackButton } from '../components/BackButton';
 
 export default function TouchFieldScreen() {
   const insets = useSafeAreaInsets();
@@ -21,13 +20,6 @@ export default function TouchFieldScreen() {
         translucent
       />
 
-      <View
-        style={[styles.backWrap, { top: insets.top + 6 }]}
-        pointerEvents="box-none"
-      >
-        <BackButton />
-      </View>
-
       {/* Hint pill. `pointerEvents="none"` so it never eats the drag gesture. */}
       <View
         style={[styles.hintWrap, { bottom: insets.bottom + 32 }]}
@@ -45,11 +37,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
   hintWrap: {
     position: 'absolute',

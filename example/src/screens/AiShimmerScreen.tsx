@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ShimmerSweep from '../components/ShimmerSweep';
-import { BackButton } from '../components/BackButton';
 
 const THINK_MS = 2600;
 
@@ -55,7 +54,6 @@ export default function AiShimmerScreen() {
       <StatusBar barStyle="light-content" backgroundColor="#0b0b10" />
 
       <View style={[styles.header, { paddingTop: insets.top + 6 }]}>
-        <BackButton />
         <Text style={styles.title}>Assistant</Text>
         <Text style={styles.subtitle}>
           {thinking ? 'Generating…' : 'react-native-effects ✦'}

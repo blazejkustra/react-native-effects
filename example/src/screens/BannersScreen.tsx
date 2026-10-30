@@ -5,7 +5,6 @@ import PartyConfetti from '../components/PartyConfetti';
 import StreakFire from '../components/StreakFire';
 import CoinGeyser from '../components/CoinGeyser';
 import Thunderstorm from '../components/Thunderstorm';
-import { BackButton } from '../components/BackButton';
 
 export default function BannersScreen() {
   const insets = useSafeAreaInsets();
@@ -28,13 +27,6 @@ export default function BannersScreen() {
         <CoinGeyser style={styles.banner} />
         <Thunderstorm style={styles.banner} />
       </ScrollView>
-
-      <View
-        style={[styles.backWrap, { top: insets.top + 6 }]}
-        pointerEvents="box-none"
-      >
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -49,10 +41,5 @@ const styles = StyleSheet.create({
   },
   banner: {
     marginTop: 14,
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
 });

@@ -18,7 +18,6 @@ import Animated, {
   clamp,
 } from 'react-native-reanimated';
 import type { LayoutChangeEvent } from 'react-native';
-import { BackButton } from '../components/BackButton';
 import RainSplash from '../components/RainSplash';
 import CrossfadeBackground from '../components/CrossfadeBackground';
 import { WEATHER_THEMES, type WeatherScenario } from '../config/weatherThemes';
@@ -564,10 +563,6 @@ export default function WeatherScreen() {
 
       {/* ═══ Fixed header — outside scroll view ═══ */}
       <View style={styles.fixedHeader} pointerEvents="box-none">
-        <View style={styles.backButtonRow}>
-          <BackButton />
-        </View>
-
         <Animated.View style={cityAnim}>
           <Text style={styles.cityName}>Kraków</Text>
           <Animated.View style={[styles.compactInfoWrap, compactInfoAnim]}>
@@ -750,9 +745,6 @@ const styles = StyleSheet.create({
   fixedHeader: {
     paddingTop: 60,
     paddingHorizontal: 20,
-  },
-  backButtonRow: {
-    marginBottom: 6,
   },
   scenarioRow: {
     position: 'absolute',

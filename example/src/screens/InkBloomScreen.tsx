@@ -17,7 +17,6 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useParamsSynchronizable } from 'react-native-effects';
 import InkBloom from '../components/InkBloom';
-import { BackButton } from '../components/BackButton';
 
 // One bloom lasts this long before the next drop falls. Kept in sync with the
 // `duration` prop below so the shader's age matches the driving timeline. The
@@ -122,13 +121,6 @@ export default function InkBloomScreen() {
         }
       />
 
-      <View
-        style={[styles.topBar, { top: insets.top + 6 }]}
-        pointerEvents="box-none"
-      >
-        <BackButton />
-      </View>
-
       <Animated.View
         style={[styles.hintWrap, { bottom: insets.bottom + 28 }]}
         pointerEvents="none"
@@ -145,11 +137,6 @@ const styles = StyleSheet.create({
     flex: 1,
     // Matches the unlit corners of the tank, so mounting does not flash.
     backgroundColor: '#000',
-  },
-  topBar: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 10,
   },
   hintWrap: {
     position: 'absolute',

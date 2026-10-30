@@ -7,7 +7,6 @@ import {
   Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'react-native-effects';
-import { Header } from '../../components/Header';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 80;
@@ -98,11 +97,6 @@ export default function LinearGradientStaticScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
 
-      <Header
-        title="Static Linear Gradients"
-        subtitle="Beautiful gradient presets"
-      />
-
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -144,12 +138,6 @@ export default function LinearGradientStaticScreen() {
             </View>
           </View>
         ))}
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            All gradients rendered with WebGPU
-          </Text>
-        </View>
       </ScrollView>
     </View>
   );
@@ -165,7 +153,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 40,
-    paddingTop: 40,
+    paddingTop: 16,
     paddingBottom: 80,
     alignItems: 'center',
   },
@@ -177,14 +165,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#252525',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
-    elevation: 10,
   },
   gradientWrapper: {
     width: '100%',
@@ -235,15 +215,5 @@ const styles = StyleSheet.create({
     color: '#777',
     fontWeight: '600',
     marginTop: 4,
-  },
-  footer: {
-    marginTop: 20,
-    paddingVertical: 20,
-  },
-  footerText: {
-    fontSize: 14,
-    color: '#555',
-    textAlign: 'center',
-    fontWeight: '500',
   },
 });

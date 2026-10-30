@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, StatusBar, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import VoiceWave from '../components/VoiceWave';
 import { useAudioReactive } from '../hooks/useAudioReactive';
-import { BackButton } from '../components/BackButton';
 
 export default function AiVoiceScreen() {
   const insets = useSafeAreaInsets();
@@ -40,13 +39,6 @@ export default function AiVoiceScreen() {
           {listening ? 'Tap to stop' : 'Tap to speak'}
         </Text>
       </View>
-
-      <View
-        style={[styles.backWrap, { top: insets.top + 6 }]}
-        pointerEvents="box-none"
-      >
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -55,11 +47,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#06070a',
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
   header: {
     paddingHorizontal: 26,

@@ -8,16 +8,13 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useParamsSynchronizable } from 'react-native-effects';
 import { DISSOLVES } from '../components/dissolves';
-import { BackButton } from '../components/BackButton';
 
 const SNAP_MS = 1700;
 const REFORM_MS = 900;
 
 export default function ThanosScreen() {
-  const insets = useSafeAreaInsets();
   const [gone, setGone] = useState(false);
   const [mode, setMode] = useState(0);
   const Active = DISSOLVES[mode]!.Component;
@@ -135,13 +132,6 @@ export default function ThanosScreen() {
           </Text>
         </Pressable>
       </View>
-
-      <View
-        style={[styles.backWrap, { top: insets.top + 6 }]}
-        pointerEvents="box-none"
-      >
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -156,11 +146,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 22,
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
   cardWrap: {
     width: '100%',

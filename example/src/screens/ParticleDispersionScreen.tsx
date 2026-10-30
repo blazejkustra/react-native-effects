@@ -7,7 +7,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   Easing,
@@ -54,7 +53,6 @@ const LABEL: Record<Phase, string> = {
 };
 
 export default function ParticleDispersionScreen() {
-  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [phase, setPhase] = useState<Phase>('idle');
   // The question shows up once the background is gone.
@@ -148,14 +146,6 @@ export default function ParticleDispersionScreen() {
         backdrop={BACKDROP}
       />
 
-      <Pressable
-        onPress={() => navigation.goBack()}
-        hitSlop={12}
-        style={[styles.back, { top: insets.top + 6 }]}
-      >
-        <Text style={styles.backGlyph}>‹</Text>
-      </Pressable>
-
       {revealed && (
         <Animated.View
           entering={FadeIn.duration(600)}
@@ -198,22 +188,6 @@ const SERIF = Platform.select({ ios: 'Georgia', default: 'serif' });
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: BACKDROP },
-  back: {
-    position: 'absolute',
-    left: 14,
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backGlyph: {
-    color: '#fff',
-    fontSize: 34,
-    lineHeight: 36,
-    marginTop: -4,
-    textShadowColor: 'rgba(0,0,0,0.4)',
-    textShadowRadius: 6,
-  },
   header: {
     position: 'absolute',
     left: 0,

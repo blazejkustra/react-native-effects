@@ -7,8 +7,6 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Hourglass from '../components/hourglass/Hourglass';
 import {
   DURATIONS_MIN,
@@ -57,8 +55,6 @@ function formatTime(seconds: number): string {
  */
 export default function HourglassScreen() {
   const { width, height } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
   const { paramsSynchronizable, setDuration, togglePause, getState } =
     useHourglassPhysics();
 
@@ -108,7 +104,7 @@ export default function HourglassScreen() {
         grain={GRAIN}
       />
       {/* Tap the glass to pause. A layer rather than a wrapping Pressable, so
-          Back, the timer and the chips stay separate accessibility nodes. */}
+          the timer and the chips stay separate accessibility nodes. */}
       <Pressable
         style={StyleSheet.absoluteFill}
         onPress={togglePause}
@@ -118,15 +114,6 @@ export default function HourglassScreen() {
         style={[StyleSheet.absoluteFill, { transform: turn }]}
         pointerEvents="box-none"
       >
-        <Pressable
-          onPress={() => navigation.goBack()}
-          hitSlop={12}
-          accessibilityRole="button"
-          accessibilityLabel="Back"
-          style={[styles.back, { top: insets.top + 6 }]}
-        >
-          <Text style={styles.backGlyph}>‹</Text>
-        </Pressable>
         <View
           style={[
             styles.band,
@@ -190,23 +177,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#ffffff',
-  },
-  back: {
-    position: 'absolute',
-    left: 14,
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 2,
-  },
-  backGlyph: {
-    color: WOOD,
-    fontSize: 34,
-    lineHeight: 36,
-    marginTop: -4,
-    textShadowColor: 'rgba(255,255,255,0.6)',
-    textShadowRadius: 4,
   },
   band: {
     position: 'absolute',

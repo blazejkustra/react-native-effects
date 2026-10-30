@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, StatusBar, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ThinkingOrb from '../components/ThinkingOrb';
 import { useAudioReactive } from '../hooks/useAudioReactive';
-import { BackButton } from '../components/BackButton';
 
 export default function AiOrbScreen() {
   const insets = useSafeAreaInsets();
@@ -36,13 +35,6 @@ export default function AiOrbScreen() {
           {listening ? 'Speak — the orb reacts' : 'Tap to talk to it'}
         </Text>
       </View>
-
-      <View
-        style={[styles.backWrap, { top: insets.top + 6 }]}
-        pointerEvents="box-none"
-      >
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -51,11 +43,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#06070a',
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
   center: {
     flex: 1,

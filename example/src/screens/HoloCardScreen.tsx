@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, StatusBar, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Aurora, LiquidChrome, Iridescence } from 'react-native-effects';
-import { BackButton } from '../components/BackButton';
 
 const CARDS = [
   {
@@ -72,15 +72,16 @@ function CardEffect({
 }
 
 export default function HoloCardScreen() {
+  const insets = useSafeAreaInsets();
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
 
-      <View style={styles.header}>
-        <BackButton />
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Text style={styles.title}>Cards</Text>
         <Text style={styles.subtitle}>
-          Each card uses a different shader effect
+          Each card catches the light its own way
         </Text>
       </View>
 
@@ -146,7 +147,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   header: {
-    paddingTop: 54,
     paddingHorizontal: 24,
     paddingBottom: 16,
   },
