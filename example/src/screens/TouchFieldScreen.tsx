@@ -14,6 +14,9 @@ export default function TouchFieldScreen() {
         style={StyleSheet.absoluteFill}
       />
 
+      {/* Keeps the left edge free of the pan so the back swipe still works. */}
+      <View style={styles.backSwipeEdge} collapsable={false} />
+
       <StatusBar barStyle="light-content" />
 
       {/* Hint pill. `pointerEvents="none"` so it never eats the drag gesture. */}
@@ -33,6 +36,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+  },
+  backSwipeEdge: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: 24,
   },
   hintWrap: {
     position: 'absolute',
