@@ -114,6 +114,7 @@ Dandelion and Birthday Candle ask for the microphone as soon as they open. Apple
 | 2.5.4 background modes | `UIBackgroundModes: audio` came from the audio plugin default and has no feature behind it. Now disabled |
 | 5.1.1 vague purpose strings | Microphone, camera and motion strings are now specific. The motion string was still the template text |
 | ITMS-91053 privacy manifest | ExpoFileSystem's own manifest is missing from the built app (its bundle is empty), and its binary uses disk space and file timestamp APIs. Reasons are now declared in the app manifest through `app.json` |
+| Release launch failure | Bundle Mode needs `require.getModules`, which Expo defines only in dev builds, so every Release build was a blank screen. Added `example/metro-get-modules-polyfill.js`, wired in `metro.config.js` |
 | Dev hooks | Every `__*` window hook was already behind `__DEV__`, and a search of the Release Hermes bundle confirms none ship. No edit needed |
 | Dev console | Removed a stray render `console.log` from `ScrollReactiveScreen.tsx` |
 | iPad | iPhone only, since nothing is designed for iPad. Reviewers may still run it in compatibility mode on an iPad |

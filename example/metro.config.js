@@ -21,6 +21,12 @@ config.resolver = {
 
 config = getBundleModeMetroConfig(config);
 
+const getPolyfills = config.serializer.getPolyfills;
+config.serializer.getPolyfills = (options) => [
+  ...getPolyfills(options),
+  path.resolve(__dirname, 'metro-get-modules-polyfill.js'),
+];
+
 // CRITICAL: Enable inlineRequires for worklets compatibility in Expo
 config.transformer = {
   ...config.transformer,
