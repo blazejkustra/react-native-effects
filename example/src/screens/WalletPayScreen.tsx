@@ -18,7 +18,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useParamsSynchronizable } from 'react-native-effects';
-import { BackButton } from '../components/BackButton';
 import {
   CardArt,
   StackCard,
@@ -278,10 +277,6 @@ export default function WalletPayScreen() {
           />
           <Text style={styles.label}>{label}</Text>
         </View>
-
-        <View style={[styles.backWrap, { top: insets.top + 6 }]}>
-          <BackButton />
-        </View>
       </View>
     </GestureDetector>
   );
@@ -357,10 +352,5 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     letterSpacing: -0.2,
     minHeight: 26,
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
 });

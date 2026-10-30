@@ -17,7 +17,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useParamsSynchronizable } from 'react-native-effects';
-import { BackButton } from '../components/BackButton';
 import PolaroidPrint, {
   PRINT_ASPECT,
 } from '../components/polaroid/PolaroidPrint';
@@ -230,10 +229,6 @@ export default function PolaroidScreen() {
       >
         <View style={styles.shutter} />
       </Pressable>
-
-      <View style={[styles.backWrap, { top: insets.top + 6 }]}>
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -292,10 +287,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#e2402c',
     borderWidth: 3,
     borderColor: '#b52d1d',
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
 });

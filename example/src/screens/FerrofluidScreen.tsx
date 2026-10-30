@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   type GestureResponderEvent,
   Pressable,
@@ -8,9 +8,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BackButton } from '../components/BackButton';
 import Ferrofluid from '../components/ferrofluid/Ferrofluid';
 import { useFerrofluidField } from '../hooks/useFerrofluidField';
 
@@ -37,12 +35,6 @@ export default function FerrofluidScreen() {
   const insets = useSafeAreaInsets();
   const { paramsSynchronizable, setTouch, calibrate, sensorAvailable } =
     useFerrofluidField(width, height);
-  const navigation = useNavigation();
-
-  // The stack's back-swipe would steal horizontal drags across the screen.
-  useEffect(() => {
-    navigation.setOptions({ gestureEnabled: false });
-  }, [navigation]);
 
   const coverScale = useMemo<[number, number]>(() => {
     const screenAspect = width / height;
@@ -91,9 +83,6 @@ export default function FerrofluidScreen() {
           </Pressable>
         ) : null}
       </View>
-      <View style={[styles.backWrap, { top: insets.top + 6 }]}>
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -120,10 +109,5 @@ const styles = StyleSheet.create({
     color: 'rgba(30, 30, 34, 0.45)',
     fontSize: 13,
     fontWeight: '600',
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
 });

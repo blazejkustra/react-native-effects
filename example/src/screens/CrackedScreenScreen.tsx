@@ -1,8 +1,6 @@
 import { type ComponentRef, useMemo, useRef } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BackButton } from '../components/BackButton';
 import CrackedGlass from '../components/cracks/CrackedGlass';
 import LockScreen from '../components/cracks/LockScreen';
 import { useCrackedGlass } from '../components/cracks/useCrackedGlass';
@@ -24,7 +22,6 @@ const NOTIFICATION = {
  * a fresh screen on.
  */
 export default function CrackedScreenScreen() {
-  const insets = useSafeAreaInsets();
   const lockRef = useRef<ComponentRef<typeof View>>(null);
   const { uri, schedule } = useSnapshotTexture(lockRef);
   const { paramsSynchronizable, hit, reset } = useCrackedGlass();
@@ -66,9 +63,6 @@ export default function CrackedScreenScreen() {
           ) : null}
         </View>
       </GestureDetector>
-      <View style={[styles.backWrap, { top: insets.top + 30 }]}>
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -80,10 +74,5 @@ const styles = StyleSheet.create({
   },
   fill: {
     ...StyleSheet.absoluteFill,
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
 });

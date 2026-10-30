@@ -13,10 +13,8 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { captureRef, releaseCapture } from 'react-native-view-shot';
 import { useParamsSynchronizable } from 'react-native-effects';
-import { BackButton } from '../components/BackButton';
 import CrtTube from '../components/crt/CrtTube';
 import { playPowerOff, playPowerOn } from '../components/crt/tubeSound';
 
@@ -32,7 +30,6 @@ const SETTLE_S = 2.2;
  * screen is snapshotted with react-native-view-shot and drawn by CrtTube.
  */
 export default function CrtOffScreen() {
-  const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const contentRef = useRef<ComponentRef<typeof View>>(null);
   const [snapshot, setSnapshot] = useState<string | null>(null);
@@ -138,15 +135,6 @@ export default function CrtOffScreen() {
         />
       )}
       <Pressable style={StyleSheet.absoluteFill} onPress={toggle} />
-      <View
-        style={[
-          styles.backWrap,
-          { top: insets.top + 6 },
-          isOff && styles.backDimmed,
-        ]}
-      >
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -155,13 +143,5 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#000',
-  },
-  backDimmed: {
-    opacity: 0.3,
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
 });

@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BackButton } from '../components/BackButton';
 import Flakes from '../components/scratchoff/Flakes';
 import ScratchCoating, {
   AREAS,
@@ -149,10 +148,6 @@ export default function ScratchOffScreen() {
       >
         <Text style={styles.buttonText}>New card</Text>
       </Pressable>
-
-      <View style={[styles.backWrap, { top: insets.top + 6 }]}>
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -295,10 +290,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
 });

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   type GestureResponderEvent,
   Platform,
@@ -10,9 +10,7 @@ import {
   Vibration,
   View,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BackButton } from '../components/BackButton';
 import BubbleWrap from '../components/bubblewrap/BubbleWrap';
 import { useBubbleWrap } from '../hooks/useBubbleWrap';
 import { usePopSound } from '../hooks/usePopSound';
@@ -39,12 +37,6 @@ export default function BubbleWrapScreen() {
   const insets = useSafeAreaInsets();
   const [popped, setPopped] = useState(0);
   const playPop = usePopSound();
-  const navigation = useNavigation();
-
-  // The stack's back-swipe would steal horizontal drags across the sheet.
-  useEffect(() => {
-    navigation.setOptions({ gestureEnabled: false });
-  }, [navigation]);
 
   const onPop = useCallback(() => {
     playPop();
@@ -102,9 +94,6 @@ export default function BubbleWrapScreen() {
           <Text style={styles.newSheetText}>New sheet</Text>
         </Pressable>
       ) : null}
-      <View style={[styles.backWrap, { top: insets.top + 6 }]}>
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -126,10 +115,5 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 244, 230, 0.85)',
     fontSize: 14,
     fontWeight: '600',
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
 });

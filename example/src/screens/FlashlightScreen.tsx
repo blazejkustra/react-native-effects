@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useParamsSynchronizable } from 'react-native-effects';
-import { BackButton } from '../components/BackButton';
 import TorchScene from '../components/flashlight/TorchScene';
 import TorchIsland, {
   type IslandMode,
@@ -116,9 +115,6 @@ export default function FlashlightScreen() {
         paramsSynchronizable={scene.paramsSynchronizable}
       />
       <Pressable style={StyleSheet.absoluteFill} onPress={collapse} />
-      <View style={[styles.backWrap, { top: insets.top + 6 }]}>
-        <BackButton />
-      </View>
       <TorchIsland
         mode={mode}
         isOn={isOn}
@@ -154,11 +150,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#000',
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 60,
   },
   quickRow: {
     position: 'absolute',

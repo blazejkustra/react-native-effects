@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
 import { StatusBar, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BackButton } from '../components/BackButton';
 import LavaLamp from '../components/lavalamp/LavaLamp';
 import { useLavaLamp } from '../hooks/useLavaLamp';
 
@@ -21,7 +19,6 @@ const IMG_H = 1795;
  */
 export default function LavaLampScreen() {
   const { width, height } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
   const { paramsSynchronizable } = useLavaLamp();
 
   const coverScale = useMemo<[number, number]>(() => {
@@ -41,9 +38,6 @@ export default function LavaLampScreen() {
         coverScale={coverScale}
         paramsSynchronizable={paramsSynchronizable}
       />
-      <View style={[styles.backWrap, { top: insets.top + 6 }]}>
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -52,10 +46,5 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#120c08',
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
 });

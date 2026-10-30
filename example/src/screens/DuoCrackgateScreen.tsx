@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { StatusBar, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BackButton } from '../components/BackButton';
 import HingeFailure from '../components/cracks/HingeFailure';
 import LockScreen from '../components/cracks/LockScreen';
 import { useHingeFailure } from '../components/cracks/useHingeFailure';
@@ -26,7 +24,6 @@ const OPEN_MIN_STAGE = 2;
  * panel, takes the damage further. Double tap for a new panel.
  */
 export default function DuoCrackgateScreen() {
-  const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const { paramsSynchronizable, advance, setFlexing, reset } =
     useHingeFailure();
@@ -77,9 +74,6 @@ export default function DuoCrackgateScreen() {
           />
         </View>
       </GestureDetector>
-      <View style={[styles.backWrap, { top: insets.top + 30 }]}>
-        <BackButton />
-      </View>
     </View>
   );
 }
@@ -91,10 +85,5 @@ const styles = StyleSheet.create({
   },
   fill: {
     ...StyleSheet.absoluteFill,
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
 });

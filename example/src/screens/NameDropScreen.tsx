@@ -18,7 +18,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useParamsSynchronizable } from 'react-native-effects';
-import { BackButton } from '../components/BackButton';
 import NameDropWave from '../components/namedrop/NameDropWave';
 import ContactPoster, {
   type ExchangeChoice,
@@ -225,16 +224,6 @@ export default function NameDropScreen() {
           onChoose={choose}
         />
       </Animated.View>
-      <View
-        style={[
-          styles.backWrap,
-          { top: insets.top + 6 },
-          phase !== 'idle' && styles.hidden,
-        ]}
-        pointerEvents={phase === 'idle' ? 'auto' : 'none'}
-      >
-        <BackButton />
-      </View>
       <GestureDetector gesture={approachGesture}>
         <View style={styles.approachZone}>
           <Animated.View style={[styles.otherPhone, peekStyle]}>
@@ -264,11 +253,6 @@ const styles = StyleSheet.create({
   },
   hidden: {
     opacity: 0,
-  },
-  backWrap: {
-    position: 'absolute',
-    left: 22,
-    zIndex: 100,
   },
   approachZone: {
     position: 'absolute',
