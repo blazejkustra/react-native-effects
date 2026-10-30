@@ -58,8 +58,6 @@ export default function ScrollReactiveScreen() {
     [setParamsSynchronizable]
   );
 
-  console.log('render ScrollReactiveScreen'); // Should only log once per page, never every frame.
-
   return (
     <View style={styles.container}>
       <ScrollReactive
