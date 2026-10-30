@@ -35,6 +35,12 @@
         {
           "iosMicrophonePermission": "RN Effects uses the microphone so the shaders react to your voice."
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "RN Effects uses the camera to shoot instant prints on the Polaroid screen."
+        }
       ]
     ]
   }

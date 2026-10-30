@@ -3,6 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "main": "index.js",
+  "expo": {
+    "autolinking": {
+      "ios": {
+        "buildFromSource": [
+          "ExpoCamera.*"
+        ]
+      }
+    }
+  },
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
@@ -15,6 +24,7 @@
     "@react-navigation/native-stack": "7.16.0",
     "expo": "~56.0.9",
     "expo-build-properties": "~56.0.17",
+    "expo-camera": "~56.0.8",
     "expo-sensors": "~56.0.5",
     "react": "19.2.3",
     "react-native": "0.85.3",
