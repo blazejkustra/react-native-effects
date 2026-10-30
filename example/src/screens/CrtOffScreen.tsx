@@ -27,9 +27,10 @@ const SETTLE_S = 2.2;
 export default function CrtOffScreen() {
   const contentRef = useRef<ComponentRef<typeof View>>(null);
   const { uri: snapshot, schedule } = useSnapshotTexture(contentRef);
-  const [isOff, setIsOff] = useState(false);
+  const [isOff, setIsOff] = useState(true);
   const toggledAt = useRef(0);
   const frame = useRef<number | null>(null);
+  const splashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { paramsSynchronizable, setParamsSynchronizable } =
     useParamsSynchronizable([1, SETTLE_S, 0, 0]);
 
@@ -55,11 +56,16 @@ export default function CrtOffScreen() {
 
   useEffect(() => {
     if (!snapshot) return;
-    const id = setTimeout(() => run(false), POWER_ON_DELAY_MS);
+    const id = setTimeout(() => {
+      setIsOff(false);
+      run(false);
+    }, POWER_ON_DELAY_MS);
+    splashTimer.current = id;
     return () => clearTimeout(id);
   }, [snapshot, run]);
 
   const toggle = useCallback(() => {
+    if (splashTimer.current !== null) clearTimeout(splashTimer.current);
     const next = !isOff;
     setIsOff(next);
     run(next);
@@ -105,7 +111,11 @@ export default function CrtOffScreen() {
           pointerEvents="none"
         />
       )}
-      <Pressable style={StyleSheet.absoluteFill} onPress={toggle} />
+      <Pressable
+        style={StyleSheet.absoluteFill}
+        onPress={toggle}
+        disabled={!snapshot}
+      />
     </View>
   );
 }
