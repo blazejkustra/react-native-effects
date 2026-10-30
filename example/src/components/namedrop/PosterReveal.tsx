@@ -16,9 +16,9 @@ type PosterRevealProps = Omit<
 };
 
 /**
- * The contact poster arriving: a blurred, glowing card swells out of the
- * Dynamic Island, comes into focus just inside the screen edges, then grows
- * to fill the display.
+ * The contact poster arriving: a blurred card swells out of the Dynamic
+ * Island on one critically damped spring, coming into focus as it grows to
+ * fill the display.
  */
 export default function PosterReveal({
   paramsSynchronizable,
@@ -51,7 +51,10 @@ struct Uniforms {
 @group(0) @binding(1) var samp: sampler;
 @group(0) @binding(2) var tex: texture_2d<f32>;
 
-const TAPS: i32 = 40;
+const TAPS: i32 = 20;
+const START: f32 = 1.57;
+const STIFFNESS: f32 = 9.0;
+const SPRING_END: f32 = 0.9939;
 
 fn ease(x: f32) -> f32 {
   let c = clamp(x, 0.0, 1.0);
@@ -92,29 +95,30 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let island = u.params0.xy * res;
   let islandSize = u.params0.zw * res;
 
-  let rise = ease((t - 1.48) / 0.16);
-  let grow = 0.62 * rise + 0.38 * smoothstep(1.66, 2.05, t);
-  let cardMin = mix(island - islandSize * 0.5, vec2<f32>(0.0), grow);
-  let cardMax = mix(island + islandSize * 0.5, res, grow);
+  let x = max(t - START, 0.0);
+  let spring = 1.0 - (1.0 + STIFFNESS * x) * exp(-STIFFNESS * x);
+  let grow = clamp(spring / SPRING_END, 0.0, 1.0);
+  let size = res * mix(0.16, 1.0, grow);
+  let top = mix(island.y - islandSize.y * 0.5, 0.0, grow);
+  let cardMin = vec2<f32>((res.x - size.x) * 0.5, top);
+  let cardMax = cardMin + size;
   let ext = (cardMax - cardMin) * 0.5;
   let center = (cardMin + cardMax) * 0.5;
-  let radius = mix(islandSize.y * 0.5, 56.0, rise);
+  let radius = mix(56.0, 0.0, smoothstep(0.96, 1.0, grow));
   let sd = rounded(pt - center, ext, min(radius, min(ext.x, ext.y)));
-  let edge = 0.8 + 26.0 * (1.0 - smoothstep(1.55, 1.7, t));
-  let coverage = (1.0 - smoothstep(-edge, edge, sd)) * step(0.001, grow);
+  let edge = 0.8 + 24.0 * (1.0 - smoothstep(0.08, 0.26, x));
+  let fadeIn = smoothstep(0.0, 0.12, x) * step(START, t);
+  let coverage = (1.0 - smoothstep(-edge, edge, sd)) * fadeIn;
 
   if (coverage <= 0.0) {
     return vec4<f32>(0.0);
   }
 
   let local = (pt - cardMin) / max(cardMax - cardMin, vec2<f32>(1.0));
-  let focus = 1.0 - smoothstep(1.62, 1.85, t);
+  let focus = 1.0 - smoothstep(0.05, 0.36, x);
   let blurPt = 30.0 * focus;
   let spin = fract(52.9829 * fract(dot(pt * u.resolution.w, vec2<f32>(0.06711, 0.00584)))) * 6.2832;
   var col = defocus(local, vec2<f32>(blurPt) / res, spin);
-  col = mix(col, vec3<f32>(0.93, 0.92, 0.97), focus * 0.35);
-
-  let a = coverage;
-  return vec4<f32>(col * a, a);
+  return vec4<f32>(col * coverage, coverage);
 }
 `;

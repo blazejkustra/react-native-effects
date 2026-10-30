@@ -21,10 +21,10 @@ type NameDropWaveProps = Omit<
 };
 
 /**
- * The home screen as NameDrop bends it: a milky glow swells out of the
- * Dynamic Island while the content beneath it bulges and blurs like a liquid
- * lens, the blur snaps away into a bright ripple that runs down the screen,
- * and the home screen sinks into a dark blur behind the incoming poster.
+ * The home screen as NameDrop bends it: a coloured band of light climbs from
+ * the bottom edge and pools under the Dynamic Island, blurring what it
+ * crosses, then a bright liquid wave bursts out of the island and the home
+ * screen sinks into a dark blur behind the incoming poster.
  */
 export default function NameDropWave({
   paramsSynchronizable,
@@ -78,9 +78,24 @@ fn soft(uv: vec2<f32>, level: f32, px: vec2<f32>) -> vec3<f32> {
   return c / 6.0;
 }
 
-fn ease(x: f32) -> f32 {
-  let c = clamp(x, 0.0, 1.0);
-  return 1.0 - (1.0 - c) * (1.0 - c) * (1.0 - c);
+fn band(x: f32, a: f32, b: f32) -> f32 {
+  return smoothstep(a, b, x);
+}
+
+// Colours sampled from the reference glow, ordered from its leading edge (s < 0)
+// to its tail (s > 0).
+fn glowColor(s: f32) -> vec3<f32> {
+  var c = mix(vec3<f32>(0.0), vec3<f32>(0.0, 0.30, 0.52), band(s, -0.75, -0.48));
+  c = mix(c, vec3<f32>(0.25, 0.54, 0.62), band(s, -0.48, -0.26));
+  c = mix(c, vec3<f32>(0.49, 0.64, 0.56), band(s, -0.26, -0.02));
+  c = mix(c, vec3<f32>(0.56, 0.50, 0.44), band(s, -0.02, 0.22));
+  c = mix(c, vec3<f32>(0.46, 0.29, 0.34), band(s, 0.22, 0.52));
+  c = mix(c, vec3<f32>(0.15, 0.10, 0.24), band(s, 0.48, 0.76));
+  return mix(c, vec3<f32>(0.0), band(s, 0.76, 1.05));
+}
+
+fn screen(a: vec3<f32>, b: vec3<f32>) -> vec3<f32> {
+  return vec3<f32>(1.0) - (vec3<f32>(1.0) - a) * (vec3<f32>(1.0) - b);
 }
 
 fn pill(p: vec2<f32>, size: vec2<f32>) -> f32 {
@@ -100,39 +115,52 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let island = u.params0.xy * res;
   let islandSize = u.params0.zw * res;
   let v = pt - island;
-  let d = length(v);
-  let dir = v / max(d, 0.001);
+  let d = length(v * vec2<f32>(0.78, 1.0));
+  let dir = v / max(length(v), 0.001);
 
-  let grow = ease(t / 1.1);
-  let front = mix(70.0, res.y * 0.62, grow);
-  let collapse = 1.0 - smoothstep(1.08, 1.22, t);
-  let veil = (1.0 - smoothstep(front * 0.3, front, d)) * smoothstep(0.0, 0.3, t) * collapse;
+  let rise = res.y * exp(-3.2 * t);
+  let dx = pt.x - island.x;
+  let wobble = 12.0 * sin(pt.x * 0.011 + t * 1.3);
+  let width = 230.0 + 0.5 * rise;
+  let s = (pt.y - rise - dx * dx * 0.0006 - wobble) / width;
+  let settle = smoothstep(360.0, 60.0, rise);
+  let hold = 1.0 - smoothstep(1.2, 1.32, t);
+  let begin = smoothstep(0.0, 0.1, t);
+  let centred = mix(0.5, 1.0, exp(-dx * dx / 42000.0));
+  let glow = glowColor(s) * mix(1.0, 1.3, settle) * centred * hold * begin;
 
-  let lensR = 90.0 + 130.0 * grow;
-  let lens = exp(-d * d / (lensR * lensR)) * veil;
-  var sp = pt - v * lens * 0.35;
+  let topHaze = smoothstep(0.0, 0.34, t) * (1.0 - smoothstep(0.36, 0.62, t)) * exp(-pt.y / 95.0);
 
-  let rk = (t - 1.18) / 0.42;
-  let rippleOn = step(0.0, rk) * (1.0 - smoothstep(0.8, 1.0, rk));
-  let rippleR = mix(-60.0, res.y * 1.25, pow(clamp(rk, 0.0, 1.0), 1.25));
-  let rw = 110.0 + 80.0 * clamp(rk, 0.0, 1.0);
-  let x = (d - rippleR) / rw;
-  let band = exp(-x * x) * rippleOn;
-  sp -= dir * x * exp(-x * x) * 70.0 * rippleOn;
-  sp.y -= band * 34.0;
+  let passed = smoothstep(-0.3, 0.1, s) * (1.0 - smoothstep(0.35, 0.8, s));
+  let veil = passed * mix(0.4, 1.0, settle) * hold * begin;
+  let lens = exp(-dot(v, v) / 26000.0) * veil;
+  var sp = pt - v * lens * 0.18;
 
-  let back = smoothstep(1.45, 1.7, t);
-  let deep = 1.0 - smoothstep(0.0, front, d);
-  let level = veil * (0.6 + 1.2 * deep) + band * 1.3 + back * 2.0;
+  let k = (t - 1.33) / 0.46;
+  let wave = step(0.0, k) * (1.0 - smoothstep(0.9, 1.25, k));
+  let radius = mix(30.0, res.y * 1.3, pow(clamp(k, 0.0, 1.0), 1.2));
+  let depth = (radius - d) / 210.0;
+  let inside = smoothstep(-0.28, 0.16, depth) * wave;
+  let wash = inside * exp(-max(depth, 0.0) / 2.0);
+  let rimX = (d - radius) / 95.0;
+  let rim = exp(-rimX * rimX) * wave;
+  sp -= dir * rimX * rim * 48.0;
+  sp -= dir * wash * 26.0;
+
+  let back = smoothstep(1.5, 1.72, t);
+  let level = veil * 1.7 + rim * 0.5 + wash * 1.5 + back * 2.0;
 
   var col = soft(sp / res, level, px);
+  col *= 1.0 - 0.32 * hold * begin * (1.0 - smoothstep(240.0, 520.0, pt.y));
+  col = screen(col, min(glow, vec3<f32>(0.95)));
+  col = screen(col, vec3<f32>(0.59, 0.71, 0.94) * topHaze * 0.85);
 
-  let glowR = 80.0 + 170.0 * grow;
-  let glow = exp(-d / glowR) * veil;
-  let milk = vec3<f32>(0.84, 0.9, 1.0);
-  col = mix(col, milk, clamp(glow * 0.9 + veil * 0.06, 0.0, 0.9));
-  col = mix(col, vec3<f32>(0.88, 0.93, 1.0), band * 0.45) + band * 0.12;
-  col *= 1.0 - back * 0.45;
+  let shade = exp(-pow((d - radius - 56.0) / 62.0, 2.0)) * wave * (1.0 - clamp(k * 2.0, 0.0, 1.0));
+  col *= 1.0 - shade * 0.55;
+
+  let waveTint = mix(vec3<f32>(0.70, 0.93, 1.0), mix(vec3<f32>(0.93, 0.95, 1.0), vec3<f32>(0.27, 0.50, 0.86), smoothstep(0.5, 2.0, depth)), smoothstep(0.0, 0.2, depth));
+  col = mix(col, waveTint, inside * exp(-max(depth, 0.0) / 3.0) * 0.94);
+  col = mix(col, vec3<f32>(0.08, 0.16, 0.30), back * 0.5);
 
   let isl = smoothstep(0.0, 1.2, pill(pt - island, islandSize));
   return vec4<f32>(clamp(col * isl, vec3<f32>(0.0), vec3<f32>(1.0)), 1.0);

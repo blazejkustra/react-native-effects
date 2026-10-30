@@ -8,10 +8,14 @@ import {
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
+  cancelAnimation,
+  Easing,
+  useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { captureRef } from 'react-native-view-shot';
 import { useParamsSynchronizable } from 'react-native-effects';
 import NameDropWave, { HOME_ATLAS } from '../components/namedrop/NameDropWave';
@@ -24,7 +28,7 @@ import ContactPoster, {
 /** Downward drag (pt) that counts as bringing the other phone close. */
 const TRIGGER_DRAG = 70;
 /** Seconds from contact until the poster is fully on screen. */
-const REVEAL_SECONDS = 2.15;
+const REVEAL_SECONDS = 2.42;
 const RESET_AFTER_CHOICE_MS = 1600;
 
 type Phase = 'home' | 'exchanging' | 'poster';
@@ -48,63 +52,70 @@ async function snapshotPoster(view: PosterHandle) {
 
 /**
  * NameDrop: drag down from the top of the home screen (or tap it) to bring
- * the other iPhone close. A milky glow wells out of the Dynamic Island, the
- * home screen bulges and blurs beneath it like a liquid lens, a bright ripple
- * runs down the glass, and the other person's "Share Your Contact" poster
- * swells out of the island into focus. Tap the poster to go back.
+ * the other iPhone close. A coloured glow climbs the screen and pools under
+ * the Dynamic Island, a liquid wave of light bursts out of it, and the other
+ * person's "Share Your Contact" poster swells into focus. Tap it to go back.
  */
 export default function NameDropScreen() {
   const { width, height } = useWindowDimensions();
   const [phase, setPhase] = useState<Phase>('home');
   const [choice, setChoice] = useState<ExchangeChoice>(null);
   const [snapshot, setSnapshot] = useState<string | null>(null);
-  const live = useParamsSynchronizable([0, 0, 0, 0]);
-  const setLive = live.setParamsSynchronizable;
+  const { paramsSynchronizable } = useParamsSynchronizable([0, 0, 0, 0]);
   const posterRef = useRef<PosterHandle>(null);
-  const clock = useRef(0);
-  const frame = useRef<number | null>(null);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isPlaying = useRef(false);
+  const clock = useSharedValue(0);
   const cover = useSharedValue(1);
 
+  useAnimatedReaction(
+    () => clock.value,
+    (seconds) => {
+      paramsSynchronizable.setBlocking(new Float64Array([seconds, 0, 0, 0]));
+    }
+  );
+
   const stopClock = useCallback(() => {
-    if (frame.current !== null) cancelAnimationFrame(frame.current);
-    frame.current = null;
+    cancelAnimation(clock);
+    isPlaying.current = false;
     if (resetTimer.current !== null) clearTimeout(resetTimer.current);
     resetTimer.current = null;
-  }, []);
+  }, [clock]);
 
   useEffect(() => stopClock, [stopClock]);
 
+  const showPoster = useCallback(() => {
+    isPlaying.current = false;
+    setPhase('poster');
+  }, []);
+
   const play = useCallback(() => {
     stopClock();
-    clock.current = 0;
+    isPlaying.current = true;
     setChoice(null);
     setPhase('exchanging');
     cover.value = 1;
-    let last = performance.now();
-    const tick = () => {
-      const now = performance.now();
-      clock.current += (Math.min(50, now - last) / 1000) * playbackSpeed;
-      last = now;
-      setLive(clock.current, 0, 0, 0);
-      if (clock.current < REVEAL_SECONDS) {
-        frame.current = requestAnimationFrame(tick);
-        return;
+    clock.value = 0;
+    clock.value = withTiming(
+      REVEAL_SECONDS,
+      {
+        duration: (REVEAL_SECONDS * 1000) / playbackSpeed,
+        easing: Easing.linear,
+      },
+      (finished) => {
+        if (!finished) return;
+        cover.value = 0;
+        scheduleOnRN(showPoster);
       }
-      frame.current = null;
-      setPhase('poster');
-      cover.value = 0;
-    };
-    frame.current = requestAnimationFrame(tick);
-  }, [stopClock, cover, setLive]);
+    );
+  }, [stopClock, cover, clock, showPoster]);
 
   const goHome = useCallback(() => {
     stopClock();
-    clock.current = 0;
-    setLive(0, 0, 0, 0);
+    clock.value = 0;
     setPhase('home');
     cover.value = withTiming(1, { duration: 320 });
-  }, [stopClock, cover, setLive]);
+  }, [stopClock, cover, clock]);
 
   const choose = useCallback(
     (picked: 'share' | 'receive') => {
@@ -129,8 +140,7 @@ export default function NameDropScreen() {
     g.__nameDrop = play;
     g.__nameDropWaveAt = (seconds) => {
       stopClock();
-      clock.current = seconds;
-      setLive(seconds, 0, 0, 0);
+      clock.value = seconds;
       const done = seconds >= REVEAL_SECONDS;
       setPhase(done ? 'poster' : 'exchanging');
       cover.value = done ? 0 : 1;
@@ -143,14 +153,14 @@ export default function NameDropScreen() {
       delete g.__nameDropWaveAt;
       delete g.__nameDropSpeed;
     };
-  }, [play, stopClock, cover, setLive]);
+  }, [play, stopClock, cover, clock]);
 
   const approach = Gesture.Pan()
     .runOnJS(true)
     .enabled(phase === 'home')
     .activeOffsetY(12)
     .onUpdate((e) => {
-      if (e.translationY > TRIGGER_DRAG && frame.current === null) play();
+      if (e.translationY > TRIGGER_DRAG && !isPlaying.current) play();
     });
   const tap = Gesture.Tap()
     .runOnJS(true)
@@ -190,12 +200,12 @@ export default function NameDropScreen() {
           </View>
           <NameDropWave
             style={StyleSheet.absoluteFill}
-            paramsSynchronizable={live.paramsSynchronizable}
+            paramsSynchronizable={paramsSynchronizable}
           />
           {snapshot !== null && (
             <PosterReveal
               style={StyleSheet.absoluteFill}
-              paramsSynchronizable={live.paramsSynchronizable}
+              paramsSynchronizable={paramsSynchronizable}
               snapshotUri={snapshot}
             />
           )}
