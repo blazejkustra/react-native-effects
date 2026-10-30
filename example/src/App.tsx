@@ -42,7 +42,6 @@ import ParticleDispersionScreen from './screens/ParticleDispersionScreen';
 import FoamLabScreen from './screens/FoamLabScreen';
 import VoiceDeleteScreen from './screens/VoiceDeleteScreen';
 import Magic8BallScreen from './screens/Magic8BallScreen';
-import CigaretteScreen from './screens/CigaretteScreen';
 import DandelionScreen from './screens/DandelionScreen';
 import HourglassScreen from './screens/HourglassScreen';
 import TelegramSpoilerScreen from './screens/TelegramSpoilerScreen';
@@ -180,7 +179,6 @@ export default function App() {
             component={VoiceDeleteScreen}
           />
           <Stack.Screen name="Magic8BallExample" component={Magic8BallScreen} />
-          <Stack.Screen name="CigaretteExample" component={CigaretteScreen} />
           <Stack.Screen name="DandelionExample" component={DandelionScreen} />
           <Stack.Screen name="HourglassExample" component={HourglassScreen} />
           <Stack.Screen

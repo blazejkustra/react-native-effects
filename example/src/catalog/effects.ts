@@ -64,13 +64,6 @@ export const SECTIONS: CatalogSection[] = [
         hero: require('../../assets/catalog/lava-lamp-hero.jpg'),
       },
       {
-        id: 'cigarette',
-        title: 'Cigarette',
-        line: 'Hold to drag, tap to flick the ash, tilt the smoke',
-        screen: 'CigaretteExample',
-        image: require('../../assets/catalog/cigarette.jpg'),
-      },
-      {
         id: 'holo-foil',
         title: 'Holo Foil',
         line: 'Rainbow foil that shifts as you tilt',

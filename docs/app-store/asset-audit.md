@@ -8,7 +8,6 @@ Each of these ships in the app bundle. Replace it or get written permission befo
 
 | Asset | Used by | What the record shows | Fix |
 | --- | --- | --- | --- |
-| `cigarette.png` | Cigarette | pngimg.com `cigarette_PNG4767`, CC BY-NC 4.0 per project notes. Non-commercial terms sit badly with a store release, and pngimg's own terms need rereading | Replace with a CC0 or self-shot photo |
 | `foam.jpg` | Beer, Foam lab | Stock photo supplied by the owner, licence never checked (the code says so too) | Find the source and license it, or shoot one |
 | `candle/cake.jpg` | Birthday Candle | Cake photo pasted by the owner, then retouched. Source unknown | Find the source, or replace |
 | `namedrop/home-atlas.jpg` | NameDrop | Real iOS home screen capture showing Apple app icons and wallpaper | Replace with an invented home screen |

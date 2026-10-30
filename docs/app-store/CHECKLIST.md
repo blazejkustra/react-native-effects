@@ -32,7 +32,7 @@ In order. Everything here needs the owner. Steps 1 to 5 stop a submission today.
 ## Screenshots
 
 16. Capture on a real iPhone or simulator, with no dev tooling or status overlays, at 6.9-inch (1320 x 2868) or the size App Store Connect currently asks for. Use up to ten images.
-17. Show interactive, original effects: Dandelion, Ferrofluid, Lava Lamp, Hourglass, Bubble Wrap. Leave out anything with another company's look, plus Cigarette and Beer. An app preview video is optional.
+17. Show interactive, original effects: Dandelion, Ferrofluid, Lava Lamp, Hourglass, Bubble Wrap. Leave out anything with another company's look, plus Beer. An app preview video is optional.
 
 ## Build and upload
 

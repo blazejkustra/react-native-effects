@@ -2,7 +2,7 @@
 
 Ranked by likelihood of rejection or legal complaint, based on the code on 2026-10-30 and the App Review Guidelines current on that date. Likelihood is judgement: App Review varies by reviewer. No effect has been removed or renamed. Every item below is an owner decision unless it says "Applied".
 
-Rules cited most: 1.1.6 (false features), 1.4.3 (tobacco and alcohol), 2.5.4 (background modes), 4.1 (copycats), 4.2 and 4.3 (minimum functionality, spam), 5.1.1 (privacy), 5.2.1 (third-party IP), 5.2.5 (Apple products).
+Rules cited most: 1.1.6 (false features), 1.4.3 (alcohol), 2.5.4 (background modes), 4.1 (copycats), 4.2 and 4.3 (minimum functionality, spam), 5.1.1 (privacy), 5.2.1 (third-party IP), 5.2.5 (Apple products).
 
 The biggest overall pattern: the app's most striking screens are faithful replicas of Apple, Telegram and Instagram interfaces, with those names on them. A reviewer who opens the catalog sees those names first. The smallest change that removes most of the risk is a rename and restyle pass across the top section below.
 
@@ -79,10 +79,10 @@ Fix: hide Foam lab and the plain gradient screens from the store build (Foam lab
 
 ## Age-rating items: fine if declared
 
-### 15. Cigarette and Lighter
-Evidence: a realistic cigarette burning on a screen that the user holds and drags.
-Guideline: 1.4.3 prohibits encouraging tobacco use. A neutral physics simulation with no brand, no call to smoke and no sale should pass, and the rating question must be answered honestly. Risk rises if the store listing features it.
-Fix: leave it out of screenshots, and keep the copy neutral. Consider a stick of incense as an alternative that keeps all the smoke work and also drops the 13+ reason. The current image is an asset blocker either way.
+### 15. Lighter
+Evidence: a realistic lighter with a flame the user strikes and tilts.
+Guideline: a neutral physics toy with no brand and no sale should pass, and the rating question must be answered honestly.
+Fix: keep the copy neutral.
 
 ### 16. Beer
 Evidence: phone as a full glass, "rotate to drink".

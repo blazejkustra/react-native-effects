@@ -75,7 +75,7 @@ Apple's current questionnaire. Answers reflect the catalog as of 2026-10-30.
 | Social media or social feed | No | |
 | Profanity or crude humor | None | |
 | Horror or fear themes | None | |
-| Alcohol, tobacco, or drug use or references | Infrequent | Beer, Cigarette and Lighter effects |
+| Alcohol, tobacco, or drug use or references | Infrequent | Beer and Lighter effects |
 | Medical or treatment information | None | |
 | Health or wellness topics | No | |
 | Mature or suggestive themes | None | |
@@ -88,7 +88,7 @@ Apple's current questionnaire. Answers reflect the catalog as of 2026-10-30.
 | Contests | None | |
 | Loot boxes | No | |
 
-Expected result: 13+. Apple maps Frequent alcohol or tobacco references to 18+, and three effects out of more than forty supports Infrequent. Apple lists Infrequent simulated gambling as R 18+ in Australia, so see the Scratch-off entry in `review-risks.md`. Confirm the outcome on the Age Ratings page in App Store Connect.
+Expected result: 13+. Apple maps Frequent alcohol or tobacco references to 18+, and two effects out of more than forty supports Infrequent. Apple lists Infrequent simulated gambling as R 18+ in Australia, so see the Scratch-off entry in `review-risks.md`. Confirm the outcome on the Age Ratings page in App Store Connect.
 
 Do not tick "Made for Kids".
 
