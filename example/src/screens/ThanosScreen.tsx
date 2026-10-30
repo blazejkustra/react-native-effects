@@ -102,7 +102,7 @@ export default function ThanosScreen() {
                   <Text style={styles.cardLabel}>STATUS</Text>
                   <Text style={styles.cardValue}>RENDERED</Text>
                 </View>
-                <Text style={styles.snapHint}>tap to snap ✦</Text>
+                <Text style={styles.snapHint}>Tap to snap</Text>
               </View>
             </Animated.View>
           </Pressable>
@@ -127,9 +127,7 @@ export default function ThanosScreen() {
         </View>
 
         <Pressable style={styles.actionBtn} onPress={gone ? reset : snap}>
-          <Text style={styles.actionText}>
-            {gone ? '↺  Restore' : 'Snap  ✦'}
-          </Text>
+          <Text style={styles.actionText}>{gone ? 'Restore' : 'Snap'}</Text>
         </Pressable>
       </View>
     </View>

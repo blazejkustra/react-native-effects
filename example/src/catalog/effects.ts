@@ -384,7 +384,7 @@ export const SECTIONS: CatalogSection[] = [
       {
         id: 'foamlab',
         title: 'Beer Foam',
-        line: 'Eight foam treatments side by side',
+        line: 'Three foam treatments side by side',
         screen: 'FoamLabExample',
         image: require('../../assets/catalog/foamlab.jpg'),
       },

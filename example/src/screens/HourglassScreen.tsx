@@ -132,7 +132,7 @@ export default function HourglassScreen() {
             {label}
           </Text>
           {paused ? (
-            <Text style={styles.hint}>paused — tap to resume</Text>
+            <Text style={styles.hint}>Paused. Tap to resume</Text>
           ) : null}
         </View>
         <View

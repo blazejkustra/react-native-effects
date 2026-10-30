@@ -10,6 +10,16 @@ export function SearchGlyph() {
   );
 }
 
+export function MicGlyph() {
+  return (
+    <View style={styles.micBox}>
+      <View style={styles.micHead} />
+      <View style={styles.micCradle} />
+      <View style={styles.micStand} />
+    </View>
+  );
+}
+
 export function Chevron() {
   return <View style={styles.chevron} />;
 }
@@ -35,6 +45,30 @@ const styles = StyleSheet.create({
     borderRadius: 1,
     backgroundColor: colors.text,
     transform: [{ rotate: '45deg' }],
+  },
+  micBox: {
+    alignItems: 'center',
+  },
+  micHead: {
+    width: 10,
+    height: 17,
+    borderRadius: 5,
+    backgroundColor: colors.text,
+  },
+  micCradle: {
+    width: 18,
+    height: 10,
+    marginTop: -5,
+    borderBottomLeftRadius: 9,
+    borderBottomRightRadius: 9,
+    borderWidth: 2,
+    borderTopWidth: 0,
+    borderColor: colors.text,
+  },
+  micStand: {
+    width: 2,
+    height: 5,
+    backgroundColor: colors.text,
   },
   chevron: {
     width: 8,

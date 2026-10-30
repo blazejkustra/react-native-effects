@@ -125,8 +125,7 @@ export default function InkBloomScreen() {
         style={[styles.hintWrap, { bottom: insets.bottom + 28 }]}
         pointerEvents="none"
       >
-        <Text style={styles.hintTitle}>Ink in water</Text>
-        <Text style={styles.hint}>tap anywhere to drop ink</Text>
+        <Text style={styles.hint}>Tap anywhere to drop ink</Text>
       </Animated.View>
     </View>
   );
@@ -146,17 +145,6 @@ const styles = StyleSheet.create({
   },
   // The tank is lit now, not black, so the caption needs a shadow to stay
   // legible over the brighter water.
-  hintTitle: {
-    color: 'rgba(255,255,255,0.94)',
-    fontSize: 15,
-    fontWeight: '700',
-    letterSpacing: 2.2,
-    textTransform: 'uppercase',
-    marginBottom: 6,
-    textShadowColor: 'rgba(0,20,26,0.75)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 6,
-  },
   hint: {
     color: 'rgba(255,255,255,0.62)',
     fontSize: 13,

@@ -1,3 +1,4 @@
+import { MicGlyph } from '../components/catalog/Glyphs';
 import { View, Text, StyleSheet, StatusBar, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ThinkingOrb from '../components/ThinkingOrb';
@@ -29,10 +30,10 @@ export default function AiOrbScreen() {
           style={[styles.mic, listening && styles.micOn]}
           onPress={toggle}
         >
-          <Text style={styles.micGlyph}>🎙️</Text>
+          <MicGlyph />
         </Pressable>
         <Text style={styles.hint}>
-          {listening ? 'Speak — the orb reacts' : 'Tap to talk to it'}
+          {listening ? 'Speak and the orb reacts' : 'Tap to talk to it'}
         </Text>
       </View>
     </View>
@@ -84,9 +85,6 @@ const styles = StyleSheet.create({
   micOn: {
     backgroundColor: '#2a1f4d',
     borderColor: '#6b4bd6',
-  },
-  micGlyph: {
-    fontSize: 26,
   },
   hint: {
     color: '#8a8a99',

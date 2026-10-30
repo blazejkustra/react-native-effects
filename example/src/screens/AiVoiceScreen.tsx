@@ -1,3 +1,4 @@
+import { MicGlyph } from '../components/catalog/Glyphs';
 import { View, Text, StyleSheet, StatusBar, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import VoiceWave from '../components/VoiceWave';
@@ -12,7 +13,6 @@ export default function AiVoiceScreen() {
       <StatusBar barStyle="light-content" backgroundColor="#06070a" />
 
       <View style={[styles.header, { paddingTop: insets.top + 60 }]}>
-        <Text style={styles.kicker}>Voice</Text>
         <Text style={styles.title}>
           {listening ? 'Listening…' : 'Tap to talk'}
         </Text>
@@ -33,7 +33,7 @@ export default function AiVoiceScreen() {
           style={[styles.mic, listening && styles.micOn]}
           onPress={toggle}
         >
-          <Text style={styles.micGlyph}>🎙️</Text>
+          <MicGlyph />
         </Pressable>
         <Text style={styles.hint}>
           {listening ? 'Tap to stop' : 'Tap to speak'}
@@ -50,14 +50,6 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 26,
-  },
-  kicker: {
-    color: '#7c7c8a',
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    marginBottom: 8,
   },
   title: {
     color: '#fff',
@@ -96,9 +88,6 @@ const styles = StyleSheet.create({
   micOn: {
     backgroundColor: '#2a1f4d',
     borderColor: '#6b4bd6',
-  },
-  micGlyph: {
-    fontSize: 26,
   },
   hint: {
     color: '#8a8a99',

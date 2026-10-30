@@ -18,11 +18,7 @@ import { ShaderView } from 'react-native-effects';
  * yellowness so the lacy seam of half-transparent bubbles is what sits on
  * our own beer.
  */
-const VARIANTS = [
-  '1 photo, as shot',
-  '2 photo, keyed edge',
-  '3 photo, keyed + whitened',
-];
+const VARIANTS = ['As shot', 'Keyed edge', 'Keyed and whitened'];
 
 // Stock foam photo supplied as the reference — check its licence before it
 // ships in the real glass.

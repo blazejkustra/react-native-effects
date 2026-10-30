@@ -34,7 +34,7 @@ export default function HoloFoilScreen() {
         </GestureDetector>
 
         <Text style={styles.hint}>
-          {source === 'motion' ? 'Tilt your phone 🌈' : 'Drag the card 🌈'}
+          {source === 'motion' ? 'Tilt your phone' : 'Drag the card'}
         </Text>
       </View>
     </View>

@@ -26,7 +26,7 @@ export default function TouchFieldScreen() {
         pointerEvents="none"
       >
         <View style={styles.hintPill}>
-          <Text style={styles.hintText}>Drag anywhere ✦</Text>
+          <Text style={styles.hintText}>Drag anywhere</Text>
         </View>
       </View>
     </View>

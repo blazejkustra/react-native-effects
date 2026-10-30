@@ -88,7 +88,7 @@ const MATERIALS: MaterialDef[] = [
     key: 'metal',
     caption: 'Brushed stainless, wet',
     title: 'Metal',
-    hint: 'Hold to pool water — it runs',
+    hint: 'Hold to pool water, then let it run',
     Component: MetalMaterial,
   },
 ];
