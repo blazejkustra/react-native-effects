@@ -3,15 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "main": "index.js",
-  "expo": {
-    "autolinking": {
-      "ios": {
-        "buildFromSource": [
-          "ExpoCamera.*"
-        ]
-      }
-    }
-  },
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
