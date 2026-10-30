@@ -47,7 +47,7 @@ export function TopBar({
       <View style={[styles.bar, { marginTop: insets.top }]}>
         <Text
           style={styles.wordmark}
-          maxFontSizeMultiplier={1.2}
+          maxFontSizeMultiplier={1}
           accessibilityRole="header"
         >
           RN Effects

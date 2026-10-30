@@ -38,7 +38,7 @@ import { usePolaroidShake } from '../hooks/usePolaroidShake';
 
 /**
  * Photos, all via Wikimedia Commons:
- * table: "Weatherworn top of wooden table" (CC0);
+ * table: "Oberfläche Wohnzimmertisch" by Martin Lorenz (CC BY-SA 3.0);
  * beach: "Black Rock beach" by Carey Ciuro (CC BY 2.0);
  * lake: "Evening on Kathleen Lake" by Jakub Fryš (CC BY-SA 4.0);
  * mountains: "Mountain lake, Mylgval mountain cirque before sunset,
