@@ -9,7 +9,9 @@ import { useParamsSynchronizable } from 'react-native-effects';
 export const GLASS_HEIGHT = 662;
 function halfWidth(y: number): number {
   const t = Math.min(1, Math.max(0, 1 - y / GLASS_HEIGHT));
-  return 86 + 46 * (1 - (1 - t) * (1 - t));
+  const side = 86 + 46 * (1 - (1 - t) * (1 - t));
+  const k = Math.max(14 - y, 0);
+  return side - 60 + Math.sqrt(Math.max(3600 - k * k, 0));
 }
 
 /** Wax on the bulb warms quickly; out in the liquid it cools slowly (s). */
