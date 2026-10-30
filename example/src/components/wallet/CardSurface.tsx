@@ -4,6 +4,8 @@ import {
   type ShaderViewProps,
 } from 'react-native-effects';
 
+export const CARD_RADIUS = 14;
+
 type CardSurfaceProps = Omit<
   ShaderViewProps,
   'fragmentShader' | 'paramsSynchronizable'
@@ -30,6 +32,7 @@ export default function CardSurface({
     <ShaderView
       fragmentShader={SHADER}
       paramsSynchronizable={paramsSynchronizable}
+      transparent
       {...rest}
     />
   );
@@ -46,6 +49,8 @@ struct Uniforms {
   live:       vec4<f32>,
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
+
+const CORNER_RADIUS = ${CARD_RADIUS}.0;
 
 fn hash(p: vec2<f32>) -> f32 {
   return fract(sin(dot(p, vec2<f32>(127.1, 311.7))) * 43758.5453);
@@ -81,6 +86,11 @@ fn brushing(uv: vec2<f32>, px: vec2<f32>) -> f32 {
   return fine * 0.45 + streaks * 0.55;
 }
 
+fn cornerDistance(uv: vec2<f32>, size: vec2<f32>, radius: f32) -> f32 {
+  let q = abs((uv - 0.5) * size) - (size * 0.5 - vec2<f32>(radius));
+  return length(max(q, vec2<f32>(0.0))) + min(max(q.x, q.y), 0.0) - radius;
+}
+
 @fragment
 fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let uv = ndc * 0.5 + 0.5;
@@ -114,10 +124,11 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let sweep = exp(-gd * gd * 260.0) * 0.5 + exp(-gd * gd * 16.0) * 0.08;
   col += vec3<f32>(sweep * sin(3.14159 * clamp(glint, 0.0, 1.0))) * lines;
 
-  let edgePx = min(min(uv.x, 1.0 - uv.x) * u.resolution.x, min(uv.y, 1.0 - uv.y) * u.resolution.y);
-  let rim = 1.0 - smoothstep(0.0, 2.5 * u.resolution.w, edgePx);
+  let edge = cornerDistance(uv, u.resolution.xy, CORNER_RADIUS * u.resolution.w);
+  let coverage = clamp(0.5 - edge, 0.0, 1.0);
+  let rim = 1.0 - smoothstep(0.0, 2.5 * u.resolution.w, -edge);
   col += vec3<f32>(0.22) * rim * (0.35 + 0.65 * uv.y + spec);
   col *= 1.0 + 0.05 * lift;
-  return vec4<f32>(clamp(col, vec3<f32>(0.0), vec3<f32>(1.0)), 1.0);
+  return vec4<f32>(clamp(col, vec3<f32>(0.0), vec3<f32>(1.0)) * coverage, coverage);
 }
 `;

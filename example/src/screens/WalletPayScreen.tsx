@@ -23,7 +23,7 @@ import {
   StackCard,
   type StackCardSpec,
 } from '../components/wallet/CardArt';
-import CardSurface from '../components/wallet/CardSurface';
+import CardSurface, { CARD_RADIUS } from '../components/wallet/CardSurface';
 import PayGlyph from '../components/wallet/PayGlyph';
 import { playChime } from '../components/wallet/chime';
 import { useHoldTilt } from '../hooks/useHoldTilt';
@@ -302,14 +302,14 @@ const styles = StyleSheet.create({
   card: {
     position: 'absolute',
     left: 16,
-    borderRadius: 14,
+    borderRadius: CARD_RADIUS,
     backgroundColor: '#0e0f11',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 12 },
   },
   cardClip: {
     flex: 1,
-    borderRadius: 14,
+    borderRadius: CARD_RADIUS,
     overflow: 'hidden',
   },
   side: {

@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { CARD_RADIUS } from './CardSurface';
+
 /** EMV chip: a gold pad with its contact segments. */
 function Chip() {
   return (
@@ -222,7 +224,7 @@ const styles = StyleSheet.create({
   stackCard: {
     position: 'absolute',
     left: 0,
-    borderRadius: 14,
+    borderRadius: CARD_RADIUS,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOpacity: 0.6,
