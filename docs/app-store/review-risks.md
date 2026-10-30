@@ -118,9 +118,9 @@ Dandelion and Birthday Candle ask for the microphone as soon as they open. Apple
 | Dev hooks | Every `__*` window hook was already behind `__DEV__`, and a search of the Release Hermes bundle confirms none ship. No edit needed |
 | Dev console | Removed a stray render `console.log` from `ScrollReactiveScreen.tsx` |
 | iPad | iPhone only, since nothing is designed for iPad. Reviewers may still run it in compatibility mode on an iPad |
-| Orientation | Portrait, since tilt effects would otherwise rotate the layout mid-gesture |
 
 ## Other decisions
 
+- **Portrait lock:** `app.json` now sets portrait, since tilt effects would otherwise rotate the layout mid-gesture. It does change Crackgate: rotating a phone no longer replays it (a tap still does), and the unfolded landscape layout on iPhone Duo was never tested. Check it on a Duo, or remove `orientation` if that effect matters more.
 - **FFmpeg:** set `"disableFFmpeg": true` on the react-native-audio-api plugin. The app decodes no audio files, so this should remove LGPL libraries, OpenSSL and about 6.5 MB. It needs `pod install`, so it was not applied or tested.
 - **Barcode scanning:** set `"barcodeScannerEnabled": false` on expo-camera. It removes ZXingObjC, which the app never uses. Also needs `pod install`.
