@@ -12,21 +12,22 @@ import { useHingeFailure } from '../components/cracks/useHingeFailure';
  */
 const WALLPAPER = require('../../assets/cracks/palms.jpg');
 const CLOCK_ORANGE = '#F79A2E';
-const FLEX_MS = 700;
+const RESET_HOLD_MS = 600;
 /** A beat after the panel opens, so the failure plays on a lit screen. */
-const FOLD_SETTLE_MS = 900;
-/** Opening the phone always gets as far as the white row. */
-const OPEN_MIN_STAGE = 2;
+const FOLD_SETTLE_MS = 700;
 
 /**
- * The iPhone Duo "crackgate" inner display failure. Every fold or unfold of
- * the phone (a window size change), or a press and hold that flexes the
- * panel, takes the damage further. Double tap for a new panel.
+ * The iPhone Duo "crackgate" inner display failure. The lock screen looks
+ * fine for a moment, then the hinge gives out on its own. Folding or
+ * unfolding the phone (a window size change) replays it, a tap pushes the
+ * damage one stage further or replays a dead panel, and a long press puts a
+ * fresh panel in. On phones without a fold the hinge is the centre line.
  */
 export default function DuoCrackgateScreen() {
   const { width, height } = useWindowDimensions();
-  const { paramsSynchronizable, advance, setFlexing, reset } =
-    useHingeFailure();
+  const { paramsSynchronizable, play, advance, reset } = useHingeFailure();
+
+  useEffect(play, [play]);
 
   const lastSize = useRef({ width, height });
   useEffect(() => {
@@ -35,25 +36,21 @@ export default function DuoCrackgateScreen() {
       return;
     }
     lastSize.current = { width, height };
-    const opened = width > height;
-    const id = setTimeout(
-      () => advance(opened ? OPEN_MIN_STAGE : 0),
-      FOLD_SETTLE_MS
-    );
+    reset();
+    const id = setTimeout(play, FOLD_SETTLE_MS);
     return () => clearTimeout(id);
-  }, [width, height, advance]);
+  }, [width, height, play, reset]);
 
   const gesture = useMemo(() => {
-    const flex = Gesture.LongPress()
+    const hold = Gesture.LongPress()
       .runOnJS(true)
-      .minDuration(FLEX_MS)
-      .maxDistance(60)
-      .onBegin(() => setFlexing(true))
-      .onStart(() => advance())
-      .onFinalize(() => setFlexing(false));
-    const fresh = Gesture.Tap().runOnJS(true).numberOfTaps(2).onEnd(reset);
-    return Gesture.Exclusive(fresh, flex);
-  }, [advance, reset, setFlexing]);
+      .minDuration(RESET_HOLD_MS)
+      .onStart(reset);
+    const tap = Gesture.Tap()
+      .runOnJS(true)
+      .onEnd((_event, success) => success && advance());
+    return Gesture.Exclusive(hold, tap);
+  }, [advance, reset]);
 
   return (
     <View style={styles.root}>
