@@ -50,7 +50,7 @@ export function TopBar({
           maxFontSizeMultiplier={1}
           accessibilityRole="header"
         >
-          RN Effects
+          Effects
         </Text>
         <View style={styles.actions}>
           <Pressable

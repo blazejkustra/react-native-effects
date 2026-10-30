@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "RN Effects",
+    "name": "Effects",
     "slug": "react-native-effects-example",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -71,21 +71,21 @@
       [
         "react-native-audio-api",
         {
-          "iosMicrophonePermission": "RN Effects listens to the microphone so effects can react to your voice and to you blowing on the screen. Audio is analysed live on your iPhone and is never recorded or sent anywhere.",
+          "iosMicrophonePermission": "Effects listens to the microphone so effects can react to your voice and to you blowing on the screen. Audio is analysed live on your iPhone and is never recorded or sent anywhere.",
           "iosBackgroundMode": false
         }
       ],
       [
         "expo-camera",
         {
-          "cameraPermission": "RN Effects uses the camera to take a photo for the instant camera effect. The photo stays on your iPhone and is never uploaded.",
-          "microphonePermission": "RN Effects listens to the microphone so effects can react to your voice and to you blowing on the screen. Audio is analysed live on your iPhone and is never recorded or sent anywhere."
+          "cameraPermission": "Effects uses the camera to take a photo for the instant camera effect. The photo stays on your iPhone and is never uploaded.",
+          "microphonePermission": "Effects listens to the microphone so effects can react to your voice and to you blowing on the screen. Audio is analysed live on your iPhone and is never recorded or sent anywhere."
         }
       ],
       [
         "expo-sensors",
         {
-          "motionPermission": "RN Effects reads device motion so effects respond when you tilt, shake or flip your iPhone. Motion data stays on your iPhone."
+          "motionPermission": "Effects reads device motion so effects respond when you tilt, shake or flip your iPhone. Motion data stays on your iPhone."
         }
       ]
     ]

@@ -1,12 +1,12 @@
-# RN Effects Privacy Policy
+# Effects Privacy Policy
 
 Effective date: 2026-10-30
 
-RN Effects is a free iPhone app that shows interactive visual effects. It is published by Blazej Kustra, an individual developer ("I" in this policy). This policy explains what the app does with your data.
+Effects is a free iPhone app that shows interactive visual effects. It is published by Blazej Kustra, an individual developer ("I" in this policy). This policy explains what the app does with your data.
 
 ## Summary
 
-RN Effects has no accounts, no ads, no analytics and no crash reporting SDK. I do not collect, receive, store, sell or share your personal data. Your photos, audio and sensor readings stay on your iPhone.
+Effects has no accounts, no ads, no analytics and no crash reporting SDK. I do not collect, receive, store, sell or share your personal data. Your photos, audio and sensor readings stay on your iPhone.
 
 ## Permissions the app asks for
 

@@ -14,8 +14,8 @@ In order. Everything here needs the owner. Steps 1 to 5 stop a submission today.
 
 6. Confirm publishing kustrablazej@gmail.com in the privacy policy and the review notes, or swap in a dedicated address.
 7. Have someone qualified read the privacy policy and the licence notes. They are written from the code, and they are not legal advice.
-8. Confirm the bundle ID `com.blazejkustra.rneffects` and the display name "RN Effects". The bundle ID cannot change after the first upload.
-9. Check the app icon. It says "RNB" while the app is called RN Effects, and the 1024 px source now has no alpha channel. Replace it if the letters are a leftover.
+8. Confirm the bundle ID `com.blazejkustra.rneffects` and the display name "Effects". The bundle ID cannot change after the first upload.
+9. Check the app icon. The 1024 px source is a capture of the Ferrofluid effect with no alpha channel and no text. Confirm it in the generated AppIcon set after prebuild.
 
 ## Apple Developer account
 

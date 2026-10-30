@@ -1,6 +1,6 @@
-# RN Effects credits and licenses
+# Effects credits and licenses
 
-RN Effects uses the third-party photographs and open-source software listed here. Thank you to their authors.
+Effects uses the third-party photographs and open-source software listed here. Thank you to their authors.
 
 The app's own code and the react-native-effects library are MIT licensed, Copyright (c) 2026 Blazej Kustra. See `LICENSE` in this repository.
 

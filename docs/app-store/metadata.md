@@ -6,7 +6,7 @@ Paste these into App Store Connect. Limits are noted where Apple enforces them. 
 
 | Field | Value |
 | --- | --- |
-| App name (30) | RN Effects |
+| App name (30) | Effects |
 | Subtitle (30) | Shaders you tilt, blow & shake |
 | Bundle ID | com.blazejkustra.rneffects |
 | SKU | rneffects-ios |
@@ -19,7 +19,7 @@ Paste these into App Store Connect. Limits are noted where Apple enforces them. 
 | Devices | iPhone only |
 | Copyright | 2026 Blazej Kustra |
 
-"React Native Effects" as the store name is possible but carries a trademark risk (see `review-risks.md`). "RN Effects" matches the name under the icon.
+"Effects" is the store name and matches the name under the icon. Check availability in App Store Connect before the first upload; if it is taken, use a subtitle-style fallback such as "Effects: Shader Toys". "React Native Effects" carries a trademark risk (see `review-risks.md`).
 
 ## URLs
 
@@ -37,7 +37,7 @@ Dozens of live GPU effects you can touch. Crack the glass, blow out a candle, po
 
 ## Description (DECISION: keep every named effect in sync with the final catalog)
 
-RN Effects is a pocket collection of interactive visual effects. Every one is a real-time shader running on your iPhone's GPU, and every one responds to you: touch, tilt, sound and motion.
+Effects is a pocket collection of interactive visual effects. Every one is a real-time shader running on your iPhone's GPU, and every one responds to you: touch, tilt, sound and motion.
 
 Things to try:
 
@@ -112,7 +112,7 @@ Basis: the app contains no proprietary or non-standard encryption and only uses 
 
 Paste into App Review Information > Notes. No demo account is needed.
 
-    RN Effects is a catalog of interactive GPU shader effects built with the open-source react-native-effects library. Each effect is an original real-time shader written for this app. There is no login, no backend, no purchases and no user-generated content.
+    Effects is a catalog of interactive GPU shader effects built with the open-source react-native-effects library. Each effect is an original real-time shader written for this app. There is no login, no backend, no purchases and no user-generated content.
 
     Everything shaped like another product is a visual demonstration running inside this app. The chat, lock screen, payment and contact screens are scripted animations with invented content: they send no messages, make no payments, and exchange no contacts. The cracked screen effects are clearly part of the app and end when you go back.
 

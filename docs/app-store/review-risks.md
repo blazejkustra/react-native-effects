@@ -75,7 +75,7 @@ Evidence: the catalog feels like a developer showcase. Entries such as "Foam lab
 Fix: hide Foam lab and the plain gradient screens from the store build (Foam lab is a developer tool that also ships an unlicensed photo). Lead with the toy-like effects, and describe the app as an interactive toy, as `metadata.md` does. The new catalog helps here. A reviewer may still consider it a tech demo, and the honest argument is depth: more than forty original real-time interactive shaders.
 
 ### 14. App name
-"React Native Effects": React Native is Meta's project name and mark, and 5.2.1 and 4.1(c) apply to third-party product names in an app name. A search of the US store on 2026-10-30 found "Expo & React Native components" by an unrelated developer, so such names do pass, but that gives no permission. I could not find a published Meta policy on this, so treat it as unresolved. No exact collision with "RN Effects" turned up. Recommended: keep "RN Effects" as already configured. The owner can also rebrand for a consumer audience, since "RN" means nothing to non-developers.
+"React Native Effects": React Native is Meta's project name and mark, and 5.2.1 and 4.1(c) apply to third-party product names in an app name. A search of the US store on 2026-10-30 found "Expo & React Native components" by an unrelated developer, so such names do pass, but that gives no permission. I could not find a published Meta policy on this, so treat it as unresolved. No exact collision with "Effects" turned up. Recommended: keep "Effects" as already configured. The owner can also rebrand for a consumer audience, since "RN" means nothing to non-developers.
 
 ## Age-rating items: fine if declared
 
