@@ -14,7 +14,7 @@ const RELEASE_SECONDS = 0.04;
 let sounds: Sounds | null = null;
 let voice: Voice | null = null;
 
-function toBuffer(ac: AudioContext, samples: Float32Array) {
+function toBuffer(ac: AudioContext, samples: Float32Array<ArrayBuffer>) {
   const buffer = ac.createBuffer(1, samples.length, ac.sampleRate);
   buffer.copyToChannel(samples, 0);
   return buffer;

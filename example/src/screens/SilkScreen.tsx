@@ -4,7 +4,7 @@ import { Silk } from 'react-native-effects';
 export default function SilkScreen() {
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
       <Silk style={StyleSheet.absoluteFill} />
     </View>
   );

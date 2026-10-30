@@ -95,7 +95,7 @@ const GRADIENT_PRESETS: GradientConfig[] = [
 export default function LinearGradientStaticScreen() {
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
+      <StatusBar barStyle="light-content" />
 
       <ScrollView
         style={styles.scrollView}

@@ -51,7 +51,7 @@ export default function AiShimmerScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0b0b10" />
+      <StatusBar barStyle="light-content" />
 
       <View style={[styles.header, { paddingTop: insets.top + 6 }]}>
         <Text style={styles.title}>Assistant</Text>

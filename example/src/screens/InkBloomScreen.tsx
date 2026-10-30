@@ -106,7 +106,7 @@ export default function InkBloomScreen() {
 
   return (
     <View style={styles.container} onLayout={onLayout}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" translucent />
+      <StatusBar barStyle="light-content" />
 
       <InkBloom
         style={StyleSheet.absoluteFill}

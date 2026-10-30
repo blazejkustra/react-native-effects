@@ -4,7 +4,7 @@ import { Campfire } from 'react-native-effects';
 export default function CampfireScreen() {
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
       <Campfire style={styles.fire} />
     </View>
   );

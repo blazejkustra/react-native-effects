@@ -144,7 +144,7 @@ export default function IMessageScreen() {
       style={styles.root}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <StatusBar barStyle="light-content" backgroundColor={IM_BG} translucent />
+      <StatusBar barStyle="light-content" />
 
       <ScrollView
         ref={scroll}

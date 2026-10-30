@@ -4,7 +4,7 @@ import { Iridescence } from 'react-native-effects';
 export default function IridescenceScreen() {
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
       <Iridescence style={StyleSheet.absoluteFill} />
     </View>
   );

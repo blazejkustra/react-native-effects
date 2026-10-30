@@ -4,7 +4,7 @@ import { Aurora } from 'react-native-effects';
 export default function AuroraScreen() {
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
       <Aurora style={StyleSheet.absoluteFill} />
     </View>
   );

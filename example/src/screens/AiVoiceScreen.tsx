@@ -10,7 +10,7 @@ export default function AiVoiceScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#06070a" />
+      <StatusBar barStyle="light-content" />
 
       <View style={[styles.header, { paddingTop: insets.top + 60 }]}>
         <Text style={styles.title}>

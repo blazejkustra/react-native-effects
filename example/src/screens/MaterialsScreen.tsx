@@ -183,7 +183,7 @@ export default function MaterialsScreen() {
       height: interpolate(p, [0, 1], [rect.height, winH]),
       borderRadius: interpolate(p, [0, 1], [CARD_RADIUS, 0]),
     };
-  }, [rect, winW, winH]);
+  });
 
   // Counter-translate the full-screen shader so it stays screen-aligned while
   // the clipping window grows over it.
@@ -196,7 +196,7 @@ export default function MaterialsScreen() {
       top: -interpolate(p, [0, 1], [rect.y, 0]),
       left: -interpolate(p, [0, 1], [rect.x, 0]),
     };
-  }, [rect]);
+  });
 
   const closeFade = useAnimatedStyle(() => ({
     opacity: interpolate(progress.value, [0.65, 1], [0, 1]),
@@ -209,7 +209,7 @@ export default function MaterialsScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" translucent />
+      <StatusBar barStyle="light-content" />
 
       <ScrollView
         contentContainerStyle={[

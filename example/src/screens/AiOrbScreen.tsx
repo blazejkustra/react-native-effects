@@ -10,7 +10,7 @@ export default function AiOrbScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#06070a" />
+      <StatusBar barStyle="light-content" />
 
       <View style={styles.center}>
         <View style={styles.orbWrap}>

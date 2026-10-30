@@ -47,7 +47,7 @@ export default function LinearGradientAnimatedScreen() {
         style={StyleSheet.absoluteFill}
       />
 
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
 
       <View style={styles.content}>
         <View style={styles.infoCard}>

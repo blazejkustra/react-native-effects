@@ -111,7 +111,7 @@ export default function DandelionScreen() {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" translucent backgroundColor="#0000" />
+      <StatusBar barStyle="light-content" />
       <Dandelion
         style={StyleSheet.absoluteFill}
         paramsSynchronizable={paramsSynchronizable}

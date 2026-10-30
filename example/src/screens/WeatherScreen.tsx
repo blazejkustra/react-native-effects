@@ -528,11 +528,7 @@ export default function WeatherScreen() {
 
   return (
     <View style={dynamicStyles.container}>
-      <StatusBar
-        barStyle={colors.statusBarStyle}
-        backgroundColor="transparent"
-        translucent
-      />
+      <StatusBar barStyle={colors.statusBarStyle} />
 
       <View style={styles.scenarioRow}>
         {SCENARIOS.map((s) => (

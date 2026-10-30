@@ -11,7 +11,7 @@ export default function BannersScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" translucent />
+      <StatusBar barStyle="light-content" />
 
       {/* A scrollable stack of notification banners. */}
       <ScrollView

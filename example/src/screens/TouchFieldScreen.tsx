@@ -14,11 +14,7 @@ export default function TouchFieldScreen() {
         style={StyleSheet.absoluteFill}
       />
 
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent
-      />
+      <StatusBar barStyle="light-content" />
 
       {/* Hint pill. `pointerEvents="none"` so it never eats the drag gesture. */}
       <View

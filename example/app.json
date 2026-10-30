@@ -4,13 +4,9 @@
     "slug": "react-native-effects-example",
     "version": "1.0.0",
     "orientation": "portrait",
+    "userInterfaceStyle": "dark",
     "scheme": "react-native-effects-example",
     "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000000"
-    },
     "ios": {
       "bundleIdentifier": "com.blazejkustra.rneffects",
       "buildNumber": "1",
@@ -50,7 +46,8 @@
             ]
           }
         ]
-      }
+      },
+      "appleTeamId": "9S2Q77K6U6"
     },
     "android": {
       "adaptiveIcon": {
@@ -86,6 +83,15 @@
         "expo-sensors",
         {
           "motionPermission": "Effects reads device motion so effects respond when you tilt, shake or flip your iPhone. Motion data stays on your iPhone."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 300,
+          "resizeMode": "contain",
+          "backgroundColor": "#000000"
         }
       ]
     ]

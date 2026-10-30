@@ -4,7 +4,7 @@ import { LiquidChrome } from 'react-native-effects';
 export default function LiquidChromeScreen() {
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
       <LiquidChrome style={StyleSheet.absoluteFill} />
     </View>
   );

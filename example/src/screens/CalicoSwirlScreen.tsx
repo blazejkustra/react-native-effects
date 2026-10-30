@@ -4,7 +4,7 @@ import { CalicoSwirl } from 'react-native-effects';
 export default function CalicoSwirlScreen() {
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="transparent" />
+      <StatusBar barStyle="light-content" />
       <CalicoSwirl style={StyleSheet.absoluteFill} />
     </View>
   );
