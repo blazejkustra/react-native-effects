@@ -5,63 +5,39 @@ import {
   useRef,
   useState,
 } from 'react';
-import {
-  Image,
-  Pressable,
-  StatusBar,
-  StyleSheet,
-  useWindowDimensions,
-  View,
-} from 'react-native';
-import { captureRef, releaseCapture } from 'react-native-view-shot';
+import { Pressable, StatusBar, StyleSheet, View } from 'react-native';
 import { useParamsSynchronizable } from 'react-native-effects';
 import CrtTube from '../components/crt/CrtTube';
 import { playPowerOff, playPowerOn } from '../components/crt/tubeSound';
+import { useSnapshotTexture } from '../components/cracks/useSnapshotTexture';
+import HomeScreen from './HomeScreen';
 
-/**
- * A real iOS home screen at device resolution. Its status bar and Dynamic
- * Island are painted out because the live ones stay on top.
- */
-const HOME_SCREEN = require('../../assets/crt/home-screen-ios.jpg');
+/** Lets the tube's first texture upload finish before the splash plays. */
+const POWER_ON_DELAY_MS = 900;
 /** Seconds after a toggle during which the tube is still animating. */
 const SETTLE_S = 2.2;
 
 /**
- * A phone screen switching off like an old CRT television: tap and the
- * picture collapses into a white-hot line, then a dot that fades on its
- * phosphor; tap again to power it back on with a degauss wobble. The home
- * screen is snapshotted with react-native-view-shot and drawn by CrtTube.
+ * The app itself switching off like an old CRT television. Its real home
+ * list is snapshotted with react-native-view-shot and drawn by CrtTube, which
+ * powers it on like a splash when the screen opens. Tap and the picture
+ * collapses into a white-hot line, then a dot that fades on its phosphor; tap
+ * again to power it back on with a degauss wobble.
  */
 export default function CrtOffScreen() {
-  const { width, height } = useWindowDimensions();
   const contentRef = useRef<ComponentRef<typeof View>>(null);
-  const [snapshot, setSnapshot] = useState<string | null>(null);
+  const { uri: snapshot, schedule } = useSnapshotTexture(contentRef);
   const [isOff, setIsOff] = useState(false);
   const toggledAt = useRef(0);
   const frame = useRef<number | null>(null);
   const { paramsSynchronizable, setParamsSynchronizable } =
     useParamsSynchronizable([1, SETTLE_S, 0, 0]);
 
-  const capture = useCallback(async () => {
-    const raw = await captureRef(contentRef, {
-      format: 'png',
-      quality: 1,
-      result: 'tmpfile',
-    });
-    setSnapshot(raw.startsWith('file://') ? raw : `file://${raw}`);
-  }, []);
-
   useEffect(() => {
     return () => {
       if (frame.current !== null) cancelAnimationFrame(frame.current);
     };
   }, []);
-
-  useEffect(() => {
-    return () => {
-      if (snapshot) releaseCapture(snapshot);
-    };
-  }, [snapshot]);
 
   const run = useCallback(
     (off: boolean) => {
@@ -79,7 +55,7 @@ export default function CrtOffScreen() {
 
   useEffect(() => {
     if (!snapshot) return;
-    const id = setTimeout(() => run(false), 650);
+    const id = setTimeout(() => run(false), POWER_ON_DELAY_MS);
     return () => clearTimeout(id);
   }, [snapshot, run]);
 
@@ -109,10 +85,6 @@ export default function CrtOffScreen() {
     };
   }, [setParamsSynchronizable]);
 
-  const onWallpaperLoad = useCallback(() => {
-    setTimeout(capture, 150);
-  }, [capture]);
-
   return (
     <View style={styles.root}>
       <StatusBar barStyle="light-content" />
@@ -120,13 +92,9 @@ export default function CrtOffScreen() {
         ref={contentRef}
         collapsable={false}
         style={StyleSheet.absoluteFill}
+        onLayout={schedule}
       >
-        <Image
-          source={HOME_SCREEN}
-          style={{ width, height }}
-          resizeMode="cover"
-          onLoad={onWallpaperLoad}
-        />
+        <HomeScreen />
       </View>
       <View style={[StyleSheet.absoluteFill, styles.root]} />
       {snapshot && (

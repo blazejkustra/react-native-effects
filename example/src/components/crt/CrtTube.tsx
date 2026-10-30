@@ -13,9 +13,9 @@ type CrtTubeProps = Omit<
 };
 
 /**
- * A snapshot of a screen shown on an old CRT tube: barrel curvature,
- * scanlines, an RGB phosphor mask and a faint rolling band while on. Power
- * off squashes the picture into a white-hot horizontal line, pulls the line
+ * A snapshot of a screen shown on an old CRT tube. At rest it matches the
+ * snapshot exactly; barrel curvature, scanlines, an RGB phosphor mask and a
+ * rolling band only ramp in during a transition. Power off squashes the picture into a white-hot horizontal line, pulls the line
  * into a dot and lets the dot's phosphor fade; power on runs it back with an
  * overshoot and a decaying degauss wobble.
  */
@@ -48,7 +48,7 @@ struct Uniforms {
 @group(0) @binding(2) var tex: texture_2d<f32>;
 
 // Barrel curvature at rest and at full squash: at rest the tube shows the
-// phone screen almost untouched, the glass bulges as the picture collapses.
+// app untouched, the glass bulges as the picture collapses.
 const CURVE_REST: f32 = 0.0;
 const CURVE_SQUASH: f32 = 0.16;
 const PHOSPHOR: vec3<f32> = vec3<f32>(0.86, 0.93, 1.0);
@@ -95,7 +95,7 @@ fn powerOn(e: f32) -> Beam {
     select(0.0, 1.0 - exp(-t * 12.0) * cos(t * 13.0), e > 0.2)
   );
   b.spot = smoothstep(0.0, 0.05, e) * (1.0 - smoothstep(0.08, 0.2, e));
-  b.wobble = smoothstep(0.18, 0.28, e) * exp(-max(e - 0.26, 0.0) * 3.2);
+  b.wobble = smoothstep(0.18, 0.28, e) * exp(-max(e - 0.26, 0.0) * 3.2) * (1.0 - smoothstep(1.5, 2.1, e));
   return b;
 }
 
@@ -151,11 +151,11 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
     var img = screen(clamp(cuv, vec2<f32>(0.0), vec2<f32>(1.0)), b.wobble);
     let t = u.time.x;
     let crt = smoothstep(0.0, 0.4, compress + b.wobble);
-    let scan = 1.0 - mix(0.025, 0.06, crt) * (0.5 - 0.5 * sin(cuv.y * res.y * 2.0944));
-    let flick = 1.0 + 0.012 * sin(t * 9.0) * sin(t * 2.3);
-    let band = mix(0.015, 0.035, crt) * exp(-pow((fract(cuv.y - t * 0.11) - 0.5) * 9.0, 2.0));
-    let vign = 1.0 - mix(0.1, 0.35, crt) * dot(c, c);
-    let mask = mix(vec3<f32>(1.0), phosphorMask(uv.x * res.x), mix(0.35, 1.0, crt));
+    let scan = 1.0 - 0.06 * crt * (0.5 - 0.5 * sin(cuv.y * res.y * 2.0944));
+    let flick = 1.0 + 0.012 * crt * sin(t * 9.0) * sin(t * 2.3);
+    let band = 0.035 * crt * exp(-pow((fract(cuv.y - t * 0.11) - 0.5) * 9.0, 2.0));
+    let vign = 1.0 - 0.35 * crt * dot(c, c);
+    let mask = mix(vec3<f32>(1.0), phosphorMask(uv.x * res.x), crt);
     img = img * mask * scan * flick * vign + band;
     img = img * (1.0 + b.wobble * 0.22 * vec3<f32>(sin(e * 21.0), sin(e * 21.0 + 2.1), sin(e * 21.0 + 4.2)));
 
