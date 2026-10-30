@@ -282,11 +282,11 @@ export default function PolaroidScreen() {
       return;
     }
     busy.current = true;
+    camera.current?.blink();
+    const photo = await squarePhoto().catch(() => null);
     setTimeout(() => {
       busy.current = false;
     }, EJECT_MS);
-    camera.current?.blink();
-    const photo = await squarePhoto().catch(() => null);
     if (photo) {
       addPrint({ uri: photo });
       return;

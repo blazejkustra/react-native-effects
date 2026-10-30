@@ -8,7 +8,7 @@ import {
   View,
   type ImageSourcePropType,
 } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import type { CameraView } from 'expo-camera';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -21,6 +21,21 @@ export type PolaroidCameraHandle = {
   takePhoto: () => Promise<string | null>;
   blink: () => void;
 };
+
+type ExpoCamera = typeof import('expo-camera');
+
+type LiveCapture = Pick<PolaroidCameraHandle, 'takePhoto'>;
+
+/** Throws on a binary built before expo-camera was added. */
+function loadExpoCamera(): ExpoCamera | null {
+  try {
+    return require('expo-camera');
+  } catch {
+    return null;
+  }
+}
+
+const expoCamera = loadExpoCamera();
 
 /** The classic stripe, top to bottom. */
 const STRIPE = ['#e2402c', '#f08a24', '#f6c73a', '#4aa564', '#2f7fc1'];
@@ -47,6 +62,58 @@ function CameraPrompt({
   );
 }
 
+/** The live feed and the permission prompt, over the fallback photo. */
+function LiveViewfinder({
+  ref,
+  expo,
+}: {
+  ref: Ref<LiveCapture>;
+  expo: ExpoCamera;
+}) {
+  const [permission, requestPermission] = expo.useCameraPermissions();
+  const [ready, setReady] = useState(false);
+  const camera = useRef<CameraView>(null);
+  const allowed = permission?.granted === true;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      takePhoto: async () => {
+        if (!ready) {
+          return null;
+        }
+        const photo = await camera.current?.takePictureAsync({
+          quality: 0.8,
+          shutterSound: false,
+        });
+        return photo?.uri ?? null;
+      },
+    }),
+    [ready]
+  );
+
+  return (
+    <>
+      {allowed ? (
+        <expo.CameraView
+          ref={camera}
+          style={StyleSheet.absoluteFill}
+          facing="back"
+          mode="picture"
+          animateShutter={false}
+          onCameraReady={() => setReady(true)}
+        />
+      ) : null}
+      {permission && !allowed ? (
+        <CameraPrompt
+          canAsk={permission.canAskAgain}
+          onAsk={requestPermission}
+        />
+      ) : null}
+    </>
+  );
+}
+
 /**
  * The back of the camera: print slot along the top edge, a square viewfinder
  * and the shutter. The window shows the live camera once allowed. Without
@@ -67,25 +134,13 @@ export default function PolaroidCamera({
   slotWidth: number;
   onShutter: () => void;
 }) {
-  const [permission, requestPermission] = useCameraPermissions();
-  const [ready, setReady] = useState(false);
-  const camera = useRef<CameraView>(null);
+  const live = useRef<LiveCapture>(null);
   const shade = useSharedValue(0);
-  const allowed = permission?.granted === true;
 
   useImperativeHandle(
     ref,
     () => ({
-      takePhoto: async () => {
-        if (!ready) {
-          return null;
-        }
-        const photo = await camera.current?.takePictureAsync({
-          quality: 0.8,
-          shutterSound: false,
-        });
-        return photo?.uri ?? null;
-      },
+      takePhoto: async () => (await live.current?.takePhoto()) ?? null,
       blink: () => {
         shade.value = withSequence(
           withTiming(1, { duration: 40 }),
@@ -93,7 +148,7 @@ export default function PolaroidCamera({
         );
       },
     }),
-    [ready, shade]
+    [shade]
   );
 
   const shadeStyle = useAnimatedStyle(() => ({ opacity: shade.value }));
@@ -114,26 +169,11 @@ export default function PolaroidCamera({
             style={StyleSheet.absoluteFill}
             resizeMode="cover"
           />
-          {allowed ? (
-            <CameraView
-              ref={camera}
-              style={StyleSheet.absoluteFill}
-              facing="back"
-              mode="picture"
-              animateShutter={false}
-              onCameraReady={() => setReady(true)}
-            />
-          ) : null}
+          {expoCamera ? <LiveViewfinder ref={live} expo={expoCamera} /> : null}
           <Animated.View
             style={[styles.shade, shadeStyle]}
             pointerEvents="none"
           />
-          {permission && !allowed ? (
-            <CameraPrompt
-              canAsk={permission.canAskAgain}
-              onAsk={requestPermission}
-            />
-          ) : null}
         </View>
       </View>
 
