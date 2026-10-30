@@ -105,7 +105,7 @@ Apple allows device frames in marketing within its guidelines, but avoid iPhone 
 "The Dynamic Island torch" is an on-screen effect and leaves the real torch off. 1.1.6 could apply if the screen implies it controls the LED. 4.3(b) lists flashlight apps as saturated, which is harmless for one effect in a larger app. Rewrite as "A beam from the top of your screen".
 
 ### 21. Permissions on entry
-Dandelion and Birthday Candle ask for the microphone as soon as they open. Apple accepts this when the purpose is clear, and refusing must leave the app usable. Worth a quick check that both screens stay usable after refusal. Not verified.
+Dandelion and Birthday Candle ask for the microphone as soon as they open. Apple accepts this when the purpose is clear, and refusing must leave the app usable. Verified on a simulator: after refusal both screens stay usable and show "Microphone permission denied".
 
 ## Fixed in the repository (Applied)
 
@@ -117,6 +117,7 @@ Dandelion and Birthday Candle ask for the microphone as soon as they open. Apple
 | Release launch failure | Bundle Mode needs `require.getModules`, which Expo defines only in dev builds, so every Release build was a blank screen. Added `example/metro-get-modules-polyfill.js`, wired in `metro.config.js` |
 | Dev hooks | Every `__*` window hook was already behind `__DEV__`, and a search of the Release Hermes bundle confirms none ship. No edit needed |
 | Dev console | Removed a stray render `console.log` from `ScrollReactiveScreen.tsx` |
+| Launch screen | Expo 58 ignores the root `splash` key, which left a launch storyboard pointing at a missing image. The black background and splash image now come from the `expo-splash-screen` plugin |
 | iPad | iPhone only, since nothing is designed for iPad. Reviewers may still run it in compatibility mode on an iPad |
 
 ## Other decisions
