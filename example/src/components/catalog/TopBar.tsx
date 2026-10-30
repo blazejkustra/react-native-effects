@@ -1,3 +1,7 @@
+import { BlurView } from 'expo-blur';
+import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
+import { SymbolView, type SFSymbol } from 'expo-symbols';
+import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   interpolate,
@@ -8,7 +12,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, SCREEN_MARGIN, scrims, SERIF } from '../../catalog/theme';
 import { SearchGlyph } from './Glyphs';
 
-const BAR_HEIGHT = 48;
+const BAR_HEIGHT = 52;
+const CONTROL_SIZE = 44;
+const SCROLL_EDGE_FADE = 28;
+const SYSTEM_MARGIN = 16;
 
 type TopBarProps = {
   scrollY: SharedValue<number>;
@@ -16,6 +23,48 @@ type TopBarProps = {
   onSearch: () => void;
   onAbout: () => void;
 };
+
+function GlassCircle({ children }: { children: ReactNode }) {
+  if (isLiquidGlassAvailable()) {
+    return (
+      <GlassView style={styles.circle} colorScheme="dark" isInteractive>
+        {children}
+      </GlassView>
+    );
+  }
+  return (
+    <BlurView style={styles.circle} tint="systemChromeMaterialDark">
+      {children}
+    </BlurView>
+  );
+}
+
+type ActionProps = {
+  label: string;
+  symbol: SFSymbol;
+  fallback: ReactNode;
+  onPress: () => void;
+};
+
+function Action({ label, symbol, fallback, onPress }: ActionProps) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+    >
+      <GlassCircle>
+        <SymbolView
+          name={symbol}
+          size={20}
+          weight="medium"
+          tintColor={colors.text}
+          fallback={fallback}
+        />
+      </GlassCircle>
+    </Pressable>
+  );
+}
 
 export function TopBar({
   scrollY,
@@ -25,7 +74,7 @@ export function TopBar({
 }: TopBarProps) {
   const insets = useSafeAreaInsets();
 
-  const backdropStyle = useAnimatedStyle(() => ({
+  const scrollEdgeStyle = useAnimatedStyle(() => ({
     opacity: interpolate(
       scrollY.value,
       [solidAfter - 70, solidAfter],
@@ -41,7 +90,11 @@ export function TopBar({
         pointerEvents="none"
       />
       <Animated.View
-        style={[styles.backdrop, backdropStyle]}
+        style={[
+          styles.scrollEdge,
+          { height: insets.top + BAR_HEIGHT + SCROLL_EDGE_FADE },
+          scrollEdgeStyle,
+        ]}
         pointerEvents="none"
       />
       <View style={[styles.bar, { marginTop: insets.top }]}>
@@ -53,26 +106,18 @@ export function TopBar({
           Effects
         </Text>
         <View style={styles.actions}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Search effects"
-            hitSlop={8}
+          <Action
+            label="Search effects"
+            symbol="magnifyingglass"
+            fallback={<SearchGlyph />}
             onPress={onSearch}
-            style={styles.action}
-          >
-            <SearchGlyph />
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="About this app"
-            hitSlop={8}
+          />
+          <Action
+            label="About this app"
+            symbol="info"
+            fallback={<Text style={styles.infoFallback}>i</Text>}
             onPress={onAbout}
-            style={styles.action}
-          >
-            <Text style={styles.info} maxFontSizeMultiplier={1}>
-              i
-            </Text>
-          </Pressable>
+          />
         </View>
       </View>
     </View>
@@ -92,16 +137,21 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  backdrop: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: colors.background,
+  scrollEdge: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    experimental_backgroundImage:
+      'linear-gradient(to bottom, rgba(0,0,0,0.96) 0%, rgba(0,0,0,0.96) 78%, rgba(0,0,0,0) 100%)',
   },
   bar: {
     height: BAR_HEIGHT,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: SCREEN_MARGIN,
+    paddingLeft: SCREEN_MARGIN,
+    paddingRight: SYSTEM_MARGIN,
   },
   wordmark: {
     fontFamily: SERIF,
@@ -114,15 +164,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
   },
-  action: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  circle: {
+    width: CONTROL_SIZE,
+    height: CONTROL_SIZE,
+    borderRadius: CONTROL_SIZE / 2,
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(40, 40, 40, 0.72)',
   },
-  info: {
+  infoFallback: {
     fontFamily: SERIF,
     fontSize: 20,
     fontWeight: '600',

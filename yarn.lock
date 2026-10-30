@@ -1965,6 +1965,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@expo-google-fonts/material-symbols@npm:^0.4.1":
+  version: 0.4.52
+  resolution: "@expo-google-fonts/material-symbols@npm:0.4.52"
+  checksum: 10c0/8b6de234164a8eae44f9497dc903536a12f9bb3ffd50c6949ea5a5636d3b06c2885d32ecc5476e0ec7075c6cfecaba02b02e5d382109b7f3820b188726578477
+  languageName: node
+  linkType: hard
+
 "@expo/cli@npm:^58.1.17":
   version: 58.1.17
   resolution: "@expo/cli@npm:58.1.17"
@@ -6667,6 +6674,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-blur@npm:~58.0.5":
+  version: 58.0.5
+  resolution: "expo-blur@npm:58.0.5"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/a35707fa2c5f0416828d8becca9182ddad00b10688dab857f7fe2862b886713ec1ed4dc268c0f332205eea89ff202040eedd265d899a0ea45712fa8119b151d7
+  languageName: node
+  linkType: hard
+
 "expo-build-properties@npm:~58.0.11":
   version: 58.0.11
   resolution: "expo-build-properties@npm:58.0.11"
@@ -6728,6 +6746,17 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/238d03dfb63e9d2dbe2d03c8bc87ea87909fa22057b788c36e7421f41a23a2754c60773e30c2e28c6ba29b01406d53a57b9bc86bce60bf575613e4eff835b1c9
+  languageName: node
+  linkType: hard
+
+"expo-glass-effect@npm:~58.0.5":
+  version: 58.0.5
+  resolution: "expo-glass-effect@npm:58.0.5"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/a4fcf07afcb5d97561b60bf460fb59caa980eea1a1e69b0b19d0c094ba59cb1907d883e504ca73fd61e1f0f5d3549b01ee33d79fd2a1d0012b1e248b7690bc33
   languageName: node
   linkType: hard
 
@@ -6845,6 +6874,21 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: 10c0/ec984becd3abf31cb5f1bc794623907aa7620922b01e20e7e1ccbd693f9e61c51f27a6e834bbdef112383ba8e61260c127e7f8ca92ceaea50af121687e623804
+  languageName: node
+  linkType: hard
+
+"expo-symbols@npm:~58.0.4":
+  version: 58.0.4
+  resolution: "expo-symbols@npm:58.0.4"
+  dependencies:
+    "@expo-google-fonts/material-symbols": "npm:^0.4.1"
+    sf-symbols-typescript: "npm:^2.0.0"
+  peerDependencies:
+    expo: "*"
+    expo-font: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/fd74782eca429c4be835b24133254b1178bb899ff617506705ed0c7fe95e1d6967b542f0ebc40e2f3e030316c91c265785f586476e546e7fdcf8f674795f4030
   languageName: node
   linkType: hard
 
@@ -10941,10 +10985,13 @@ __metadata:
     "@webgpu/types": "npm:0.1.70"
     babel-preset-expo: "npm:~58.0.0"
     expo: "npm:~58.0.21"
+    expo-blur: "npm:~58.0.5"
     expo-build-properties: "npm:~58.0.11"
     expo-camera: "npm:~58.0.0"
+    expo-glass-effect: "npm:~58.0.5"
     expo-sensors: "npm:~58.0.4"
     expo-splash-screen: "npm:~58.0.12"
+    expo-symbols: "npm:~58.0.4"
     react: "npm:19.3.0"
     react-native: "npm:0.88.1"
     react-native-audio-api: "npm:^0.13.6"
@@ -11669,7 +11716,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sf-symbols-typescript@npm:^2.1.0":
+"sf-symbols-typescript@npm:^2.0.0, sf-symbols-typescript@npm:^2.1.0":
   version: 2.2.0
   resolution: "sf-symbols-typescript@npm:2.2.0"
   checksum: 10c0/3f3bbf33aaad19e619d6f169899b39e9fe9c5fd21f0d6d511100e36887606ad349109ddc6ff82933f2b8cbf437dd7105c2ae6b0059b291dc47f143b30c2074cc
