@@ -12,9 +12,6 @@ const GLYPHS = {
   lock: require('../../../assets/cracks/lock-fill.png'),
   flashlight: require('../../../assets/cracks/flashlight-off-fill.png'),
   camera: require('../../../assets/cracks/camera-fill.png'),
-  signal: require('../../../assets/cracks/cellularbars.png'),
-  wifi: require('../../../assets/cracks/wifi.png'),
-  battery: require('../../../assets/cracks/battery-100percent.png'),
   message: require('../../../assets/cracks/message-fill.png'),
 };
 
@@ -100,7 +97,7 @@ type LockScreenProps = {
 };
 
 /**
- * A static clone of the iOS 26 lock screen (status bar, lock glyph, date,
+ * A static clone of the iOS 26 lock screen (lock glyph, date,
  * clock, flashlight and camera buttons, home indicator) over a wallpaper
  * photo. Rendered as plain views so it can be snapshotted into a texture.
  */
@@ -123,15 +120,6 @@ export default function LockScreen({
     <View ref={ref} style={styles.root} collapsable={false} onLayout={onLayout}>
       <Image source={wallpaper} style={styles.fill} resizeMode="cover" />
       <View style={[styles.shade, { opacity: dim }]} />
-
-      <View style={[styles.statusBar, { top: top / 2 - 10 }]}>
-        <Text style={styles.carrier}>Orange</Text>
-        <View style={styles.statusIcons}>
-          <Glyph source={GLYPHS.signal} height={11} aspect={151 / 102} />
-          <Glyph source={GLYPHS.wifi} height={11} aspect={127 / 97} />
-          <Glyph source={GLYPHS.battery} height={12} aspect={167 / 85} />
-        </View>
-      </View>
 
       <View style={[styles.head, { paddingTop: top + (landscape ? 4 : 10) }]}>
         <Glyph source={GLYPHS.lock} height={17} aspect={93 / 112} />
@@ -206,25 +194,6 @@ const styles = StyleSheet.create({
   shade: {
     ...StyleSheet.absoluteFill,
     backgroundColor: '#000',
-  },
-  statusBar: {
-    position: 'absolute',
-    left: 34,
-    right: 30,
-    height: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  carrier: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  statusIcons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
   },
   head: {
     alignItems: 'center',
