@@ -29,7 +29,11 @@ import PolaroidCamera, {
 import SquareCropper, {
   type SquareCropperHandle,
 } from '../components/polaroid/SquareCropper';
-import { playWhirr } from '../components/polaroid/whirr';
+import {
+  playFilmWhirr,
+  playShutterClick,
+  stopCameraSound,
+} from '../components/polaroid/cameraSound';
 import { usePolaroidShake } from '../hooks/usePolaroidShake';
 
 /**
@@ -216,12 +220,12 @@ function Print({
 /**
  * Polaroid instant print.
  *
- * Press the shutter: the camera takes a real photo (or a bundled one on the
- * simulator or without permission), the motor whirrs and a print slides out
- * onto the table. It starts as the milky blue-grey of the opacifier and
- * develops over about twenty seconds in the order the film does it. Shake the
- * phone and the top print swings in your fingers while every wet print
- * develops a little faster. Prints pile up, newest on top, and can be dragged
+ * Press the shutter: it clicks, the camera takes a real photo (or a bundled
+ * one on the simulator or without permission), the film rolls and a print
+ * slides out onto the table. It starts as the milky blue-grey of the
+ * opacifier and develops over about twenty seconds in the order the film does
+ * it. Shake the phone and the top print swings in your fingers while every wet
+ * print develops a little faster. Prints pile up, newest on top, and can be dragged
  * apart; a finished print is frozen and costs no GPU time.
  * `__polaroidPhoto(uri)` prints any image in dev builds, through the same
  * square crop a real photo takes.
@@ -235,6 +239,7 @@ export default function PolaroidScreen() {
   const nextId = useRef(0);
   const nextZ = useRef(0);
   const busy = useRef(false);
+  const left = useRef(false);
   const [prints, setPrints] = useState<PrintSpec[]>([]);
   const [bundledIndex, setBundledIndex] = useState(0);
   const [pausedBelowId, setPausedBelowId] = useState(0);
@@ -261,7 +266,10 @@ export default function PolaroidScreen() {
     const spec = makePrint(nextId.current++, ++nextZ.current, photo);
     setPausedBelowId(spec.id);
     setTimeout(() => {
-      playWhirr(EJECT_MS / 1000 - 0.25);
+      if (left.current) {
+        return;
+      }
+      playFilmWhirr();
       setPrints((ps) => [...ps, spec].slice(-MAX_PRINTS));
     }, GPU_PAUSE_LEAD_MS);
     setTimeout(() => setPausedBelowId(0), GPU_PAUSE_LEAD_MS + GPU_PAUSE_MS);
@@ -283,6 +291,7 @@ export default function PolaroidScreen() {
     }
     busy.current = true;
     camera.current?.blink();
+    playShutterClick();
     const photo = await squarePhoto().catch(() => null);
     setTimeout(() => {
       busy.current = false;
@@ -294,6 +303,14 @@ export default function PolaroidScreen() {
     addPrint(PHOTOS[bundledIndex % PHOTOS.length]!);
     setBundledIndex(bundledIndex + 1);
   }, [addPrint, bundledIndex, squarePhoto]);
+
+  useEffect(() => {
+    left.current = false;
+    return () => {
+      left.current = true;
+      stopCameraSound();
+    };
+  }, []);
 
   useEffect(() => {
     if (!__DEV__) {
