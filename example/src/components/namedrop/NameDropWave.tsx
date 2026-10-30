@@ -78,20 +78,15 @@ fn soft(uv: vec2<f32>, level: f32, px: vec2<f32>) -> vec3<f32> {
   return c / 6.0;
 }
 
-fn band(x: f32, a: f32, b: f32) -> f32 {
-  return smoothstep(a, b, x);
+fn glowColor(s: f32) -> vec3<f32> {
+  let spread = select(0.62, 0.95, s > 0.0);
+  let envelope = exp(-s * s / (2.0 * spread * spread));
+  let tone = mix(vec3<f32>(0.42, 0.64, 0.82), vec3<f32>(0.92, 0.64, 0.52), smoothstep(-0.9, 1.1, s));
+  return tone * envelope;
 }
 
-// Colours sampled from the reference glow, ordered from its leading edge (s < 0)
-// to its tail (s > 0).
-fn glowColor(s: f32) -> vec3<f32> {
-  var c = mix(vec3<f32>(0.0), vec3<f32>(0.0, 0.30, 0.52), band(s, -0.75, -0.48));
-  c = mix(c, vec3<f32>(0.25, 0.54, 0.62), band(s, -0.48, -0.26));
-  c = mix(c, vec3<f32>(0.49, 0.64, 0.56), band(s, -0.26, -0.02));
-  c = mix(c, vec3<f32>(0.56, 0.50, 0.44), band(s, -0.02, 0.22));
-  c = mix(c, vec3<f32>(0.46, 0.29, 0.34), band(s, 0.22, 0.52));
-  c = mix(c, vec3<f32>(0.15, 0.10, 0.24), band(s, 0.48, 0.76));
-  return mix(c, vec3<f32>(0.0), band(s, 0.76, 1.05));
+fn dither(p: vec2<f32>) -> f32 {
+  return (fract(52.9829 * fract(dot(p, vec2<f32>(0.06711, 0.00584)))) - 0.5) / 255.0;
 }
 
 fn screen(a: vec3<f32>, b: vec3<f32>) -> vec3<f32> {
@@ -121,13 +116,13 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let rise = res.y * exp(-3.2 * t);
   let dx = pt.x - island.x;
   let wobble = 12.0 * sin(pt.x * 0.011 + t * 1.3);
-  let width = 230.0 + 0.5 * rise;
+  let width = 340.0 + 0.6 * rise;
   let s = (pt.y - rise - dx * dx * 0.0006 - wobble) / width;
   let settle = smoothstep(360.0, 60.0, rise);
   let hold = 1.0 - smoothstep(1.2, 1.32, t);
   let begin = smoothstep(0.0, 0.1, t);
-  let centred = mix(0.5, 1.0, exp(-dx * dx / 42000.0));
-  let glow = glowColor(s) * mix(1.0, 1.3, settle) * centred * hold * begin;
+  let centred = mix(0.35, 1.0, exp(-dx * dx / 36000.0));
+  let glow = glowColor(s) * mix(0.11, 0.3, settle) * centred * hold * begin;
 
   let topHaze = smoothstep(0.0, 0.34, t) * (1.0 - smoothstep(0.36, 0.62, t)) * exp(-pt.y / 95.0);
 
@@ -151,9 +146,14 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let level = veil * 1.7 + rim * 0.5 + wash * 1.5 + back * 2.0;
 
   var col = soft(sp / res, level, px);
-  col *= 1.0 - 0.32 * hold * begin * (1.0 - smoothstep(240.0, 520.0, pt.y));
+  let luma = dot(col, vec3<f32>(0.3, 0.59, 0.11));
+  col = mix(col, vec3<f32>(luma * 0.92, luma * 0.97, luma * 1.08), veil * 0.12);
+  col *= 1.0 - 0.3 * hold * begin * (1.0 - smoothstep(200.0, 620.0, pt.y));
   col = screen(col, min(glow, vec3<f32>(0.95)));
-  col = screen(col, vec3<f32>(0.59, 0.71, 0.94) * topHaze * 0.85);
+  col = screen(col, vec3<f32>(0.59, 0.71, 0.94) * topHaze * 0.16);
+  let coreDistance = length(v * vec2<f32>(0.7, 1.0));
+  let core = clamp(1.25 * exp(-coreDistance / 125.0), 0.0, 1.0) * smoothstep(0.05, 0.7, t) * hold;
+  col = screen(col, vec3<f32>(0.86, 0.93, 1.0) * core);
 
   let shade = exp(-pow((d - radius - 56.0) / 62.0, 2.0)) * wave * (1.0 - clamp(k * 2.0, 0.0, 1.0));
   col *= 1.0 - shade * 0.55;
@@ -163,6 +163,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   col = mix(col, vec3<f32>(0.08, 0.16, 0.30), back * 0.5);
 
   let isl = smoothstep(0.0, 1.2, pill(pt - island, islandSize));
-  return vec4<f32>(clamp(col * isl, vec3<f32>(0.0), vec3<f32>(1.0)), 1.0);
+  let finished = col * isl + vec3<f32>(dither(pt * u.resolution.w));
+  return vec4<f32>(clamp(finished, vec3<f32>(0.0), vec3<f32>(1.0)), 1.0);
 }
 `;
