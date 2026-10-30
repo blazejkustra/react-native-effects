@@ -6,230 +6,200 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
-  Easing,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
-  withSequence,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import { captureRef } from 'react-native-view-shot';
 import { useParamsSynchronizable } from 'react-native-effects';
-import NameDropWave from '../components/namedrop/NameDropWave';
+import NameDropWave, { HOME_ATLAS } from '../components/namedrop/NameDropWave';
+import PosterReveal from '../components/namedrop/PosterReveal';
 import ContactPoster, {
   type ExchangeChoice,
+  type PosterHandle,
 } from '../components/namedrop/ContactPoster';
 
-/** A real iPhone home screen screenshot, its status bar painted out. */
-const HOME_SCREEN = require('../../assets/crt/home-screen.jpg');
-/** The Dynamic Island centre on the iPhone 18 Pro Max, pt. */
-const ISLAND_CENTER = { x: 220, y: 32 };
-/** Drag distance (pt) that brings the other phone close enough. */
+/** Downward drag (pt) that counts as bringing the other phone close. */
 const TRIGGER_DRAG = 70;
-const PEEK_REST = 16;
-const PEEK_TOUCH = 34;
-const CARD_DELAY_MS = 520;
-const WAVE_SECONDS = 3;
+/** Seconds from contact until the poster is fully on screen. */
+const REVEAL_SECONDS = 2.15;
+const RESET_AFTER_CHOICE_MS = 1600;
 
-type Phase = 'idle' | 'exchanging';
+type Phase = 'home' | 'exchanging' | 'poster';
+
+type NameDropDevHooks = {
+  __nameDrop?: () => void;
+  __nameDropWaveAt?: (seconds: number) => void;
+  __nameDropSpeed?: (factor: number | null) => void;
+};
+
+let playbackSpeed = 1;
+
+async function snapshotPoster(view: PosterHandle) {
+  const raw = await captureRef(view, {
+    format: 'png',
+    quality: 1,
+    result: 'tmpfile',
+  });
+  return raw.startsWith('file://') ? raw : `file://${raw}`;
+}
 
 /**
- * NameDrop: drag the other phone (peeking in at the top edge) down onto this
- * one. The screen dims, a liquid bloom of light pours out of the Dynamic
- * Island and ripples across the screen, and the other person's Contact
- * Poster unfolds from the island with Receive Only / Share. Tap outside the
- * poster to part the phones.
+ * NameDrop: drag down from the top of the home screen (or tap it) to bring
+ * the other iPhone close. A milky glow wells out of the Dynamic Island, the
+ * home screen bulges and blurs beneath it like a liquid lens, a bright ripple
+ * runs down the glass, and the other person's "Share Your Contact" poster
+ * swells out of the island into focus. Tap the poster to go back.
  */
 export default function NameDropScreen() {
-  const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
-  const [phase, setPhase] = useState<Phase>('idle');
+  const [phase, setPhase] = useState<Phase>('home');
   const [choice, setChoice] = useState<ExchangeChoice>(null);
-  const wave = useParamsSynchronizable([0, 0, 0, 0]);
-  const setWave = wave.setParamsSynchronizable;
-  const waveStart = useRef(0);
-  const waveStrength = useRef({ value: 0, target: 0 });
+  const [snapshot, setSnapshot] = useState<string | null>(null);
+  const live = useParamsSynchronizable([0, 0, 0, 0]);
+  const setLive = live.setParamsSynchronizable;
+  const posterRef = useRef<PosterHandle>(null);
+  const clock = useRef(0);
   const frame = useRef<number | null>(null);
-  const isTogether = useRef(false);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cover = useSharedValue(1);
 
-  const dim = useSharedValue(0);
-  const card = useSharedValue(0);
-  const settle = useSharedValue(1);
-  const peek = useSharedValue(PEEK_REST);
+  const stopClock = useCallback(() => {
+    if (frame.current !== null) cancelAnimationFrame(frame.current);
+    frame.current = null;
+    if (resetTimer.current !== null) clearTimeout(resetTimer.current);
+    resetTimer.current = null;
+  }, []);
 
-  const runWave = useCallback(() => {
+  useEffect(() => stopClock, [stopClock]);
+
+  const play = useCallback(() => {
+    stopClock();
+    clock.current = 0;
+    setChoice(null);
+    setPhase('exchanging');
+    cover.value = 1;
     let last = performance.now();
     const tick = () => {
       const now = performance.now();
-      const dt = Math.min(0.05, (now - last) / 1000);
+      clock.current += (Math.min(50, now - last) / 1000) * playbackSpeed;
       last = now;
-      const s = waveStrength.current;
-      s.value += (s.target - s.value) * (1 - Math.exp(-6 * dt));
-      const t = (now - waveStart.current) / 1000;
-      setWave(Math.min(t, WAVE_SECONDS), s.value, 0, 0);
-      const idle = s.target === 0 && s.value < 0.005;
-      frame.current = idle ? null : requestAnimationFrame(tick);
+      setLive(clock.current, 0, 0, 0);
+      if (clock.current < REVEAL_SECONDS) {
+        frame.current = requestAnimationFrame(tick);
+        return;
+      }
+      frame.current = null;
+      setPhase('poster');
+      cover.value = 0;
     };
-    if (frame.current !== null) cancelAnimationFrame(frame.current);
     frame.current = requestAnimationFrame(tick);
-  }, [setWave]);
+  }, [stopClock, cover, setLive]);
 
-  useEffect(() => {
-    return () => {
-      if (frame.current !== null) cancelAnimationFrame(frame.current);
-    };
-  }, []);
-
-  const startWave = useCallback(
-    (strength: number) => {
-      waveStart.current = performance.now();
-      waveStrength.current = { value: strength, target: strength };
-      runWave();
-    },
-    [runWave]
-  );
-
-  const connect = useCallback(() => {
-    if (isTogether.current) return;
-    isTogether.current = true;
-    setPhase('exchanging');
-    setChoice(null);
-    peek.value = withSpring(PEEK_TOUCH, { damping: 16, stiffness: 180 });
-    dim.value = withTiming(0.62, { duration: 380 });
-    startWave(1);
-    settle.value = 1;
-    card.value = withDelay(
-      CARD_DELAY_MS,
-      withSpring(1, { damping: 18, stiffness: 150, mass: 1 })
-    );
-  }, [peek, dim, card, settle, startWave]);
+  const goHome = useCallback(() => {
+    stopClock();
+    clock.current = 0;
+    setLive(0, 0, 0, 0);
+    setPhase('home');
+    cover.value = withTiming(1, { duration: 320 });
+  }, [stopClock, cover, setLive]);
 
   const choose = useCallback(
     (picked: 'share' | 'receive') => {
       setChoice(picked);
-      settle.value = withSequence(
-        withTiming(0.955, { duration: 140, easing: Easing.out(Easing.quad) }),
-        withSpring(1, { damping: 9, stiffness: 160 })
-      );
-      if (picked === 'share') startWave(0.75);
+      resetTimer.current = setTimeout(goHome, RESET_AFTER_CHOICE_MS);
     },
-    [settle, startWave]
+    [goHome]
   );
 
-  const part = useCallback(() => {
-    if (!isTogether.current) return;
-    isTogether.current = false;
-    setPhase('idle');
-    card.value = withTiming(0, {
-      duration: 340,
-      easing: Easing.in(Easing.cubic),
-    });
-    dim.value = withTiming(0, { duration: 420 });
-    peek.value = withSpring(PEEK_REST, { damping: 18, stiffness: 160 });
-    waveStrength.current.target = 0;
-    runWave();
-  }, [card, dim, peek, runWave]);
+  const captureSnapshot = useCallback(() => {
+    if (!posterRef.current) return;
+    snapshotPoster(posterRef.current)
+      .then(setSnapshot)
+      .catch((e) => console.warn('[NameDrop] poster snapshot failed:', e));
+  }, []);
 
-  // `__nameDrop()` brings the phones together without the drag;
-  // `__nameDropWaveAt(seconds)` freezes the light at one moment.
+  // `__nameDrop()` plays the exchange, `__nameDropWaveAt(seconds)` freezes
+  // it at one moment and `__nameDropSpeed(factor | null)` slows it down.
   useEffect(() => {
     if (!__DEV__) return;
-    const g = globalThis as {
-      __nameDrop?: () => void;
-      __nameDropWaveAt?: (seconds: number) => void;
-    };
-    g.__nameDrop = connect;
+    const g = globalThis as NameDropDevHooks;
+    g.__nameDrop = play;
     g.__nameDropWaveAt = (seconds) => {
-      if (frame.current !== null) cancelAnimationFrame(frame.current);
-      frame.current = null;
-      setWave(seconds, 1, 0, 0);
+      stopClock();
+      clock.current = seconds;
+      setLive(seconds, 0, 0, 0);
+      const done = seconds >= REVEAL_SECONDS;
+      setPhase(done ? 'poster' : 'exchanging');
+      cover.value = done ? 0 : 1;
+    };
+    g.__nameDropSpeed = (factor) => {
+      playbackSpeed = factor ?? 1;
     };
     return () => {
       delete g.__nameDrop;
       delete g.__nameDropWaveAt;
+      delete g.__nameDropSpeed;
     };
-  }, [connect, setWave]);
+  }, [play, stopClock, cover, setLive]);
 
   const approach = Gesture.Pan()
     .runOnJS(true)
-    .enabled(phase === 'idle')
-    .onChange((e) => {
-      peek.value = PEEK_REST + Math.max(0, e.translationY) * 0.45;
-      if (e.translationY > TRIGGER_DRAG) connect();
-    })
-    .onEnd(() => {
-      if (!isTogether.current) {
-        peek.value = withSpring(PEEK_REST, { damping: 18, stiffness: 160 });
-      }
+    .enabled(phase === 'home')
+    .activeOffsetY(12)
+    .onUpdate((e) => {
+      if (e.translationY > TRIGGER_DRAG && frame.current === null) play();
     });
-  const tapPeek = Gesture.Tap().runOnJS(true).onEnd(connect);
-  const approachGesture = Gesture.Race(approach, tapPeek);
+  const tap = Gesture.Tap()
+    .runOnJS(true)
+    .enabled(phase === 'home')
+    .onEnd(play);
+  const homeGesture = Gesture.Exclusive(approach, tap);
 
-  const cardWidth = width - 20;
-  const cardHeight = Math.round(height * 0.74);
-  const cardTop = insets.top - 6;
-
-  const dimStyle = useAnimatedStyle(() => ({ opacity: dim.value }));
-  const peekStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: peek.value }],
-  }));
-  const cardStyle = useAnimatedStyle(() => {
-    const p = card.value;
-    const rise = (1 - p) * -(cardTop + cardHeight * 0.5 - ISLAND_CENTER.y);
-    return {
-      opacity: Math.min(1, p * 2.5),
-      transform: [
-        { translateY: rise },
-        { scaleX: (0.22 + 0.78 * p) * settle.value },
-        { scaleY: (0.06 + 0.94 * p) * settle.value },
-      ],
-    };
-  });
+  const coverStyle = useAnimatedStyle(() => ({ opacity: cover.value }));
 
   return (
     <View style={styles.root}>
-      <Image
-        source={HOME_SCREEN}
-        style={{ width, height }}
-        resizeMode="cover"
-      />
-      <Animated.View
-        style={[StyleSheet.absoluteFill, styles.dim, dimStyle]}
-        pointerEvents="none"
-      />
-      <NameDropWave
+      <Pressable
         style={StyleSheet.absoluteFill}
-        origin={ISLAND_CENTER}
-        paramsSynchronizable={wave.paramsSynchronizable}
-        pointerEvents="none"
-      />
-      {phase === 'exchanging' && (
-        <Pressable style={StyleSheet.absoluteFill} onPress={part} />
-      )}
-      <Animated.View
-        style={[
-          styles.cardWrap,
-          { top: cardTop, width: cardWidth, height: cardHeight },
-          cardStyle,
-        ]}
-        pointerEvents={phase === 'exchanging' ? 'box-none' : 'none'}
+        onPress={goHome}
+        disabled={phase !== 'poster'}
       >
         <ContactPoster
-          width={cardWidth}
-          height={cardHeight}
+          ref={posterRef}
+          width={width}
+          height={height}
           choice={choice}
           onChoose={choose}
+          onAvatarLoad={captureSnapshot}
         />
-      </Animated.View>
-      <GestureDetector gesture={approachGesture}>
-        <View style={styles.approachZone}>
-          <Animated.View style={[styles.otherPhone, peekStyle]}>
-            <View style={styles.otherPhoneGlass} />
-          </Animated.View>
-        </View>
+      </Pressable>
+      <GestureDetector gesture={homeGesture}>
+        <Animated.View
+          style={[StyleSheet.absoluteFill, coverStyle]}
+          pointerEvents={phase === 'poster' ? 'none' : 'auto'}
+        >
+          <View style={[StyleSheet.absoluteFill, styles.clip]}>
+            <Image
+              source={HOME_ATLAS}
+              style={{ width: width * 3, height }}
+              resizeMode="stretch"
+            />
+          </View>
+          <NameDropWave
+            style={StyleSheet.absoluteFill}
+            paramsSynchronizable={live.paramsSynchronizable}
+          />
+          {snapshot !== null && (
+            <PosterReveal
+              style={StyleSheet.absoluteFill}
+              paramsSynchronizable={live.paramsSynchronizable}
+              snapshotUri={snapshot}
+            />
+          )}
+        </Animated.View>
       </GestureDetector>
     </View>
   );
@@ -240,50 +210,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  dim: {
-    backgroundColor: '#000',
-  },
-  cardWrap: {
-    position: 'absolute',
-    left: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.45,
-    shadowRadius: 30,
-    shadowOffset: { width: 0, height: 14 },
-  },
-  hidden: {
-    opacity: 0,
-  },
-  approachZone: {
-    position: 'absolute',
-    top: 0,
-    left: 120,
-    right: 120,
-    height: 120,
-    alignItems: 'center',
-    zIndex: 90,
-  },
-  otherPhone: {
-    position: 'absolute',
-    top: -90,
-    width: 380,
-    height: 90,
-    borderBottomLeftRadius: 58,
-    borderBottomRightRadius: 58,
-    backgroundColor: '#2a2a2e',
-    borderWidth: 2,
-    borderTopWidth: 0,
-    borderColor: '#9a9aa1',
+  clip: {
     overflow: 'hidden',
-  },
-  otherPhoneGlass: {
-    position: 'absolute',
-    left: 5,
-    right: 5,
-    top: 0,
-    bottom: 5,
-    borderBottomLeftRadius: 52,
-    borderBottomRightRadius: 52,
-    backgroundColor: '#050506',
   },
 });
