@@ -44,9 +44,9 @@ Guidelines: 1.1.6 ("trick/joke functionality... inaccurate device data", and it 
 Fix: keep the app's chrome visible, or show a persistent small caption, so nobody can read it as their real phone. Replace the lock screen with an abstract scene (a photo with an invented clock style). Rename Crackgate to "Hinge Crack" and remove "iPhone Duo". Applied: the review note states that the effect is contained in the app.
 
 ### 8. Thanos
-Evidence: Marvel character name as a title and a film still as the thumbnail.
+Evidence: Marvel character name as a title. The redesigned thumbnail is an app screenshot and the film still is gone.
 Guidelines: 5.2.1.
-Fix: rename "Snap" or "Dust", replace the thumbnail, and rephrase "Snap" copy only if needed.
+Fix: rename to "Snap" or "Dust".
 
 ## Medium: real chance of rejection or complaint
 

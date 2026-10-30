@@ -11,7 +11,6 @@ Each of these ships in the app bundle. Replace it or get written permission befo
 | `cigarette.png` | Cigarette | pngimg.com `cigarette_PNG4767`, CC BY-NC 4.0 per project notes. Non-commercial terms sit badly with a store release, and pngimg's own terms need rereading | Replace with a CC0 or self-shot photo |
 | `foam.jpg` | Beer, Foam lab | Stock photo supplied by the owner, licence never checked (the code says so too) | Find the source and license it, or shoot one |
 | `candle/cake.jpg` | Birthday Candle | Cake photo pasted by the owner, then retouched. Source unknown | Find the source, or replace |
-| `components/thanos.png` | Catalog thumbnail | Still of Thanos from a Marvel film (Disney) | Replace with a screenshot of the app's own effect |
 | `namedrop/home-atlas.jpg` | NameDrop | Real iOS home screen capture showing Apple app icons and wallpaper | Replace with an invented home screen |
 | `iphone-background.png` | Siri Orb | Real iOS home screen capture showing Apple app icons and wallpaper | Replace with an invented home screen |
 | `telegram/pattern.png` | Telegram screens | A real Telegram chat wallpaper | Draw an original pattern |
@@ -19,7 +18,7 @@ Each of these ships in the app bundle. Replace it or get written permission befo
 | `instagram/*.png` icons | Voice Delete | Cropped from a recording of Instagram | Redraw or use an MIT icon set |
 | `telegram/avatar.jpg` | Telegram screens | Identifiable man speaking on stage. No record of who took it or who he is | Confirm you own it and have consent, or swap for a credited or generated avatar |
 | `weather/*.png` | Weather | No source recorded in git or notes. They look like an existing weather icon set | Identify the set, or redraw |
-| `components/*.png` showing other products | Catalog thumbnails | Several thumbnails show third-party marks: `cards.png` (Monzo), `wallet.png` (Mastercard-style logo), `siri-orb.png` (Safari and Messages icons), `imessage.png`, `telegram-spoiler.png`, `banners.png` (Duolingo) | Retake after the matching screens change. Depends on whether the redesign keeps these files |
+| `catalog/*.jpg` showing other products | Catalog thumbnails | App screenshots that show third-party marks: `holo-card.jpg` (Revolut, Monzo), `wallet.jpg` (Mastercard-style logo), `siri-orb.jpg` (Safari and Messages icons), `banners.jpg` (Duolingo), `imessage.jpg`, `telegram-*.jpg`, `voice-delete.jpg`, and `weather.jpg` | Retake after the matching screens change |
 
 Picsum images load at runtime in Voice Delete. Lorem Picsum draws from Unsplash photographs, and the owner has no record of which ones, so bundling known images is the safer route.
 
@@ -35,8 +34,8 @@ Picsum images load at runtime in Voice Delete. Lorem Picsum draws from Unsplash 
 
 Verified against the Commons API on 2026-10-30, author and licence match `docs/credits.md`: `namedrop/avatar.jpg`, `flashlight/corridor.jpg`, `polaroid/photo-*.jpg`, `polaroid/table.jpg` and `bubblewrap/walnut.jpg` (Lorenz), `dandelion/dandelion-atlas.jpg`, `hourglass/hourglass-atlas.jpg`, `dispersion/cat-atlas.png`, `lavalamp/lava-lamp.jpg`, `cracks/palms.jpg`, `cracks/swing.jpg`, `ferrofluid/marble.jpg`.
 
-Original to the project: `icon.png`, `splash-icon.png`, `adaptive-icon.png`, `favicon.png` (present from the initial commit, please confirm you made them), and thumbnails that are screenshots of this app's own shaders.
+Original to the project: `icon.png`, `splash-icon.png`, `adaptive-icon.png`, `favicon.png` (present from the initial commit, please confirm you made them), and the other `catalog/*.jpg` thumbnails, which are screenshots of this app.
 
 ## In the repository but not shipped
 
-Nothing requires these, so Metro leaves them out: `charizard.png` (a scan of a Pokémon card, owned by Nintendo, Creatures and GAME FREAK), `components/desert.png`, `components/glitter.png`. Delete `charizard.png` from the public repository regardless.
+Nothing requires these, so Metro leaves them out: `charizard.png` (a scan of a Pokémon card, owned by Nintendo, Creatures and GAME FREAK). Delete `charizard.png` from the public repository regardless.
