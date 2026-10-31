@@ -140,7 +140,6 @@ export default function IMessageScreen() {
                 onTarget={
                   isScreenEffect(m.effect) ? onTargetFor(m.id) : undefined
                 }
-                wantSnapshot={m.effect === 'echo'}
               />
             </View>
           );

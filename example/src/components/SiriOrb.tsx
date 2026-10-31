@@ -4,9 +4,9 @@ import { ShaderView } from 'react-native-effects';
 import type { ColorInput } from 'react-native-effects';
 
 type Props = ViewProps & {
-  /** Primary orb color (magenta/purple). */
+  /** Primary orb color. */
   color?: ColorInput;
-  /** Accent color for chromatic edges (cyan). */
+  /** Second orb color, swirled through the first. */
   accentColor?: ColorInput;
   /** Animation speed multiplier. Default: 1.0 */
   speed?: number;
@@ -17,8 +17,8 @@ type Props = ViewProps & {
 };
 
 export default function SiriOrb({
-  color = '#a855f6',
-  accentColor = '#06b6d4',
+  color = '#d9a441',
+  accentColor = '#0f6b5a',
   speed = 1.0,
   activity = 0.0,
   bloom = 0.6,
@@ -80,26 +80,8 @@ fn fbm3(p_in: vec2<f32>) -> f32 {
   return v;
 }
 
-// Palette: vivid neon colors
 fn orbPalette(t: f32) -> vec3<f32> {
-  // Deep magenta -> electric purple -> hot cyan -> warm pink -> back
-  let magenta = vec3<f32>(0.95, 0.05, 0.55);
-  let purple  = vec3<f32>(0.50, 0.05, 0.95);
-  let cyan    = vec3<f32>(0.0, 0.85, 0.95);
-  let pink    = vec3<f32>(1.0, 0.25, 0.55);
-  let blue    = vec3<f32>(0.15, 0.25, 0.95);
-
-  let tt = fract(t);
-  if (tt < 0.2) {
-    return mix(magenta, purple, tt / 0.2);
-  } else if (tt < 0.4) {
-    return mix(purple, blue, (tt - 0.2) / 0.2);
-  } else if (tt < 0.6) {
-    return mix(blue, cyan, (tt - 0.4) / 0.2);
-  } else if (tt < 0.8) {
-    return mix(cyan, pink, (tt - 0.6) / 0.2);
-  }
-  return mix(pink, magenta, (tt - 0.8) / 0.2);
+  return mix(u.color0.rgb, u.color1.rgb, 0.5 + 0.5 * sin(t * 6.2831853));
 }
 
 @fragment
@@ -121,33 +103,19 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let radius = 0.22 + breathe;
 
   // ---- Internal swirling colors ----
-  // Use sin/cos of angle to avoid atan2 discontinuity
   let warpAmt = 1.5 + activity * 1.5;
-  let angle = atan2(centered.y, centered.x);
-  let sa = sin(angle);
-  let ca = cos(angle);
-
-  // Seamless polar-like coords using sin/cos (no wrapping seam)
-  let polar1 = vec2<f32>(ca + dist * 2.0, sa + dist * 2.0);
-  let polar2 = vec2<f32>(sa * 1.5 + dist * 3.0, ca * 1.5 - dist * 3.0);
 
   // Two layers of warped noise for rich color variation
-  let warp1 = fbm3(polar1 + vec2<f32>(time * 0.2, time * 0.15)) - 0.5;
-  let warp2 = fbm3(polar2 + vec2<f32>(-time * 0.18, time * 0.22) + 5.0) - 0.5;
+  let warp1 = fbm3(centered * 3.5 + vec2<f32>(time * 0.2, time * 0.15)) - 0.5;
+  let warp2 = fbm3(centered * 6.0 + vec2<f32>(-time * 0.18, time * 0.22) + 5.0) - 0.5;
 
-  // Color index: use sin/cos blend instead of raw angle to stay seamless
-  let colorIdx = (sa * 0.5 + ca * 0.3) * 0.5 + 0.5 + warp1 * warpAmt * 0.3 + warp2 * warpAmt * 0.2 + time * 0.05;
+  let colorIdx = warp1 * warpAmt + warp2 * warpAmt * 0.6 + time * 0.05;
 
-  // Get vivid palette color
   var orbCol = orbPalette(colorIdx);
-
-  // Boost saturation and vibrancy
-  let lum = dot(orbCol, vec3<f32>(0.299, 0.587, 0.114));
-  orbCol = mix(vec3<f32>(lum), orbCol, 1.6);
 
   // Add radial brightness variation (brighter center)
   let normDist = dist / radius;
-  let coreBright = 1.0 + (1.0 - smoothstep(0.0, 0.7, normDist)) * 0.8;
+  let coreBright = 1.0 + (1.0 - smoothstep(0.0, 0.8, normDist)) * 0.3;
   orbCol *= coreBright;
 
   // Add subtle noise shimmer
@@ -165,45 +133,28 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
 
   // ---- Specular highlights ----
   let sp1 = vec2<f32>(cos(time * 0.6) * 0.1, sin(time * 0.8) * 0.08);
-  let spec1 = exp(-length(centered - sp1) * length(centered - sp1) * 350.0) * 1.2;
+  let spec1 = exp(-length(centered - sp1) * length(centered - sp1) * 350.0) * 0.35;
 
   let sp2 = vec2<f32>(cos(time * -0.4 + 2.0) * 0.06, sin(time * 0.55 + 1.0) * 0.07);
-  let spec2 = exp(-length(centered - sp2) * length(centered - sp2) * 600.0) * 0.7;
+  let spec2 = exp(-length(centered - sp2) * length(centered - sp2) * 600.0) * 0.2;
 
   // ---- Compose orb ----
   var col = orbCol * mask;
-  col += rimColor * rim * 0.6;
+  col += rimColor * rim * 0.3;
   col += vec3<f32>(1.0, 0.95, 1.0) * (spec1 + spec2) * mask;
 
   // ---- Outer glow / bloom ----
-  // Multi-colored glow that bleeds past the edge
   let glowFalloff = 80.0;
   let gd = max(0.0, dist - radius + 0.01);
   let glowMask = exp(-gd * gd * glowFalloff) * bloomIntensity;
 
-  // Chromatic glow: different colors in different directions (seamless)
-  let glowCol = orbPalette((sa * 0.5 + ca * 0.3) * 0.5 + 0.5 + time * 0.03);
-  col += glowCol * glowMask * 0.7;
+  col += u.color0.rgb * glowMask * (1.0 - mask) * 0.7;
 
   // Wide subtle ambient glow
   let ambientGlow = exp(-dist * dist * 12.0) * 0.08 * bloomIntensity;
-  let ambientCol = orbPalette(time * 0.02 + 0.5);
-  col += ambientCol * ambientGlow;
+  col += u.color0.rgb * ambientGlow;
 
-  // ---- Chromatic aberration at edges ----
-  let caStr = smoothstep(radius * 0.5, radius * 1.2, dist) * 0.02;
-  let caOff = normalize(centered + vec2<f32>(0.0001)) * caStr;
-
-  let distR = length(centered + caOff);
-  let distB = length(centered - caOff);
-  let maskR = 1.0 - smoothstep(radius - edgeWidth, radius + edgeWidth * 0.5, distR);
-  let maskB = 1.0 - smoothstep(radius - edgeWidth, radius + edgeWidth * 0.5, distB);
-
-  // Shift red outward, blue inward for energy feel
-  col.r = col.r * 0.5 + orbCol.r * coreBright * maskR * 0.5;
-  col.b = col.b * 0.5 + orbCol.b * coreBright * maskB * 0.5;
-
-  // Tone mapping — preserve vibrancy
+  // Tone mapping
   col = pow(col, vec3<f32>(0.92));
   col = clamp(col, vec3<f32>(0.0), vec3<f32>(1.0));
 

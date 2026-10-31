@@ -27,15 +27,6 @@ export default function ScreenEffectPlayer({ effect, target, onDone }: Props) {
     case 'lasers':
       return <LasersEffect onDone={onDone} />;
     case 'echo':
-      if (!target.snapshotUri) {
-        return null;
-      }
-      return (
-        <EchoEffect
-          rect={target.rect}
-          snapshotUri={target.snapshotUri}
-          onDone={onDone}
-        />
-      );
+      return <EchoEffect rect={target.rect} onDone={onDone} />;
   }
 }

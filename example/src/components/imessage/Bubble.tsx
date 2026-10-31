@@ -1,8 +1,7 @@
 import { useCallback, useRef, type ComponentRef } from 'react';
 import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
-import { captureRef } from 'react-native-view-shot';
 import Animated, { Easing, withTiming } from 'react-native-reanimated';
-import type { BubbleTarget, Message, Rect } from './types';
+import type { BubbleTarget, Message } from './types';
 
 export const IM_BLUE = '#2D7D6A';
 export const IM_GREY = '#2A2F36';
@@ -12,9 +11,8 @@ const RADIUS = 12;
 
 type ViewHandle = ComponentRef<typeof View>;
 
-// Measure and snapshot only once the entrance animation has finished and the
-// thread has scrolled to the end; earlier, the snapshot would catch the
-// bubble mid-fade and the rect would be where it was, not where it is.
+// Measure only once the entrance animation has finished and the thread has
+// scrolled to the end; earlier, the rect would be where it was, not where it is.
 const ENTER_MS = 260;
 const MEASURE_DELAY_MS = ENTER_MS + 60;
 
@@ -42,22 +40,15 @@ type Props = {
   msg: Message;
   /** The last bubble of a run gets a square corner on the sender's side. */
   tail: boolean;
-  /** Report the window rect (and, when asked, a snapshot) once laid out. */
+  /** Report the window rect once laid out. */
   onTarget?: (target: BubbleTarget) => void;
-  wantSnapshot?: boolean;
 };
 
 /**
- * One chat bubble: a real `Text` in a rounded view. A bubble that a screen effect will play for measures itself in
- * the window once laid out, and snapshots itself when the effect (echo)
- * needs its pixels.
+ * One chat bubble: a real `Text` in a rounded view. A bubble that a screen
+ * effect will play for measures itself in the window once laid out.
  */
-export default function Bubble({
-  msg,
-  tail,
-  onTarget,
-  wantSnapshot = false,
-}: Props) {
+export default function Bubble({ msg, tail, onTarget }: Props) {
   const mine = msg.from === 'me';
   const bubbleRef = useRef<ViewHandle>(null);
   const reported = useRef(false);
@@ -68,33 +59,13 @@ export default function Bubble({
         return;
       }
       reported.current = true;
-      setTimeout(async () => {
-        const node = bubbleRef.current;
-        if (!node) {
-          return;
-        }
-        try {
-          const rect = await new Promise<Rect>((resolve) =>
-            node.measureInWindow((x, y, w, h) => resolve({ x, y, w, h }))
-          );
-          let snapshotUri: string | null = null;
-          if (wantSnapshot) {
-            const raw = await captureRef(bubbleRef, {
-              format: 'png',
-              quality: 1,
-              result: 'tmpfile',
-            });
-            snapshotUri = raw.startsWith('file://') ? raw : `file://${raw}`;
-          }
-          onTarget({ rect, snapshotUri });
-        } catch (err) {
-          if (__DEV__) {
-            console.warn('bubble capture failed', err);
-          }
-        }
+      setTimeout(() => {
+        bubbleRef.current?.measureInWindow((x, y, w, h) =>
+          onTarget({ rect: { x, y, w, h } })
+        );
       }, MEASURE_DELAY_MS);
     },
-    [onTarget, wantSnapshot]
+    [onTarget]
   );
 
   const bg = mine ? IM_BLUE : IM_GREY;

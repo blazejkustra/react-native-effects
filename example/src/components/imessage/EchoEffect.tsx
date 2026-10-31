@@ -8,19 +8,14 @@ export const ECHO_MS = 2400;
 type Props = {
   /** The sent bubble, window logical px. */
   rect: Rect;
-  /** View-shot of that bubble; every echo is a copy of it. */
-  snapshotUri: string;
   onDone: () => void;
 };
 
 /**
- * Echo: the bubble is copied a couple of dozen times and the
- * copies swirl out of it across the whole screen, shrinking a little and
- * fading at the end of their flight, while the real bubble stays put. The copies are the bubble's own
- * pixels: for every fragment each copy's transform is undone and the
- * snapshot sampled where it lands inside the rect.
+ * Encore: rings in the outline of the bubble ripple out of it across the
+ * screen, thinning and fading as they travel, while the bubble stays put.
  */
-export default function EchoEffect({ rect, snapshotUri, onDone }: Props) {
+export default function EchoEffect({ rect, onDone }: Props) {
   const paramsSynchronizable = useEffectProgress(ECHO_MS, onDone);
   return (
     <ShaderView
@@ -29,7 +24,6 @@ export default function EchoEffect({ rect, snapshotUri, onDone }: Props) {
       fragmentShader={SHADER}
       paramsSynchronizable={paramsSynchronizable}
       params={[rect.x, rect.y, rect.w, rect.h]}
-      texture={{ uri: snapshotUri }}
       transparent
     />
   );
@@ -46,18 +40,18 @@ struct Uniforms {
   live:       vec4<f32>,
 };
 @group(0) @binding(0) var<uniform> u: Uniforms;
-@group(0) @binding(1) var samp: sampler;
-@group(0) @binding(2) var tex: texture_2d<f32>;
 
-const COPIES: i32 = 22;
-const STAGGER: f32 = 0.38;     // share of the play spent launching copies
-const GOLDEN: f32 = 2.39996;   // sunflower angle between neighbouring slots
-const SWIRL: f32 = 1.2;        // radians a copy swings about the bubble in flight
+const RINGS: i32 = 5;
+const STAGGER: f32 = 0.14;     // share of the play between two rings
+const WIDTH: f32 = 2.2;        // ring half-width, px
+const WAKE: f32 = 46.0;        // e-fold length of the glow behind a ring, px
+const CORNER: f32 = 12.0;      // bubble corner radius, px
+const MINT = vec3<f32>(0.62, 0.95, 0.83);
+const TEAL = vec3<f32>(0.18, 0.49, 0.42);
 
-fn hash21(p: vec2<f32>) -> f32 {
-  var p3 = fract(vec3<f32>(p.xyx) * 0.1031);
-  p3 = p3 + dot(p3, p3.yzx + 33.33);
-  return fract((p3.x + p3.y) * p3.z);
+fn sdRoundBox(p: vec2<f32>, halfSize: vec2<f32>, r: f32) -> f32 {
+  let q = abs(p) - halfSize + vec2<f32>(r);
+  return length(max(q, vec2<f32>(0.0))) + min(max(q.x, q.y), 0.0) - r;
 }
 
 @fragment
@@ -71,54 +65,30 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let res = u.resolution.xy / u.resolution.w;
   let q = vec2<f32>(uv.x, 1.0 - uv.y) * res;
 
-  let origin = u.params0.xy;
   let size = u.params0.zw;
-  let centre = origin + size * 0.5;
+  let centre = u.params0.xy + size * 0.5;
+  let d = sdRoundBox(q - centre, size * 0.5, CORNER);
+  let reach = res.y * 0.9;
+  let flight = 1.0 - STAGGER * f32(RINGS - 1);
 
   var rgb = vec3<f32>(0.0);
   var a = 0.0;
-  for (var i = 0; i < COPIES; i = i + 1) {
-    let fi = f32(i);
-    let h2 = hash21(vec2<f32>(fi, 7.9));
-    // Copies leave one after another, then all fly on the same clock.
-    let ti = clamp((p - STAGGER * fi / f32(COPIES)) / (1.0 - STAGGER), 0.0, 1.0);
-    if (ti <= 0.0) {
+  for (var i = 0; i < RINGS; i = i + 1) {
+    let ti = clamp((p - STAGGER * f32(i)) / flight, 0.0, 1.0);
+    if (ti <= 0.0 || ti >= 1.0) {
       continue;
     }
-    let ease = 1.0 - pow(1.0 - ti, 2.4);
-    // Each copy owns a slot in a sunflower laid over the whole screen, so
-    // the swarm fills it evenly, and swings into its
-    // slot about the bubble rather than flying straight, so the flight
-    // reads as a spiral.
-    let slot = vec2<f32>(cos(fi * GOLDEN), sin(fi * GOLDEN))
-      * sqrt((fi + 0.5) / f32(COPIES));
-    let dest = res * 0.5 + slot * res * vec2<f32>(0.44, 0.46);
-    let arm = dest - centre;
-    let turn = SWIRL * (1.0 - ease);
-    let ct = cos(turn);
-    let st = sin(turn);
-    let c = centre
-      + vec2<f32>(ct * arm.x - st * arm.y, st * arm.x + ct * arm.y) * ease;
-    let scale = mix(1.0, 0.7, ease);
-    // The swarm holds together and each copy thins only at the end of its
-    // flight, so the screen is full before anything is gone.
-    let alpha = 1.0 - smoothstep(0.65, 1.0, ti);
-    let rot = (h2 - 0.5) * 0.9 * ease;
-
-    // Undo this copy's transform: where in the bubble does q come from?
-    let d = q - c;
-    let cr = cos(rot);
-    let sr = sin(rot);
-    let local = vec2<f32>(cr * d.x + sr * d.y, -sr * d.x + cr * d.y) / scale;
-    let t = (local + size * 0.5) / size;
-    if (t.x < 0.0 || t.x > 1.0 || t.y < 0.0 || t.y > 1.0) {
-      continue;
-    }
-    let s = textureSampleLevel(tex, samp, t, 0.0);
-    let w = s.a * alpha * (1.0 - a);
-    rgb = rgb + s.rgb * w;
-    a = a + w;
+    let x = d - reach * (1.0 - pow(1.0 - ti, 1.8));
+    let ring = exp(-x * x / (2.0 * WIDTH * WIDTH));
+    let wake = select(0.0, exp(x / WAKE) * 0.16, x < 0.0);
+    let fade = smoothstep(0.0, 0.06, ti) * pow(1.0 - ti, 1.4);
+    let inten = (ring + wake) * fade;
+    rgb = rgb + mix(MINT, TEAL, ti) * inten;
+    a = a + inten;
   }
-  return vec4<f32>(rgb, a);
+
+  let outside = smoothstep(0.0, 2.0, d);
+  let alpha = clamp(a * outside, 0.0, 1.0);
+  return vec4<f32>(min(rgb * outside, vec3<f32>(alpha)), alpha);
 }
 `;

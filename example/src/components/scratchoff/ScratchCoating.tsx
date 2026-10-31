@@ -5,14 +5,13 @@ import {
   type ShaderViewProps,
 } from 'react-native-effects';
 
-/** The play area, in points. Three prize boxes in a row, a bonus strip. */
+/** The play area, in points. Three prize boxes in a row. */
 export const PLAY_W = 340;
-export const PLAY_H = 182;
+export const PLAY_H = 104;
 export const AREAS = [
   { x: 0, y: 0, w: 104, h: 104 },
   { x: 118, y: 0, w: 104, h: 104 },
   { x: 236, y: 0, w: 104, h: 104 },
-  { x: 0, y: 118, w: 340, h: 64 },
 ] as const;
 export const AREA_RADIUS = 10;
 
@@ -35,7 +34,7 @@ type ScratchCoatingProps = Omit<
    */
   paramsSynchronizable: ParamsSynchronizable;
   /** Symbol under each area: star, clover, diamond, heart. */
-  symbols: readonly [PrizeSymbol, PrizeSymbol, PrizeSymbol, PrizeSymbol];
+  symbols: readonly [PrizeSymbol, PrizeSymbol, PrizeSymbol];
 };
 
 /**
@@ -201,8 +200,7 @@ fn areaRect(i: i32) -> vec4<f32> {
   switch (i) {
     case 0: { return ${rect(0)}; }
     case 1: { return ${rect(1)}; }
-    case 2: { return ${rect(2)}; }
-    default: { return ${rect(3)}; }
+    default: { return ${rect(2)}; }
   }
 }
 
@@ -211,12 +209,8 @@ fn symbolKind(i: i32) -> f32 {
 }
 
 fn holoSymbol(pt: vec2<f32>, r: vec4<f32>, kind: f32, tilt: vec2<f32>) -> vec4<f32> {
-  var c = r.xy + vec2<f32>(r.z * 0.5, r.w * 0.42);
-  var size = r.w * 0.27;
-  if (r.z > r.w * 2.0) {
-    c = r.xy + vec2<f32>(r.w * 0.62, r.w * 0.5);
-    size = r.w * 0.3;
-  }
+  let c = r.xy + r.zw * 0.5;
+  let size = r.w * 0.3;
   let q = vec2<f32>(pt.x - c.x, c.y - pt.y) / size;
   if (dot(q, q) > 2.6) {
     return vec4<f32>(0.0);
@@ -261,7 +255,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
 
   var area = -1;
   var r = vec4<f32>(0.0);
-  for (var i = 0; i < 4; i++) {
+  for (var i = 0; i < 3; i++) {
     let ri = areaRect(i);
     if (sdRoundRect(pt, ri, RADIUS) < 0.0) {
       area = i;

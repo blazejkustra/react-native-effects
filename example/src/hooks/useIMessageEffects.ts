@@ -61,7 +61,7 @@ export const DEFAULT_TEXT: Record<EffectId, string> = {
   spotlight: 'all eyes on this one',
   confetti: 'we did it 🎉',
   fireworks: 'happy new year',
-  lasers: 'pew pew',
+  lasers: 'a little sunshine',
 };
 
 export type Playing = {
@@ -71,8 +71,8 @@ export type Playing = {
   messageId: string;
 };
 
-// Every bubble that a screen effect plays for reports its window rect (and
-// snapshot) here once laid out, so the effect can start where the bubble is.
+// Every bubble that a screen effect plays for reports its window rect here
+// once laid out, so the effect can start where the bubble is.
 const targets = new Map<string, BubbleTarget>();
 const targetWaiters = new Map<string, ((t: BubbleTarget) => void)[]>();
 
@@ -89,23 +89,14 @@ export function forgetTarget(id: string) {
   targets.delete(id);
 }
 
-function waitForTarget(
-  id: string,
-  needSnapshot: boolean
-): Promise<BubbleTarget> {
+function waitForTarget(id: string): Promise<BubbleTarget> {
   const have = targets.get(id);
-  if (have && (!needSnapshot || have.snapshotUri)) {
+  if (have) {
     return Promise.resolve(have);
   }
   return new Promise((resolve) => {
     const list = targetWaiters.get(id) ?? [];
-    list.push((t) => {
-      if (!needSnapshot || t.snapshotUri) {
-        resolve(t);
-      } else {
-        waitForTarget(id, true).then(resolve);
-      }
-    });
+    list.push(resolve);
     targetWaiters.set(id, list);
   });
 }
@@ -126,8 +117,8 @@ function stamp() {
 /**
  * The conversation and the one screen effect that can play at a time. `send`
  * appends a real bubble; when it carries a screen effect, the effect starts
- * once the bubble has laid out and reported where it is (and, for echo, has
- * been snapshotted), never sooner than the start delay.
+ * once the bubble has laid out and reported where it is, never sooner than
+ * the start delay.
  */
 export function useIMessageEffects() {
   const [messages, setMessages] = useState<Message[]>(() => [
@@ -198,7 +189,7 @@ export function useIMessageEffects() {
       setMessages((prev) => [...prev, msg]);
       if (isScreenEffect(effect)) {
         const startedAt = Date.now();
-        waitForTarget(id, effect === 'echo').then(() => {
+        waitForTarget(id).then(() => {
           const wait = Math.max(
             0,
             EFFECT_START_DELAY_MS - (Date.now() - startedAt)

@@ -42,6 +42,4 @@ export type Rect = { x: number; y: number; w: number; h: number };
 /** What a screen effect needs to know about the bubble it plays for. */
 export type BubbleTarget = {
   rect: Rect;
-  /** A view-shot of the bubble, present once captured; echo needs it. */
-  snapshotUri: string | null;
 };

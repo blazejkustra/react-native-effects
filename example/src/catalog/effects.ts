@@ -95,7 +95,7 @@ export const SECTIONS: CatalogSection[] = [
       {
         id: 'cracked-screen',
         title: 'Cracked Screen',
-        line: 'Tap hard and the glass breaks where you hit it',
+        line: 'Tap and the glass breaks where you hit it',
         screen: 'CrackedScreenExample',
         image: require('../../assets/catalog/cracked-screen.jpg'),
         hero: require('../../assets/catalog/cracked-screen-hero.jpg'),
@@ -263,7 +263,7 @@ export const SECTIONS: CatalogSection[] = [
     effects: [
       {
         id: 'send-effects',
-        title: 'Send Effects',
+        title: 'Message Flourishes',
         line: 'Pick a chip and your message lands with a flourish',
         screen: 'SendEffectsExample',
         image: require('../../assets/catalog/send-effects.jpg'),
