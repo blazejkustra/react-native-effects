@@ -7,14 +7,13 @@ Paste these into App Store Connect. Limits are noted where Apple enforces them. 
 | Field | Value |
 | --- | --- |
 | App name (30) | Effects |
-| Subtitle (30) | Shaders you tilt, blow & shake |
+| Subtitle (30) | Toys you tilt, blow & shake |
 | Bundle ID | com.blazejkustra.rneffects |
 | SKU | rneffects-ios |
 | Version | 1.0.0 |
 | Build | 1 |
 | Primary language | English (U.S.) |
 | Primary category | Entertainment |
-| Secondary category | Graphics & Design |
 | Price | Free, no in-app purchases |
 | Devices | iPhone only |
 | Copyright | 2026 Blazej Kustra |
@@ -56,7 +55,7 @@ Sensor and microphone readings are used live for the animation and stay on your 
 
 ## Keywords (100)
 
-shader,gpu,visual,interactive,physics,particles,webgpu,generative,satisfying,fidget,art,animation
+interactive,physics,particles,satisfying,fidget,toy,art,animation,visual,sensory,relaxing,simulation
 
 Leave out every third-party name, including Apple, iPhone, Instagram, Telegram and Polaroid.
 

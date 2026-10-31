@@ -1,1 +1,1 @@
-shader,gpu,visual,interactive,physics,particles,webgpu,generative,satisfying,fidget,art,animation
+interactive,physics,particles,satisfying,fidget,toy,art,animation,visual,sensory,relaxing,simulation
