@@ -114,11 +114,11 @@ The owner asked to release, so the fixes below are applied. Where an item above 
 | Item | Status | What changed |
 | --- | --- | --- |
 | 1 Wallet | Fixed | Now "Metal Card": a single tap, no payment flow or system phrases, invented mark, app-styled sheet, no card stack. The glint shader is unchanged |
-| 2 Home screens | Fixed | Invented round tiles on a CC0 photo in Glow Orb and Wave Reveal |
+| 2 Home screens | Fixed | No app-icon grid remains. Glow Orb sits on a CC0 misty path photo and Wave Reveal carries that scene to a dusk photo |
 | 3 Telegram screens | Fixed | Now "Message Dissolve" and "Hidden Text", with redrawn icons, an original wallpaper and an invented chat style |
 | 4 Voice Delete | Fixed | Restyled, redrawn icons, four bundled images, no network |
 | 5 iMessage Effects | Fixed | Now "Send Effects", with teal bubbles, a flat top bar and no call button |
-| 6 NameDrop | Fixed | Now "Wave Reveal", described as an animation. No share choice, no exchanged outcome |
+| 6 NameDrop | Fixed | Now "Wave Reveal", an animation from a misty morning scene to a dusk photo. No contact poster, no real person, no share choice |
 | 7 Cracked Screen, Crackgate | Fixed | Abstract scene with an invented clock and a persistent caption. Crackgate is now "Hinge Crack" and the product name is gone |
 | 8 Thanos | Fixed | Now "Dust" |
 | 9 Weather | Fixed | New copy, labelled "Sample forecast", left-aligned layout, solid range bars, redrawn icons |
@@ -131,7 +131,7 @@ The owner asked to release, so the fixes below are applied. Where an item above 
 | 17 Scratch-off | Fixed | Now "Lucky Clover" in the UI, with points and symbols and no ticket price. The simulated gambling answer can be None |
 | 18 Jokes and names | Fixed | Invented people, everyday chat scripts, developer in-jokes removed |
 | 19 Device frames | Open | Nothing changed. Applies to marketing images |
-| 20 Flashlight | Fixed | New copy |
+| 20 Flashlight | Fixed | New copy. The SF Symbol PNGs are deleted and the screen uses plain sliders and a switch |
 | 21 Permissions | No change needed | Already verified |
 
 ## Fixed in the repository (Applied)
