@@ -52,6 +52,7 @@ platform :ios do
   desc "Upload the listing and screenshots without a binary"
   lane :listing do
     upload_to_app_store(
+      app_version: "1.0.0",
       metadata_path: "fastlane/metadata",
       screenshots_path: "fastlane/screenshots",
       skip_binary_upload: true,

@@ -6,7 +6,7 @@ Paste these into App Store Connect. Limits are noted where Apple enforces them. 
 
 | Field | Value |
 | --- | --- |
-| App name (30) | Effects |
+| App name (30) | Effects: shaders & fun |
 | Subtitle (30) | Toys you tilt, blow & shake |
 | Bundle ID | com.blazejkustra.rneffects |
 | SKU | rneffects-ios |
