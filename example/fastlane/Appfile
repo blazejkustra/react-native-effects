@@ -1,0 +1,3 @@
+app_identifier("com.blazejkustra.rneffects")
+apple_id(ENV["APPLE_ID"]) if ENV["APPLE_ID"]
+team_id(ENV["APPLE_TEAM_ID"]) if ENV["APPLE_TEAM_ID"]
