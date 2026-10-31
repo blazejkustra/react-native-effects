@@ -78,9 +78,6 @@ def chat_icons():
         stroke(d, arc(12, 11, 7, 0, 180), width=1.9)
         stroke(d, [(12, 18), (12, 21)], width=1.9)
 
-    def check(d):
-        stroke(d, [(4, 13), (9.5, 18.5), (20, 6.5)], width=2.4)
-
     def reply(d):
         stroke(d, [(10, 5), (4, 11), (10, 17)], width=2.1)
         stroke(d, [(4, 11), (13, 11)] + arc(13, 17, 6, -90, 0), width=2.1)
@@ -106,7 +103,7 @@ def chat_icons():
             fill='white',
         )
 
-    for draw_icon in (back, plus, mic, check, reply, copy, trash, send, play):
+    for draw_icon in (back, plus, mic, reply, copy, trash, send, play):
         image, draw = canvas()
         draw_icon(draw)
         save_icon(image, ASSETS / 'chat' / f'{draw_icon.__name__}.png')
@@ -386,56 +383,15 @@ def cake(commons):
     image.resize((730, 1043), Image.LANCZOS).save(ASSETS / 'candle' / 'cake.jpg', quality=88)
 
 
-TILES = [
-    ((64, 150, 140), 'peak'), ((236, 186, 84), 'sun'), ((92, 112, 190), 'wave'), ((208, 96, 120), 'ring'),
-    ((236, 236, 228), 'bars'), ((60, 74, 88), 'dot'), ((150, 186, 110), 'leaf'), ((116, 82, 160), 'peak'),
-    ((226, 140, 64), 'wave'), ((70, 128, 178), 'ring'), ((42, 46, 52), 'sun'), ((196, 206, 214), 'leaf'),
-]
-
-
-def tile(draw, cx, cy, r, color, kind):
-    draw.ellipse((cx - r, cy - r, cx + r, cy + r), fill=color)
-    ink = (255, 255, 255) if sum(color) < 560 else (40, 44, 50)
-    s = r * 0.5
-    if kind == 'peak':
-        draw.polygon([(cx - s, cy + s * 0.6), (cx - s * 0.1, cy - s * 0.8), (cx + s, cy + s * 0.6)], fill=ink)
-    elif kind == 'sun':
-        draw.ellipse((cx - s * 0.7, cy - s * 0.7, cx + s * 0.7, cy + s * 0.7), fill=ink)
-    elif kind == 'wave':
-        for dy in (-s * 0.5, s * 0.5):
-            pts = [(cx - s + i * 2 * s / 24, cy + dy + math.sin(i / 24 * 6.28) * s * 0.28) for i in range(25)]
-            draw.line(pts, fill=ink, width=round(s * 0.26), joint='curve')
-    elif kind == 'ring':
-        draw.ellipse((cx - s, cy - s, cx + s, cy + s), outline=ink, width=round(s * 0.3))
-    elif kind == 'bars':
-        for i, h in enumerate((0.5, 1.0, 0.72)):
-            x = cx - s + i * s * 0.8
-            draw.rounded_rectangle((x, cy + s * 0.7 - h * s * 1.4, x + s * 0.4, cy + s * 0.7), s * 0.15, fill=ink)
-    elif kind == 'dot':
-        for dx in (-s * 0.7, 0, s * 0.7):
-            draw.ellipse((cx + dx - s * 0.2, cy - s * 0.2, cx + dx + s * 0.2, cy + s * 0.2), fill=ink)
-    elif kind == 'leaf':
-        draw.chord((cx - s, cy - s * 1.2, cx + s * 1.4, cy + s * 1.2), 100, 260, fill=ink)
-
-
-def home_screens(commons):
+def wave_scenes(commons):
     width, height = 1206, 2622
-    wallpaper = cover_crop(Image.open(commons / 'reel.jpg').convert('RGB'), width, height, 0.5)
-    wallpaper = wallpaper.filter(ImageFilter.GaussianBlur(3))
+    photo = cover_crop(Image.open(commons / 'reel.jpg').convert('RGB'), width, height, 0.5)
     shade = Image.new('RGB', (width, height), (10, 26, 34))
-    home = Image.blend(wallpaper, shade, 0.52).convert('RGBA')
-    glass = Image.new('RGBA', (width * 2, height * 2), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(glass)
-    r = 150
-    for i, (color, kind) in enumerate(TILES):
-        row, column = divmod(i, 4)
-        tile(draw, 2 * (153 + column * 300), 2 * (430 + row * 310), r, color, kind)
-    home.alpha_composite(glass.resize((width, height), Image.LANCZOS))
-    home = home.convert('RGB')
-    (ASSETS / 'home').mkdir(exist_ok=True)
-    home.save(ASSETS / 'home' / 'home-screen.jpg', quality=86)
+    scene = Image.blend(photo, shade, 0.34)
+    (ASSETS / 'scenes').mkdir(exist_ok=True)
+    scene.save(ASSETS / 'scenes' / 'misty-path.jpg', quality=86)
 
-    island = ImageDraw.Draw(atlas_panel := home.copy())
+    island = ImageDraw.Draw(atlas_panel := scene.copy())
     pill_w, pill_h = 0.312 * width, 0.0408 * height
     island.rounded_rectangle(
         (width / 2 - pill_w / 2, 0.0376 * height - pill_h / 2, width / 2 + pill_w / 2, 0.0376 * height + pill_h / 2),
@@ -446,7 +402,11 @@ def home_screens(commons):
     atlas.paste(atlas_panel, (0, 0))
     atlas.paste(atlas_panel.filter(ImageFilter.GaussianBlur(22)), (width, 0))
     atlas.paste(atlas_panel.filter(ImageFilter.GaussianBlur(60)), (width * 2, 0))
-    atlas.resize((2412, 1748), Image.LANCZOS).save(ASSETS / 'wave' / 'home-atlas.jpg', quality=84)
+    atlas.resize((2412, 1748), Image.LANCZOS).save(ASSETS / 'wave' / 'scene-atlas.jpg', quality=84)
+
+    swing = Image.open(ASSETS / 'cracks' / 'swing.jpg').convert('RGB')
+    dusk = swing.crop((820, 0, 1498, 1473)).resize((width, height), Image.LANCZOS)
+    dusk.save(ASSETS / 'wave' / 'dusk.jpg', quality=86)
 
 
 def main():
@@ -460,7 +420,7 @@ def main():
     weather_icons()
     foam()
     cake(commons)
-    home_screens(commons)
+    wave_scenes(commons)
 
 
 if __name__ == '__main__':

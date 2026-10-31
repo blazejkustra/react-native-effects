@@ -91,16 +91,16 @@ export default function ThanosScreen() {
             >
               <View style={styles.cardTopRow}>
                 <View style={styles.chip} />
-                <Text style={styles.brandMark}>WebGPU</Text>
+                <Text style={styles.brandMark}>Corner Cafe</Text>
               </View>
 
-              <Text style={styles.cardTitle}>react-native-effects</Text>
-              <Text style={styles.cardNumber}>0451 · SHADER · WORKLET</Text>
+              <Text style={styles.cardTitle}>Coffee Club</Text>
+              <Text style={styles.cardNumber}>0451 · 2208 · 7316</Text>
 
               <View style={styles.cardBottomRow}>
                 <View>
-                  <Text style={styles.cardLabel}>STATUS</Text>
-                  <Text style={styles.cardValue}>RENDERED</Text>
+                  <Text style={styles.cardLabel}>STAMPS</Text>
+                  <Text style={styles.cardValue}>8 OF 10</Text>
                 </View>
                 <Text style={styles.snapHint}>Tap to snap</Text>
               </View>

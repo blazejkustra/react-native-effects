@@ -15,7 +15,7 @@ type Props = ViewProps & {
  * climb. The blaze stays bottom-weighted so the title keeps its contrast.
  */
 export default function StreakFire({
-  caption = 'Sprout · Don’t lose your streak',
+  caption = 'Sprout · Keep it going',
   title = '365 day streak 🔥',
   style,
   ...rest

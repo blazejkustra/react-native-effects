@@ -6,9 +6,9 @@ export default function SiriOrbScreen() {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/home/home-screen.jpg')}
+        source={require('../../assets/scenes/misty-path.jpg')}
         style={styles.backgroundImage}
-        resizeMode="contain"
+        resizeMode="cover"
       />
 
       <StatusBar barStyle="light-content" />

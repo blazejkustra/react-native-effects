@@ -9,15 +9,15 @@ type Props = ViewProps & {
 };
 
 /**
- * A severe-weather banner with a live storm inside. A brooding fbm cloud deck
+ * A stormy weather banner with a live storm inside. A brooding fbm cloud deck
  * hangs across the top; every couple of seconds a branching lightning bolt
  * tears a noise-driven path from the clouds to the bottom edge, strobing
  * 2–3 times and flash-lighting the whole card (clouds included) while faint
  * rain streaks fall through the glow.
  */
 export default function Thunderstorm({
-  caption = 'Weather Alert · Severe',
-  title = 'Storm until 9 PM',
+  caption = 'Weather · Rainy evening',
+  title = 'Thunder later tonight',
   style,
   ...rest
 }: Props) {

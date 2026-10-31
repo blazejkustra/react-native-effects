@@ -26,7 +26,6 @@ type Ticket = {
   amounts: string[];
   bonus: string;
   serial: string;
-  win: boolean;
 };
 
 function pick<T>(list: readonly T[]): T {
@@ -34,22 +33,16 @@ function pick<T>(list: readonly T[]): T {
 }
 
 function makeTicket(): Ticket {
-  const win = Math.random() < 0.6;
   const main = pick<PrizeSymbol>([0, 1, 2, 3]);
-  const others = ([0, 1, 2, 3] as PrizeSymbol[]).filter((s) => s !== main);
-  const row: PrizeSymbol[] = win
-    ? [main, main, main]
-    : [main, main, pick(others)].sort(() => Math.random() - 0.5);
   const prize = pick(POINTS);
   const serial = Array.from({ length: 3 }, () =>
     Math.floor(1000 + Math.random() * 9000)
   ).join(' ');
   return {
-    symbols: [row[0]!, row[1]!, row[2]!, pick<PrizeSymbol>([0, 1, 2, 3])],
-    amounts: win ? [prize, prize, prize] : row.map(() => pick(POINTS)),
+    symbols: [main, main, main, pick<PrizeSymbol>([0, 1, 2, 3])],
+    amounts: [prize, prize, prize],
     bonus: pick(['+5 pts', '+10 pts', '+25 pts']),
     serial,
-    win,
   };
 }
 
@@ -130,9 +123,7 @@ export default function ScratchOffScreen() {
       </View>
 
       <Text style={[styles.result, !done && styles.hidden]}>
-        {ticket.win
-          ? `You found three ${SYMBOL_NAMES[ticket.symbols[0]]}`
-          : 'Not this time'}
+        You found three {SYMBOL_NAMES[ticket.symbols[0]]}
       </Text>
 
       <Pressable

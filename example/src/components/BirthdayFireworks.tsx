@@ -17,8 +17,8 @@ type Props = ViewProps & {
  * silver, gold) picked per burst.
  */
 export default function BirthdayFireworks({
-  caption = 'Birthday · From your calendar',
-  title = 'Today, Jun 9',
+  caption = 'Happy birthday',
+  title = 'Make a wish',
   style,
   ...rest
 }: Props) {

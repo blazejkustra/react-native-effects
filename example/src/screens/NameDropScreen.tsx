@@ -18,11 +18,11 @@ import Animated, {
 import { scheduleOnRN } from 'react-native-worklets';
 import { captureRef } from 'react-native-view-shot';
 import { useParamsSynchronizable } from 'react-native-effects';
-import NameDropWave, { HOME_ATLAS } from '../components/namedrop/NameDropWave';
+import NameDropWave, { SCENE_ATLAS } from '../components/namedrop/NameDropWave';
 import PosterReveal from '../components/namedrop/PosterReveal';
-import ContactPoster, {
+import DuskPoster, {
   type PosterHandle,
-} from '../components/namedrop/ContactPoster';
+} from '../components/namedrop/DuskPoster';
 
 /** Downward drag (pt) that starts the wave. */
 const TRIGGER_DRAG = 70;
@@ -49,7 +49,7 @@ async function snapshotPoster(view: PosterHandle) {
 }
 
 /**
- * An animation on an invented home screen: drag down from the top (or tap) and
+ * An animation over a misty morning scene: drag down from the top (or tap) and
  * a coloured glow climbs the screen and pools under the cut-out, a liquid wave
  * of light bursts out of it, and a poster swells into focus. Tap it to go back.
  */
@@ -161,11 +161,11 @@ export default function NameDropScreen() {
         onPress={goHome}
         disabled={phase !== 'poster'}
       >
-        <ContactPoster
+        <DuskPoster
           ref={posterRef}
           width={width}
           height={height}
-          onAvatarLoad={captureSnapshot}
+          onImageLoad={captureSnapshot}
         />
       </Pressable>
       <GestureDetector gesture={homeGesture}>
@@ -175,7 +175,7 @@ export default function NameDropScreen() {
         >
           <View style={[StyleSheet.absoluteFill, styles.clip]}>
             <Image
-              source={HOME_ATLAS}
+              source={SCENE_ATLAS}
               style={{ width: width * 3, height }}
               resizeMode="stretch"
             />

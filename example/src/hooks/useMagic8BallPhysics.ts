@@ -28,18 +28,18 @@ const CHURN_RELEASE = 1.45;
 /** Churn that knocks a settled answer back off the window. */
 const SHAKE_TRIGGER = 0.3;
 /**
- * Churn the fluid has to fall below before the die can float back up. Set by
+ * Churn the fluid has to fall below before the answer can float back up. Set by
  * pacing, not by physics: the fluid is still visibly moving at 0.2, and
  * waiting for it to go properly still leaves three seconds of staring at murk.
  */
 const CALM = 0.2;
 
-/** How fast a churning fluid drags the die back down, in rise units per second. */
+/** How fast a churning fluid drags the answer back down, in rise units per second. */
 const SINK_RATE = 1.5;
 
 /**
  * Buoyancy: a CONSTANT push, against linear drag — not a spring pulling the
- * die toward the window.
+ * answer toward the window.
  *
  * This is the difference between the answer floating up and the answer popping
  * up. A spring is slowest where it starts and fastest where it arrives, so it
@@ -63,15 +63,15 @@ const SWAY_DAMPING = 3.2;
 const SWAY_KICK = 2.1;
 
 /**
- * How far off square the die is when it starts its climb (rad), and the spring
- * that turns it back. A die arriving already flat to the window is the single
+ * How far off square the answer is when it starts its climb (rad), and the spring
+ * that turns it back. An answer arriving already flat to the window is the single
  * most artificial thing this screen can do: it has been tumbling in the fluid,
  * so it has to come up turned and rotate the last few degrees into place.
  *
  * Under-damped on purpose — it overshoots square by a couple of degrees and
  * comes back, which is what a face settling against glass in a thick fluid
  * does. Softer than the rise spring, so the turn is still finishing after the
- * die has touched: two motions ending together read as one scripted move.
+ * answer has touched: two motions ending together read as one scripted move.
  */
 const SPIN_MIN = 0.34;
 const SPIN_MAX = 0.72;
@@ -79,15 +79,15 @@ const SPIN_STIFFNESS = 5;
 const SPIN_DAMPING = 1.9;
 
 /**
- * A second, much softer spring that carries the die's ORIENTATION to world-up.
+ * A second, much softer spring that carries the answer's ORIENTATION to world-up.
  *
  * It cannot be the tilt spring. That one is stiff because it IS the hand — the
  * rise axis has to answer the phone immediately — but tilt comes from atan2 of
  * a raw accelerometer, which carries a degree or so of noise plus whatever the
- * hand is doing. Rotating the die (and the answer printed on it) straight off
+ * hand is doing. Rotating the answer (and the answer printed on it) straight off
  * that makes the text tremble while the phone is held still.
  *
- * Half a second to follow, well damped: noise never survives it, and a die
+ * Half a second to follow, well damped: noise never survives it, and an answer
  * that heavy in a fluid that thick should lag the phone anyway.
  */
 const ORIENT_STIFFNESS = 20;
@@ -101,9 +101,9 @@ const SWIRL_CHURNED = 2.2;
 const SYNC_EPSILON = 0.004;
 
 /**
- * Where the die sits when it is still deep in the murk, in window radii.
- * Hard-coded to the same number in the shader, which draws the die this text
- * sits on — change one and you change both.
+ * Where the answer sits when it is still deep in the murk, in window radii.
+ * Hard-coded to the same number in the shader, which opens the clearing this
+ * text sits in — change one and you change both.
  */
 const SUBMERGED_DEPTH = 1.2;
 /** How far the sway pushes it off the rise axis, in window radii. */
@@ -130,13 +130,13 @@ type BallSim = {
   /** 0 = lost in the murk, 1 = pressed against the window. */
   rise: number;
   riseVel: number;
-  /** Signed sideways wobble of the die, in window radii-ish. */
+  /** Signed sideways wobble of the answer, in window radii-ish. */
   sway: number;
   swayVel: number;
-  /** How far the die is turned off square (rad), and how fast. */
+  /** How far the answer is turned off square (rad), and how fast. */
   spin: number;
   spinVel: number;
-  /** The die's heading, lagging world-up (rad). */
+  /** The answer's heading, lagging world-up (rad). */
   orient: number;
   orientVel: number;
   /** Integrated phase — never time x a speed that varies at runtime. */
@@ -149,16 +149,16 @@ export type Magic8BallPhysics = {
   >['paramsSynchronizable'];
   /** Shake it by hand — a tap on the ball, or the debug hook. */
   shake: (strength?: number) => void;
-  /** 0..1, how far the die has floated up. Drives the answer text. */
+  /** 0..1, how far the answer has floated up. Drives the answer text. */
   rise: SharedValue<number>;
   /**
-   * Where the die is, relative to the middle of the window, in window radii.
+   * Where the answer is, relative to the middle of the window, in window radii.
    * Screen convention: y grows DOWNWARD, so it can be fed straight into a
    * transform.
    */
   drift: SharedValue<{ x: number; y: number }>;
   /**
-   * How the die is turned, in DEGREES and in the screen's sense (positive =
+   * How the answer is turned, in DEGREES and in the screen's sense (positive =
    * clockwise), so the answer text turns with the face it is printed on. Both
    * the world-up alignment and the spin left over from the climb.
    */
@@ -169,15 +169,15 @@ export type Magic8BallPhysics = {
  * The physics of a mystic ball.
  *
  * One input: the accelerometer. Its in-plane gravity angle says which way is
- * really up, and the die floats up along that axis — tip the phone and the
+ * really up, and the answer floats up along that axis — tip the phone and the
  * answer rises in from a different corner of the window. Differentiating the
- * same signal gives a shake, which churns the fluid; churn drags the die back
+ * same signal gives a shake, which churns the fluid; churn drags the answer back
  * down off the glass, and only once the fluid has calmed does buoyancy carry
  * a new answer up into the window, bumping the glass once as it arrives.
  *
  * Writes the live channel every frame:
  * `u.live = (tilt rad, churn 0..1, rise 0..1, swirlPhase)`,
- * `u.liveData[0] = (sway, die rotation rad, 0, 0)`.
+ * `u.liveData[0] = (sway, answer rotation rad, 0, 0)`.
  */
 export function useMagic8BallPhysics({
   onSubmerged,
@@ -370,7 +370,7 @@ export function useMagic8BallPhysics({
       }
 
       if (s.phase === 'sinking') {
-        // The more violently the fluid is moving, the faster it strips the die
+        // The more violently the fluid is moving, the faster it strips the answer
         // off the glass.
         s.rise -= SINK_RATE * dt * (0.35 + s.churn);
         if (s.rise <= 0) {
@@ -396,7 +396,7 @@ export function useMagic8BallPhysics({
         s.rise += s.riseVel * dt;
         if (s.rise >= 1) {
           // It has met the glass; it cannot go further, and most of the
-          // energy goes into the fluid rather than back into the die.
+          // energy goes into the fluid rather than back into the answer.
           s.rise = 1;
           if (s.riseVel > GLASS_SETTLE) {
             s.riseVel = -s.riseVel * GLASS_BOUNCE;
@@ -428,14 +428,14 @@ export function useMagic8BallPhysics({
         s.rise,
         s.swirlPhase,
         s.sway,
-        // One slot carries the die's whole rotation: the heading it is settling
+        // One slot carries the answer's whole rotation: the heading it is settling
         // to, plus the spin the climb left behind.
         s.spin + s.orient,
         0,
         0
       );
 
-      // The answer text has to sit on the die, so it needs the same offset the
+      // The answer text has to sit on the answer, so it needs the same offset the
       // shader computes: up the world-up axis as it rises, plus the sway
       // across it. Pushed to the UI thread only when it has actually moved, so
       // a settled ball costs nothing.
@@ -443,7 +443,7 @@ export function useMagic8BallPhysics({
         rise.value = s.rise;
         syncedRise = s.rise;
       }
-      // The text is printed on the die, so it takes the die's whole rotation:
+      // The text is printed on the answer, so it takes the answer's whole rotation:
       // world-up alignment plus whatever spin the climb has left. uv rotates
       // counter-clockwise, a transform clockwise.
       const turn = s.spin + s.orient;

@@ -254,7 +254,7 @@ export function useIMessageEffects() {
 
 /**
  * Dev-only globals so the simulator can drive the screen without the
- * keyboard or a long-press:
+ * keyboard:
  *  - `__imsgSend(effect, text?)` — append an outgoing bubble and play its
  *    effect; `effect` is one of none, echo, spotlight, confetti,
  *    fireworks, lasers. Returns the new message id.

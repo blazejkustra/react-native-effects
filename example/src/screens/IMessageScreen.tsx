@@ -6,7 +6,6 @@ import {
   type ComponentRef,
 } from 'react';
 import {
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -25,16 +24,14 @@ import Bubble, {
   IM_CHROME,
 } from '../components/imessage/Bubble';
 import { Chevron } from '../components/imessage/glyphs';
-import EffectsSheet from '../components/imessage/EffectsSheet';
 import ScreenEffectPlayer from '../components/imessage/ScreenEffectPlayer';
 import {
   EFFECT_LABEL,
   isScreenEffect,
   type BubbleTarget,
-  type EffectId,
+  type ScreenEffectId,
 } from '../components/imessage/types';
 import {
-  DEFAULT_TEXT,
   DEMO_ORDER,
   forgetTarget,
   reportTarget,
@@ -42,11 +39,8 @@ import {
   useIMessageEffects,
 } from '../hooks/useIMessageEffects';
 
-// A made-up chat. Sending can carry a screen effect (echo, spotlight, confetti,
-// fireworks, lasers) that plays once over the thread. The demo is scripted: it
-// opens with one text from Noa, each effect button posts the next line with
-// that effect and Noa answers a beat later. Long-press the send button for the
-// full effects sheet.
+// A made-up chat. Each chip sends the draft with its screen effect. With an
+// empty draft it posts the next scripted line, and Noa answers a beat later.
 
 const CONTACT = 'Noa';
 const HEADER_H = 56;
@@ -57,7 +51,6 @@ export default function IMessageScreen() {
   const { messages, playing, busy, send, finishPlaying, getTarget } =
     useIMessageEffects();
   const [draft, setDraft] = useState('');
-  const [sheet, setSheet] = useState<string | null>(null);
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const messagesRef = useRef(messages);
   messagesRef.current = messages;
@@ -88,21 +81,12 @@ export default function IMessageScreen() {
     setDraft('');
   }, [draft, send]);
 
-  const openSheet = useCallback(() => {
-    // The sheet needs the whole screen; the keyboard would cover its preview.
-    Keyboard.dismiss();
-    setSheet(draft.trim() || DEFAULT_TEXT.none);
-  }, [draft]);
-
-  const sendWith = useCallback(
-    (effect: EffectId) => {
-      if (sheet !== null) {
-        send(effect, sheet);
-      }
-      setSheet(null);
+  const sendWithEffect = useCallback(
+    (effect: ScreenEffectId) => {
+      send(effect, draft);
       setDraft('');
     },
-    [send, sheet]
+    [draft, send]
   );
 
   const onTargetFor = useCallback(
@@ -190,7 +174,7 @@ export default function IMessageScreen() {
             return (
               <Pressable
                 key={e}
-                onPress={() => send(e)}
+                onPress={() => sendWithEffect(e)}
                 disabled={busy}
                 style={({ pressed }) => [
                   styles.effectChip,
@@ -224,7 +208,7 @@ export default function IMessageScreen() {
               value={draft}
               onChangeText={setDraft}
               placeholder="Write something"
-              placeholderTextColor="#6E6E73"
+              placeholderTextColor="#8FA6A0"
               style={styles.input}
               multiline
               keyboardAppearance="dark"
@@ -233,12 +217,9 @@ export default function IMessageScreen() {
             {draft.trim() ? (
               <Pressable
                 onPress={sendPlain}
-                onLongPress={openSheet}
-                delayLongPress={350}
                 style={styles.send}
                 accessibilityRole="button"
                 accessibilityLabel="Send"
-                accessibilityHint="Hold to send with an effect"
               >
                 <Text style={styles.sendArrow}>↑</Text>
               </Pressable>
@@ -248,14 +229,6 @@ export default function IMessageScreen() {
       </View>
 
       {player}
-
-      {sheet !== null && (
-        <EffectsSheet
-          text={sheet}
-          onClose={() => setSheet(null)}
-          onSend={sendWith}
-        />
-      )}
     </KeyboardAvoidingView>
   );
 }
@@ -317,7 +290,6 @@ const styles = StyleSheet.create({
   bottom: {
     backgroundColor: IM_BG,
   },
-  // One row, in the order the demo means them to be pressed.
   effectRow: {
     flexDirection: 'row',
     justifyContent: 'center',

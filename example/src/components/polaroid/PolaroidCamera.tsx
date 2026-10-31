@@ -55,7 +55,7 @@ function CameraPrompt({
       style={styles.prompt}
     >
       <Text style={styles.promptText}>
-        {canAsk ? 'Use camera' : 'Open Settings'}
+        {canAsk ? 'Continue' : 'Open Settings'}
       </Text>
     </Pressable>
   );

@@ -17,11 +17,11 @@ export type ScreenEffectId = (typeof SCREEN_EFFECTS)[number];
 
 export const EFFECT_LABEL: Record<EffectId, string> = {
   none: 'None',
-  echo: 'Echo',
-  spotlight: 'Spotlight',
-  confetti: 'Confetti',
-  fireworks: 'Fireworks',
-  lasers: 'Lasers',
+  echo: 'Encore',
+  spotlight: 'Limelight',
+  confetti: 'Flurry',
+  fireworks: 'Skyburst',
+  lasers: 'Beams',
 };
 
 export function isScreenEffect(e: EffectId): e is ScreenEffectId {

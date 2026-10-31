@@ -13,8 +13,10 @@ import ShimmerSweep from '../components/ShimmerSweep';
 
 const THINK_MS = 2600;
 
+const QUESTION = 'What can I cook with eggs, spinach and feta?';
+
 const ANSWER =
-  'react-native-effects renders procedural WGSL shaders on WebGPU, off the JS thread, at 60fps. Aurora, liquid chrome, holographic foil, a card that snaps to dust… all generated in real time, no images or video. Just drop in a <ShaderView />.';
+  'A quick frittata would work well. Wilt the spinach in a little butter, pour over four beaten eggs, crumble in the feta and cook gently until just set. Finish under the grill for a golden top.';
 
 /** Grey placeholder lines that the iridescent shimmer sweeps across. */
 function Skeleton() {
@@ -56,7 +58,7 @@ export default function AiShimmerScreen() {
       <View style={[styles.header, { paddingTop: insets.top + 6 }]}>
         <Text style={styles.title}>Assistant</Text>
         <Text style={styles.subtitle}>
-          {thinking ? 'Generating…' : 'react-native-effects'}
+          {thinking ? 'Generating…' : 'Recipe ideas'}
         </Text>
       </View>
 
@@ -64,14 +66,12 @@ export default function AiShimmerScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* User message */}
         <View style={styles.userRow}>
           <View style={styles.userBubble}>
-            <Text style={styles.userText}>What is react-native-effects?</Text>
+            <Text style={styles.userText}>{QUESTION}</Text>
           </View>
         </View>
 
-        {/* Assistant message */}
         <View style={styles.aiRow}>
           <View style={styles.avatar}>
             <Text style={styles.avatarGlyph}>✦</Text>
@@ -80,7 +80,6 @@ export default function AiShimmerScreen() {
             {thinking ? (
               <>
                 <Skeleton />
-                {/* The react-native-effects shimmer, clipped to the bubble. */}
                 <ShimmerSweep
                   style={StyleSheet.absoluteFill}
                   pointerEvents="none"

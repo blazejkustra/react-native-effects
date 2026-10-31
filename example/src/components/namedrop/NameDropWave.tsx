@@ -5,11 +5,11 @@ import {
 } from 'react-native-effects';
 
 /**
- * The invented home screen next to two pre-blurred copies of itself, so the
+ * The misty morning scene next to two pre-blurred copies of itself, so the
  * shader can blend any blur strength from three samples.
  */
-export const HOME_ATLAS = require('../../../assets/wave/home-atlas.jpg');
-/** The cut-out painted into the home screen image, in uv (y-down). */
+export const SCENE_ATLAS = require('../../../assets/wave/scene-atlas.jpg');
+/** The cut-out painted into the scene, in uv (y-down). */
 export const ISLAND_UV = { x: 0.5, y: 0.0376, w: 0.312, h: 0.0408 };
 
 type NameDropWaveProps = Omit<
@@ -34,7 +34,7 @@ export default function NameDropWave({
       fragmentShader={SHADER}
       paramsSynchronizable={paramsSynchronizable}
       params={[ISLAND_UV.x, ISLAND_UV.y, ISLAND_UV.w, ISLAND_UV.h]}
-      texture={HOME_ATLAS}
+      texture={SCENE_ATLAS}
       {...rest}
     />
   );

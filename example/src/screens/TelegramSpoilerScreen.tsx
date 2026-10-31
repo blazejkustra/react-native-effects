@@ -131,7 +131,7 @@ function Body({
   mode: SpanMode;
   onSpoilerPress?: (e: GestureResponderEvent) => void;
 }) {
-  // Only the visible copy carries the time and checks; the other two just
+  // Only the visible copy carries the time; the other two just
   // reserve the same space so the text wraps identically.
   const metaInvisible = mode !== 'hidden';
   return (
@@ -172,9 +172,6 @@ function Body({
       </Text>
       <View style={[styles.meta, metaInvisible && styles.invisible]}>
         <Text style={styles.time}>{msg.time}</Text>
-        {msg.from === 'me' && (
-          <Icon source={ICONS.check} size={13} color="#fff" />
-        )}
       </View>
     </View>
   );

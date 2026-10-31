@@ -168,7 +168,6 @@ const Bubble = forwardRef<
           <Text style={styles.bubbleText}>{msg.text}</Text>
           <View style={styles.meta}>
             <Text style={styles.time}>{msg.time}</Text>
-            <Icon source={ICONS.check} size={13} color="#fff" />
           </View>
         </View>
       </View>

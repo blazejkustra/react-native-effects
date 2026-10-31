@@ -34,24 +34,9 @@ export const SECTIONS: CatalogSection[] = [
     layout: 'posters',
     effects: [
       {
-        id: 'beer',
-        title: 'Beer',
-        line: 'Tilt to slosh, rotate to drink, tap to refill',
-        screen: 'BeerExample',
-        image: require('../../assets/catalog/beer.jpg'),
-      },
-      {
-        id: 'lighter',
-        title: 'Lighter',
-        line: 'Tap to strike. The flame stays upright as you tilt',
-        screen: 'LighterExample',
-        image: require('../../assets/catalog/lighter.jpg'),
-        hero: require('../../assets/catalog/lighter-hero.jpg'),
-      },
-      {
         id: 'hourglass',
         title: 'Hourglass',
-        line: 'Run a Pomodoro, then flip your phone to restart it',
+        line: 'Run a focus timer, then flip your phone to restart it',
         screen: 'HourglassExample',
         image: require('../../assets/catalog/hourglass.jpg'),
       },
@@ -98,6 +83,7 @@ export const SECTIONS: CatalogSection[] = [
         line: 'Blow on your phone and the seeds drift away',
         screen: 'DandelionExample',
         image: require('../../assets/catalog/dandelion.jpg'),
+        hero: require('../../assets/catalog/dandelion-hero.jpg'),
       },
     ],
   },
@@ -124,7 +110,7 @@ export const SECTIONS: CatalogSection[] = [
       {
         id: 'crt-off',
         title: 'CRT Off',
-        line: 'Close the app like an old TV',
+        line: 'Switch off like an old TV',
         screen: 'CrtOffExample',
         image: require('../../assets/catalog/crt-off.jpg'),
       },
@@ -166,7 +152,7 @@ export const SECTIONS: CatalogSection[] = [
       {
         id: 'flashlight',
         title: 'Flashlight',
-        line: 'A beam from the top of your screen. Swipe to shape it',
+        line: 'Tilt a beam around a dark corridor and shape it',
         screen: 'FlashlightExample',
         image: require('../../assets/catalog/flashlight.jpg'),
       },
@@ -187,7 +173,7 @@ export const SECTIONS: CatalogSection[] = [
       {
         id: 'wave-reveal',
         title: 'Wave Reveal',
-        line: 'A wave of light bursts from the top of the screen',
+        line: 'A wave of light carries you from morning to dusk',
         screen: 'WaveRevealExample',
         image: require('../../assets/catalog/wave-reveal.jpg'),
       },
@@ -197,6 +183,20 @@ export const SECTIONS: CatalogSection[] = [
         line: 'A burning eye that follows your finger',
         screen: 'TouchFieldExample',
         image: require('../../assets/catalog/touch-field.jpg'),
+      },
+      {
+        id: 'lighter',
+        title: 'Lighter',
+        line: 'Tap to strike. The flame stays upright as you tilt',
+        screen: 'LighterExample',
+        image: require('../../assets/catalog/lighter.jpg'),
+      },
+      {
+        id: 'beer',
+        title: 'Beer',
+        line: 'Tilt to slosh, rotate to empty it, tap to refill',
+        screen: 'BeerExample',
+        image: require('../../assets/catalog/beer.jpg'),
       },
     ],
   },
@@ -208,7 +208,7 @@ export const SECTIONS: CatalogSection[] = [
       {
         id: 'mystic-ball',
         title: 'Mystic Ball',
-        line: 'Shake your phone and the answer floats up through the ink',
+        line: 'Shake your phone and the answer surfaces through the mist',
         screen: 'MysticBallExample',
         image: require('../../assets/catalog/mystic-ball.jpg'),
       },
@@ -264,7 +264,7 @@ export const SECTIONS: CatalogSection[] = [
       {
         id: 'send-effects',
         title: 'Send Effects',
-        line: 'Hold send to pick lasers, confetti, fireworks and more',
+        line: 'Pick a chip and your message lands with a flourish',
         screen: 'SendEffectsExample',
         image: require('../../assets/catalog/send-effects.jpg'),
       },
@@ -376,7 +376,7 @@ const ALL_EFFECTS = SECTIONS.flatMap((section) => section.effects);
 const FEATURED_IDS = [
   'lava-lamp',
   'cracked-screen',
-  'lighter',
+  'dandelion',
   'birthday-candle',
   'aurora',
 ];
@@ -394,8 +394,13 @@ const ALPHABETICAL_ENTRIES = SECTIONS.flatMap((section) =>
   }))
 ).sort((a, b) => a.effect.title.localeCompare(b.effect.title));
 
+const MIN_QUERY_LENGTH = 2;
+
 export function searchEffects(query: string) {
   const needle = query.trim().toLowerCase();
+  if (needle.length < MIN_QUERY_LENGTH) {
+    return ALL_EFFECTS;
+  }
   return ALPHABETICAL_ENTRIES.filter((entry) =>
     entry.haystack.includes(needle)
   ).map((entry) => entry.effect);
