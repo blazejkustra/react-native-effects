@@ -109,14 +109,23 @@ Basis: the app contains no proprietary or non-standard encryption and only uses 
 
 Paste into App Review Information > Notes. No demo account is needed.
 
-    Effects is a catalog of interactive GPU shader effects built with the open-source react-native-effects library. Each effect is an original real-time shader written for this app. There is no login, no backend, no purchases and no user-generated content.
+    Effects is a catalog of interactive real-time visual effects rendered on the GPU. There is no login, no backend, no purchases, no network use and no user-generated content. No demo account is needed.
 
-    Everything shaped like another product is a visual demonstration running inside this app. The chat and card screens are scripted animations with invented content: they send no messages and make no payments. The cracked screen effects carry a caption saying they are an effect, and they end when you go back.
+    All people, chats, cards, banners, balances and forecasts in the app are fictional sample content. Chat screens are scripted animations and send nothing. Card screens make no payments. Weather is a labelled sample forecast. Banners are invented notifications and use no calendar or weather data. AI Orb, AI Shimmer and AI Voice are visual effects and contain no AI service.
 
-    Device features to test: a real iPhone is recommended, since the simulator has no motion sensors.
-    - Microphone: open Dandelion or Birthday Candle and blow on the phone. AI Orb and AI Voice start on tap. Audio is analysed live and is never recorded.
-    - Camera: open Instant Camera and allow the camera, then press the shutter. The photo stays in temporary storage.
+    Device features (a real iPhone is recommended, because the simulator has no motion sensors):
+    - Microphone: open Dandelion or Birthday Candle and blow on the phone. AI Orb and AI Voice start on tap. Audio is analysed live and never recorded. Refusing permission leaves the screens usable.
+    - Camera: open Instant Camera, press Continue, allow the camera, then press the shutter. The photo stays in temporary storage and is not saved or uploaded.
     - Motion: tilt in Beer, Hourglass or Lava Lamp. Shake in Instant Camera or Mystic Ball.
-    - Magnetometer: hold a magnet near the phone in Ferrofluid.
+    - Magnetometer: hold a magnet near the phone in Ferrofluid, or touch and hold the screen if no magnet is available.
+
+    Other notes:
+    - Cracked Screen and Hinge Crack show a permanent caption saying they are an effect. They end when you go back.
+    - Hourglass is a working focus timer.
+    - Flashlight is an on-screen beam and does not use the LED.
+    - Scratch-off uses symbols and always reveals a match. There is no money, stake or prize.
+    - Beer is a physics toy with no brand, drinking game or challenge.
+    - Links on the About screen, including the Privacy Policy, open in the system browser.
+    - The app is iPhone only and runs in compatibility mode on iPad.
 
     Contact: kustrablazej@gmail.com
