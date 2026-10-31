@@ -45,7 +45,7 @@ steps:
   - wait: 400
   - tap: { text: Clear text }
   - tool: keyboard
-    args: { text: "ink" }
+    args: { text: "bloom" }
   - wait: 300
   - tap: { text: "Ink Bloom" }
   - wait: 800

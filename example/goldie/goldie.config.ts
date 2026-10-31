@@ -62,7 +62,8 @@ export default {
       'cracked-screen',
       'store-03-cracked-screen',
       'Crack the glass',
-      'Tap and it breaks where you hit it.'
+      'Tap and it breaks where you hit it.',
+      'classic'
     ),
     screenshot(
       'bubble-wrap',
