@@ -1,6 +1,6 @@
 # Effects credits and licenses
 
-Effects uses the third-party photographs and open-source software listed here. Thank you to their authors.
+Effects uses the third-party photographs and open-source software listed here. Everything else in the app, including icons, chat wallpapers, weather symbols, the foam texture and the home screens, is original and drawn in code or by `example/assets/tools/generate-assets.py`. Thank you to their authors.
 
 The app's own code and the react-native-effects library are MIT licensed, Copyright (c) 2026 Blazej Kustra. See `LICENSE` in this repository.
 
@@ -10,28 +10,27 @@ All from Wikimedia Commons. Each is cropped, resized or otherwise adapted for th
 
 | Effect | File | Work | Author | License |
 | --- | --- | --- | --- | --- |
-| NameDrop | `namedrop/avatar.jpg` | [Smiling senior woman with curly hair portrait](https://commons.wikimedia.org/wiki/File:Smiling_senior_woman_with_curly_hair_portrait.jpg), cropped to the face | Shixart1985 | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) |
+| Wave Reveal | `wave/avatar.jpg` | [Smiling senior woman with curly hair portrait](https://commons.wikimedia.org/wiki/File:Smiling_senior_woman_with_curly_hair_portrait.jpg), cropped to the face | Shixart1985 | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) |
 | Flashlight | `flashlight/corridor.jpg` | [Grungy corridor of abandoned school](https://commons.wikimedia.org/wiki/File:Grungy_corridor_of_abandoned_school.jpg) | Shixart1985 | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) |
-| Polaroid | `polaroid/photo-beach.jpg` | [Black Rock beach](https://commons.wikimedia.org/wiki/File:Black_Rock_beach.jpg) | Carey Ciuro | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) |
-| Polaroid | `polaroid/photo-lake.jpg` | [Evening on Kathleen Lake](https://commons.wikimedia.org/wiki/File:Evening_on_Kathleen_Lake.jpg) | Jakub Fryš | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
-| Polaroid | `polaroid/photo-mountains.jpg` | [Mountain lake, Mylgval mountain cirque before sunset, Caucasus Mountains](https://commons.wikimedia.org/wiki/File:Mountain_lake,_Mylgval_mountain_cirque_before_sunset,_Caucasus_Mountains.jpg) | Vyacheslav Argenberg | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
-| Polaroid, Bubble Wrap | `polaroid/table.jpg`, `bubblewrap/walnut.jpg` | [Oberfläche Wohnzimmertisch](https://commons.wikimedia.org/wiki/File:Oberfl%C3%A4che_Wohnzimmertisch.JPG) | Martin Lorenz | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
+| Instant Camera | `camera/photo-beach.jpg` | [Black Rock beach](https://commons.wikimedia.org/wiki/File:Black_Rock_beach.jpg) | Carey Ciuro | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) |
+| Instant Camera | `camera/photo-lake.jpg` | [Evening on Kathleen Lake](https://commons.wikimedia.org/wiki/File:Evening_on_Kathleen_Lake.jpg) | Jakub Fryš | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| Instant Camera | `camera/photo-mountains.jpg` | [Mountain lake, Mylgval mountain cirque before sunset, Caucasus Mountains](https://commons.wikimedia.org/wiki/File:Mountain_lake,_Mylgval_mountain_cirque_before_sunset,_Caucasus_Mountains.jpg) | Vyacheslav Argenberg | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| Instant Camera, Bubble Wrap | `camera/table.jpg`, `bubblewrap/walnut.jpg` | [Oberfläche Wohnzimmertisch](https://commons.wikimedia.org/wiki/File:Oberfl%C3%A4che_Wohnzimmertisch.JPG) | Martin Lorenz | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
 | Dandelion | `dandelion/dandelion-atlas.jpg` | [Taraxacum seedhead Paslieres 2013-05-09 n01](https://commons.wikimedia.org/wiki/File:Taraxacum_seedhead_Paslieres_2013-05-09_n01.jpg), extended and masked | Marie-Lan Nguyen | [CC BY 2.5](https://creativecommons.org/licenses/by/2.5/) |
 | Hourglass | `hourglass/hourglass-atlas.jpg` | [Wooden hourglass 3](https://commons.wikimedia.org/wiki/File:Wooden_hourglass_3.jpg), sand painted out and masked | S Sepp | [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
 | Particle Dispersion | `dispersion/cat-atlas.png` | [Orange tabby cat sitting on fallen leaves](https://commons.wikimedia.org/wiki/File:Orange_tabby_cat_sitting_on_fallen_leaves-Hisashi-01.jpg), masked | Hisashi | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/) |
 | Lava Lamp | `lavalamp/lava-lamp.jpg` | [Lava lamp (yellow)](https://commons.wikimedia.org/wiki/File:Lava_lamp_(yellow).jpg) | DMGualtieri | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
-| Crackgate | `cracks/palms.jpg` | [Palm silhouettes](https://commons.wikimedia.org/wiki/File:Palm_silhouettes.jpg) | Prakash G (Prakash Srivaths) | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
+| Hinge Crack | `cracks/palms.jpg` | [Palm silhouettes](https://commons.wikimedia.org/wiki/File:Palm_silhouettes.jpg) | Prakash G (Prakash Srivaths) | [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
 | Cracked Screen | `cracks/swing.jpg` | [Seaside swing at dusk](https://commons.wikimedia.org/wiki/File:Seaside_swing_at_dusk_(Unsplash).jpg) | Georg Nietsch | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
 | Ferrofluid | `ferrofluid/marble.jpg` | [Marble Kymi Euboea Greece](https://commons.wikimedia.org/wiki/File:Marble_Kymi_Euboea_Greece.jpg) | Jebulon | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
-
-Lorem Picsum (picsum.photos) serves the four placeholder pictures in the Voice Delete effect at runtime.
+| Birthday Candle | `candle/cake.jpg` | [3rd birthday cake](https://commons.wikimedia.org/wiki/File:3rd_birthday_cake_(Unsplash_10b8Lvvc-4g).jpg), background extended and flame painted out | Annie Spratt | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| Voice Delete | `chat/photo-post.jpg` | [Forest path at sunset](https://commons.wikimedia.org/wiki/File:Forest_path_at_sunset_(Unsplash).jpg) | Sergei Akulich | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
+| Voice Delete, Glow Orb, Wave Reveal | `chat/photo-reel.jpg`, background of `home/home-screen.jpg` and `wave/home-atlas.jpg` | [Misty path](https://commons.wikimedia.org/wiki/File:Misty_path_(Unsplash).jpg) | Alessio Lin | [CC0](https://creativecommons.org/publicdomain/zero/1.0/) |
 
 ## Native software
 
 | Component | Used through | License |
 | --- | --- | --- |
-| FFmpeg 8.0.1 (libavcodec, libavformat, libavutil, libswresample) | react-native-audio-api, as separate dynamic frameworks | LGPL 2.1 or later. Source: https://ffmpeg.org. Build scripts: https://github.com/software-mansion-labs/rn-audio-libs |
-| OpenSSL | statically inside the FFmpeg frameworks | Apache-2.0 |
 | Dawn (WebGPU) | react-native-webgpu | BSD-3-Clause |
 | miniaudio | react-native-audio-api | MIT-0 or public domain |
 | PFFFT | react-native-audio-api | BSD-style |
@@ -42,7 +41,6 @@ Lorem Picsum (picsum.photos) serves the four placeholder pictures in the Voice D
 | glog | react-native | BSD-3-Clause |
 | double-conversion | react-native | BSD-3-Clause |
 | fmt | react-native | MIT |
-| ZXingObjC | expo-camera barcode scanning | Apache-2.0 |
 | Expo modules | expo | MIT |
 
 ## JavaScript packages in the app bundle

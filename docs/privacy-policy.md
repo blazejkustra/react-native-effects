@@ -1,6 +1,6 @@
 # Effects Privacy Policy
 
-Effective date: 2026-10-30
+Effective date: 2026-10-31
 
 Effects is a free iPhone app that shows interactive visual effects. It is published by Blazej Kustra, an individual developer ("I" in this policy). This policy explains what the app does with your data.
 
@@ -20,7 +20,7 @@ The app reads the sound level and frequency of the live signal to drive the anim
 
 ### Camera
 
-The Polaroid effect uses the back camera so you can take a photo and watch it develop as an instant print. You have to allow the camera and press the shutter.
+The Instant Camera effect uses the back camera so you can take a photo and watch it develop as an instant print. You have to allow the camera and press the shutter.
 
 The photo is held in the app's temporary storage on your iPhone so it can be shown on screen. It is never uploaded and is never added to your photo library. iOS clears this temporary storage over time, and deleting the app removes it.
 
@@ -34,9 +34,7 @@ Some effects take a picture of their own screen content to animate it, for examp
 
 ## Network use
 
-The app works without an account and sends none of your data to me. There is one network feature:
-
-- The Voice Delete effect downloads four placeholder pictures from the public image service Lorem Picsum (picsum.photos). As with any web request, that service and its hosting providers receive your IP address and basic request details. I do not receive this information and the request contains nothing else about you. Lorem Picsum's own terms and privacy practices apply to it.
+The app makes no network requests of its own. Everything it shows is bundled with it, and it works offline.
 
 Links on the About screen open in your browser, where the website's own privacy policy applies.
 

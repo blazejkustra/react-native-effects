@@ -3,7 +3,7 @@
 WebGPU shader effects for React Native. Drop in a component, or write your own effect in WGSL. Rendering runs on a separate JS runtime, so a busy JS thread does not stall the animation.
 
 <p align="center">
-  <img src="docs/media/demo.webp" alt="The example app: the effects catalog, Lava Lamp, Liquid Chrome, Thanos, Bubble Wrap, Ferrofluid, Polaroid and CRT Off" width="300">
+  <img src="docs/media/demo.webp" alt="The example app: the effects catalog, Lava Lamp, Liquid Chrome, Dust, Bubble Wrap, Ferrofluid, Instant Camera and CRT Off" width="300">
 </p>
 
 > **Experimental.** APIs may change without notice. The library relies on `react-native-worklets` bundle mode, which is off by default for now.
