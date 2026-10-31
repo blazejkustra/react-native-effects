@@ -13,4 +13,4 @@ There are also fabrics, liquid metal, northern lights, fire, ink and weather ski
 
 The app has no accounts, no ads and no tracking. It is built on react-native-effects, an open-source library, and the source code is on GitHub.
 
-Sensor and microphone readings are used live for the animation and stay on your iPhone. The cracks, chats and payment scenes are visual effects only: nothing happens to your device, and no messages or payments are sent.
+Sensor and microphone readings are used live for the animation and stay on your iPhone. The cracks, chats and cards are visual effects only: nothing happens to your device, and no messages or payments are sent.
