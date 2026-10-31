@@ -1,0 +1,14 @@
+steps:
+  - launch: com.blazejkustra.rneffects
+  - await: { visible: { text: Search effects } }
+  - tap: { text: Search effects }
+  - wait: 1000
+  - tool: keyboard
+    args: { text: "ferro" }
+  - wait: 500
+  - tap: { text: "Ferrofluid" }
+  - wait: 2000
+  - echo: A held touch is the magnet, so the flow ends with the finger still down for the capture
+  - tool: gesture-custom
+    args: { events: [{ type: Down, x: 0.5, y: 0.45 }] }
+  - wait: 4000
