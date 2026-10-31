@@ -1,0 +1,10 @@
+steps:
+  - launch: com.blazejkustra.rneffects
+  - await: { visible: { text: Search effects } }
+  - tap: { text: Search effects }
+  - wait: 1000
+  - tool: keyboard
+    args: { text: "lava" }
+  - wait: 500
+  - tap: { text: "Lava Lamp" }
+  - wait: 9000

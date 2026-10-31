@@ -1,0 +1,20 @@
+steps:
+  - launch: com.blazejkustra.rneffects
+  - await: { visible: { text: Search effects } }
+  - tap: { text: Search effects }
+  - wait: 1000
+  - tool: keyboard
+    args: { text: "bubble" }
+  - wait: 500
+  - tap: { text: "Bubble Wrap" }
+  - wait: 2000
+  - echo: Near-vertical drags, because a mostly sideways drag triggers the swipe-back gesture
+  - tool: gesture-swipe
+    args: { fromX: 0.3, fromY: 0.2, toX: 0.3, toY: 0.72, durationMs: 700, momentum: false }
+  - tool: gesture-swipe
+    args: { fromX: 0.42, fromY: 0.2, toX: 0.42, toY: 0.72, durationMs: 700, momentum: false }
+  - tool: gesture-swipe
+    args: { fromX: 0.54, fromY: 0.2, toX: 0.54, toY: 0.72, durationMs: 700, momentum: false }
+  - tool: gesture-swipe
+    args: { fromX: 0.66, fromY: 0.2, toX: 0.66, toY: 0.72, durationMs: 700, momentum: false }
+  - wait: 1500

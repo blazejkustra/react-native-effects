@@ -16,7 +16,7 @@ function tone(ac: AudioContext, freq: number, at: number, length: number) {
   osc.stop(at + length + 0.02);
 }
 
-/** A soft two-note success chime, in the spirit of the Apple Pay ding. */
+/** A soft two-note success chime, for the reveal. */
 export function playChime() {
   try {
     ctx = ctx ?? new AudioContext();

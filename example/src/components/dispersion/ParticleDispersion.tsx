@@ -42,7 +42,7 @@ type ParticleDispersionProps = Omit<
  * from the top down both sides while the cut-out shrinks a little and settles
  * in the middle of the screen.
  *
- * Same fragment-only particle trick as the Telegram dissolve: each ~1.3pt
+ * Same fragment-only particle trick as the message dissolve: each ~1.3pt
  * cell of the background is one grain, released in order of its distance
  * from the subject (precomputed into the atlas), carried by a smooth wind
  * field that is inverted per fragment, and gathered from a 5×5 cell window.

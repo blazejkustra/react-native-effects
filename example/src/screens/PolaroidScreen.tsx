@@ -44,11 +44,11 @@ import { usePolaroidShake } from '../hooks/usePolaroidShake';
  * mountains: "Mountain lake, Mylgval mountain cirque before sunset,
  * Caucasus Mountains" by Vyacheslav Argenberg (CC BY 4.0).
  */
-const TABLE = require('../../assets/polaroid/table.jpg');
+const TABLE = require('../../assets/camera/table.jpg');
 const PHOTOS = [
-  require('../../assets/polaroid/photo-beach.jpg'),
-  require('../../assets/polaroid/photo-lake.jpg'),
-  require('../../assets/polaroid/photo-mountains.jpg'),
+  require('../../assets/camera/photo-beach.jpg'),
+  require('../../assets/camera/photo-lake.jpg'),
+  require('../../assets/camera/photo-mountains.jpg'),
 ];
 
 /** Real prints are readable in ~2 min and done in ~15; this is the demo cut. */
@@ -218,7 +218,7 @@ function Print({
 }
 
 /**
- * Polaroid instant print.
+ * An instant print.
  *
  * Press the shutter: it clicks, the camera takes a real photo (or a bundled
  * one on the simulator or without permission), the film rolls and a print

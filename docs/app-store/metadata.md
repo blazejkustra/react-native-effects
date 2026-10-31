@@ -6,15 +6,14 @@ Paste these into App Store Connect. Limits are noted where Apple enforces them. 
 
 | Field | Value |
 | --- | --- |
-| App name (30) | Effects |
-| Subtitle (30) | Shaders you tilt, blow & shake |
+| App name (30) | Effects: shaders & fun |
+| Subtitle (30) | Toys you tilt, blow & shake |
 | Bundle ID | com.blazejkustra.rneffects |
 | SKU | rneffects-ios |
 | Version | 1.0.0 |
 | Build | 1 |
 | Primary language | English (U.S.) |
 | Primary category | Entertainment |
-| Secondary category | Graphics & Design |
 | Price | Free, no in-app purchases |
 | Devices | iPhone only |
 | Copyright | 2026 Blazej Kustra |
@@ -41,7 +40,7 @@ Effects is a pocket collection of interactive visual effects. Every one is a rea
 
 Things to try:
 
-- Tap hard and watch the screen glass crack where you hit it
+- Tap and watch the screen glass crack where you hit it
 - Blow on your phone to send dandelion seeds drifting or put out a candle
 - Tilt to stir a lava lamp and slosh a full glass
 - Hold a magnet near your phone and watch ferrofluid reach for it
@@ -52,11 +51,11 @@ There are also fabrics, liquid metal, northern lights, fire, ink and weather ski
 
 The app has no accounts, no ads and no tracking. It is built on react-native-effects, an open-source library, and the source code is on GitHub.
 
-Sensor and microphone readings are used live for the animation and stay on your iPhone. The cracks, chats and payment scenes are visual effects only: nothing happens to your device, and no messages or payments are sent.
+Sensor and microphone readings are used live for the animation and stay on your iPhone. The cracks, chats and cards are visual effects only: nothing happens to your device, and no messages or payments are sent.
 
 ## Keywords (100)
 
-shader,gpu,visual,interactive,physics,particles,webgpu,generative,satisfying,fidget,art,animation
+interactive,physics,particles,satisfying,fidget,toy,art,animation,visual,sensory,relaxing,simulation
 
 Leave out every third-party name, including Apple, iPhone, Instagram, Telegram and Polaroid.
 
@@ -84,11 +83,11 @@ Apple's current questionnaire. Answers reflect the catalog as of 2026-10-30.
 | Realistic violence | None | |
 | Guns or other weapons | None | |
 | Gambling | No | No real money |
-| Simulated gambling | Infrequent | Scratch-off card with dollar prizes |
+| Simulated gambling | None | Scratch-off uses symbols only, with no points, money or wagering |
 | Contests | None | |
 | Loot boxes | No | |
 
-Expected result: 13+. Apple maps Frequent alcohol or tobacco references to 18+, and two effects out of more than forty supports Infrequent. Apple lists Infrequent simulated gambling as R 18+ in Australia, so see the Scratch-off entry in `review-risks.md`. Confirm the outcome on the Age Ratings page in App Store Connect.
+Expected result: 13+. Apple maps Frequent alcohol or tobacco references to 18+, and two effects out of about forty supports Infrequent. Confirm the outcome on the Age Ratings page in App Store Connect.
 
 Do not tick "Made for Kids".
 
@@ -100,26 +99,33 @@ Do not tick "Made for Kids".
 
 Why this holds: nothing the app reads leaves the device and there is no analytics, crash SDK, account or backend. Microphone and sensor data is analysed in memory, photos stay in temporary storage, and Apple defines collection as data transmitted off the device and kept beyond the real-time request.
 
-One caveat: Voice Delete fetches four images from picsum.photos, so that service sees the user's IP address. The developer never receives it, which keeps the answer accurate, and bundling those images removes the caveat altogether.
-
 ## Export compliance
 
 `ITSAppUsesNonExemptEncryption` is `false` in `example/app.json`, so App Store Connect will skip the encryption question.
 
-Basis: the app contains no proprietary or non-standard encryption and only uses HTTPS through iOS. The FFmpeg libraries inside react-native-audio-api include OpenSSL code, and the app never calls it. Setting `disableFFmpeg` removes that code entirely (see the decision in `review-risks.md`). The owner is the party certifying this to Apple.
+Basis: the app contains no proprietary or non-standard encryption and only uses HTTPS through iOS. `disableFFmpeg` removes the OpenSSL code that FFmpeg would bring in. The owner is the party certifying this to Apple.
 
 ## Review notes
 
 Paste into App Review Information > Notes. No demo account is needed.
 
-    Effects is a catalog of interactive GPU shader effects built with the open-source react-native-effects library. Each effect is an original real-time shader written for this app. There is no login, no backend, no purchases and no user-generated content.
+    Effects is a catalog of interactive real-time visual effects rendered on the GPU. There is no login, no backend, no purchases, no network use and no user-generated content. No demo account is needed.
 
-    Everything shaped like another product is a visual demonstration running inside this app. The chat, lock screen, payment and contact screens are scripted animations with invented content: they send no messages, make no payments, and exchange no contacts. The cracked screen effects are clearly part of the app and end when you go back.
+    All people, chats, cards, banners, balances and forecasts in the app are fictional sample content. Chat screens are scripted animations and send nothing. Card screens make no payments. Weather is a labelled sample forecast. Banners are invented notifications and use no calendar or weather data. AI Orb, AI Shimmer and AI Voice are visual effects and contain no AI service.
 
-    Device features to test: a real iPhone is recommended, since the simulator has no motion sensors.
-    - Microphone: open Dandelion or Birthday Candle and blow on the phone. AI Orb and AI Voice start on tap. Audio is analysed live and is never recorded.
-    - Camera: open Polaroid and allow the camera, then press the shutter. The photo stays in temporary storage.
-    - Motion: tilt in Beer, Hourglass or Lava Lamp. Shake in Polaroid or Magic 8-Ball.
-    - Magnetometer: hold a magnet near the phone in Ferrofluid.
+    Device features (a real iPhone is recommended, because the simulator has no motion sensors):
+    - Microphone: open Dandelion or Birthday Candle and blow on the phone. AI Orb and AI Voice start on tap. Audio is analysed live and never recorded. Refusing permission leaves the screens usable.
+    - Camera: open Instant Camera, press Continue, allow the camera, then press the shutter. The photo stays in temporary storage and is not saved or uploaded.
+    - Motion: tilt in Beer, Hourglass or Lava Lamp. Shake in Instant Camera or Mystic Ball.
+    - Magnetometer: hold a magnet near the phone in Ferrofluid, or touch and hold the screen if no magnet is available.
+
+    Other notes:
+    - Cracked Screen and Hinge Crack show a permanent caption saying they are an effect. They end when you go back.
+    - Hourglass is a working focus timer.
+    - Flashlight is an on-screen beam and does not use the LED.
+    - Scratch-off uses symbols and always reveals a match. There is no money, stake or prize.
+    - Beer is a physics toy with no brand, drinking game or challenge.
+    - Links on the About screen, including the Privacy Policy, open in the system browser.
+    - The app is iPhone only and runs in compatibility mode on iPad.
 
     Contact: kustrablazej@gmail.com

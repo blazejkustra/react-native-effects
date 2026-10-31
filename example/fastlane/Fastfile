@@ -1,0 +1,66 @@
+default_platform(:ios)
+
+APP_ID = "com.blazejkustra.rneffects"
+WORKSPACE = "ios/Effects.xcworkspace"
+
+def next_build_number
+  latest_testflight_build_number(app_identifier: APP_ID, initial_build_number: 0) + 1
+end
+
+def api_key_auth_args
+  path = ENV["APP_STORE_CONNECT_API_KEY_PATH"]
+  return [] unless path
+  key = JSON.parse(File.read(File.expand_path(path)))
+  return [] unless key["key_filepath"]
+  [
+    "-authenticationKeyPath #{File.expand_path(key['key_filepath']).shellescape}",
+    "-authenticationKeyID #{key['key_id']}",
+    "-authenticationKeyIssuerID #{key['issuer_id']}"
+  ]
+end
+
+def signing_xcargs(build_number)
+  args = ["-allowProvisioningUpdates", "CURRENT_PROJECT_VERSION=#{build_number}"] + api_key_auth_args
+  args << "DEVELOPMENT_TEAM=#{ENV['APPLE_TEAM_ID']}" if ENV["APPLE_TEAM_ID"]
+  args.join(" ")
+end
+
+platform :ios do
+  private_lane :build do
+    Dir.chdir("..") do
+      sh("yarn", "prebuild:clean", "--platform", "ios")
+    end
+    build_number = next_build_number
+    UI.message("Building #{APP_ID} build #{build_number}")
+    build_app(
+      workspace: WORKSPACE,
+      scheme: "Effects",
+      configuration: "Release",
+      export_method: "app-store",
+      xcargs: signing_xcargs(build_number),
+      output_directory: "build/ios",
+      clean: true
+    )
+  end
+
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    build
+    upload_to_testflight(skip_waiting_for_build_processing: true)
+  end
+
+  desc "Upload the listing and screenshots without a binary"
+  lane :listing do
+    upload_to_app_store(
+      app_version: "1.0.0",
+      metadata_path: "fastlane/metadata",
+      screenshots_path: "fastlane/screenshots",
+      skip_binary_upload: true,
+      overwrite_screenshots: true,
+      force: true,
+      submit_for_review: false,
+      automatic_release: false,
+      precheck_include_in_app_purchases: false
+    )
+  end
+end

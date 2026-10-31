@@ -46,7 +46,7 @@ function formatTime(seconds: number): string {
 }
 
 /**
- * An hourglass that is a Pomodoro timer.
+ * An hourglass that is a focus timer.
  *
  * A photograph of a wooden hourglass; the sand in it is drawn from the time
  * left. Tilt the phone and the sand tilts with real gravity, holding its

@@ -107,6 +107,33 @@ Apple allows device frames in marketing within its guidelines, but avoid iPhone 
 ### 21. Permissions on entry
 Dandelion and Birthday Candle ask for the microphone as soon as they open. Apple accepts this when the purpose is clear, and refusing must leave the app usable. Verified on a simulator: after refusal both screens stay usable and show "Microphone permission denied".
 
+## Status on 2026-10-31
+
+The owner asked to release, so the fixes below are applied. Where an item above names an effect by its old title, this table gives the new one.
+
+| Item | Status | What changed |
+| --- | --- | --- |
+| 1 Wallet | Fixed | Now "Metal Card": a single tap, no payment flow or system phrases, invented mark, app-styled sheet, no card stack. The glint shader is unchanged |
+| 2 Home screens | Fixed | No app-icon grid remains. Glow Orb sits on a CC0 misty path photo and Wave Reveal carries that scene to a dusk photo |
+| 3 Telegram screens | Fixed | Now "Message Dissolve" and "Hidden Text", with redrawn icons, an original wallpaper and an invented chat style |
+| 4 Voice Delete | Fixed | Restyled, redrawn icons, four bundled images, no network |
+| 5 iMessage Effects | Fixed | Now "Message Flourishes", with teal bubbles, a flat top bar and no call button. Encore is now rings rippling out of the bubble and Beams is now warm daylight shafts, so neither matches Echo or Lasers |
+| 6 NameDrop | Fixed | Now "Wave Reveal", an animation from a misty morning scene to a dusk photo. No contact poster, no real person, no share choice |
+| 7 Cracked Screen, Crackgate | Fixed | Abstract scene with an invented clock and a persistent caption. Crackgate is now "Hinge Crack" and the product name is gone |
+| 8 Thanos | Fixed | Now "Dust" |
+| 9 Weather | Fixed | New copy, labelled "Sample forecast", left-aligned layout, solid range bars, redrawn icons |
+| 10 Orbs, Banners | Fixed | "Glow Orb" is a centred gold and jade orb with a soft halo and no screen-edge glow, "Morphing thinking blob", invented app name in the banner, new Banners line |
+| 11 Cards | Fixed | Invented issuers, obviously fake numbers, contactless mark removed |
+| 12 Trademarked titles | Fixed | "Instant Camera" with a neutral stripe, "Mystic Ball" with a 7, "The Eye" with new copy |
+| 13 Positioning | Fixed in the catalog | Beer Foam (Foam lab), Linear Gradient, Circular Gradient and Scroll Reactive removed. A reviewer may still call the app a tech demo |
+| 14 App name | Open | Unchanged: "Effects" |
+| 15, 16 Lighter, Beer | Open | Age rating answers, and keep Beer out of screenshots |
+| 17 Scratch-off | Fixed | Now "Lucky Clover" in the UI, with symbols only: no points, bonus strip or ticket price. The simulated gambling answer can be None |
+| 18 Jokes and names | Fixed | Invented people, everyday chat scripts, developer in-jokes removed |
+| 19 Device frames | Open | Nothing changed. Applies to marketing images |
+| 20 Flashlight | Fixed | New copy. The SF Symbol PNGs are deleted and the screen uses plain sliders and a switch |
+| 21 Permissions | No change needed | Already verified |
+
 ## Fixed in the repository (Applied)
 
 | Risk | Change |
@@ -122,6 +149,6 @@ Dandelion and Birthday Candle ask for the microphone as soon as they open. Apple
 
 ## Other decisions
 
-- **Portrait lock:** `app.json` now sets portrait, since tilt effects would otherwise rotate the layout mid-gesture. It does change Crackgate: rotating a phone no longer replays it (a tap still does), and the unfolded landscape layout on iPhone Duo was never tested. Check it on a Duo, or remove `orientation` if that effect matters more.
-- **FFmpeg:** set `"disableFFmpeg": true` on the react-native-audio-api plugin. The app decodes no audio files, so this should remove LGPL libraries, OpenSSL and about 6.5 MB. It needs `pod install`, so it was not applied or tested.
-- **Barcode scanning:** set `"barcodeScannerEnabled": false` on expo-camera. It removes ZXingObjC, which the app never uses. Also needs `pod install`.
+- **Portrait lock:** `app.json` now sets portrait, since tilt effects would otherwise rotate the layout mid-gesture. Hinge Crack replays on a tap. Rotating no longer replays it.
+- **FFmpeg:** `"disableFFmpeg": true` is set on the react-native-audio-api plugin. The Release build on 2026-10-31 has no FFmpeg frameworks.
+- **Barcode scanning:** `"barcodeScannerEnabled": false` is set on expo-camera. See `docs/credits.md`.

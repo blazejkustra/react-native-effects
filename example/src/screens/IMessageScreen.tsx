@@ -6,7 +6,6 @@ import {
   type ComponentRef,
 } from 'react';
 import {
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -23,25 +22,16 @@ import Bubble, {
   IM_BG,
   IM_BLUE,
   IM_CHROME,
-  IM_MUTED,
 } from '../components/imessage/Bubble';
-import {
-  Chevron,
-  Lock,
-  Microphone,
-  Plus,
-  VideoCamera,
-} from '../components/imessage/glyphs';
-import EffectsSheet from '../components/imessage/EffectsSheet';
+import { Chevron } from '../components/imessage/glyphs';
 import ScreenEffectPlayer from '../components/imessage/ScreenEffectPlayer';
 import {
   EFFECT_LABEL,
   isScreenEffect,
   type BubbleTarget,
-  type EffectId,
+  type ScreenEffectId,
 } from '../components/imessage/types';
 import {
-  DEFAULT_TEXT,
   DEMO_ORDER,
   forgetTarget,
   reportTarget,
@@ -49,20 +39,11 @@ import {
   useIMessageEffects,
 } from '../hooks/useIMessageEffects';
 
-// iMessage clone, dark appearance, laid out from a real Messages thread:
-// circular back and video buttons flank a large avatar over the name pill,
-// the conversation opens with the iMessage / Encrypted / date block, and the
-// composer is a translucent pill whose mic becomes the send arrow once there
-// is text. Sending can carry a screen effect (echo, spotlight, confetti,
-// fireworks, lasers) that plays once over the chat.
-// The demo is scripted: it opens with one text from Kacper, each effect
-// button posts the next line with that effect and Kacper answers a beat
-// later. Long-press the send arrow for the full effects sheet.
+// A made-up chat. Each chip sends the draft with its screen effect. With an
+// empty draft it posts the next scripted line, and Noa answers a beat later.
 
-const CONTACT = 'Kacper';
-const STARTED = '12 Sep 2026 at 09:41';
-// Header: avatar + gap + name pill, measured from the reference.
-const HEADER_H = 60 + 6 + 30;
+const CONTACT = 'Noa';
+const HEADER_H = 56;
 
 export default function IMessageScreen() {
   const insets = useSafeAreaInsets();
@@ -70,7 +51,6 @@ export default function IMessageScreen() {
   const { messages, playing, busy, send, finishPlaying, getTarget } =
     useIMessageEffects();
   const [draft, setDraft] = useState('');
-  const [sheet, setSheet] = useState<string | null>(null);
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
   const messagesRef = useRef(messages);
   messagesRef.current = messages;
@@ -101,21 +81,12 @@ export default function IMessageScreen() {
     setDraft('');
   }, [draft, send]);
 
-  const openSheet = useCallback(() => {
-    // The sheet needs the whole screen; the keyboard would cover its preview.
-    Keyboard.dismiss();
-    setSheet(draft.trim() || DEFAULT_TEXT.none);
-  }, [draft]);
-
-  const sendWith = useCallback(
-    (effect: EffectId) => {
-      if (sheet !== null) {
-        send(effect, sheet);
-      }
-      setSheet(null);
+  const sendWithEffect = useCallback(
+    (effect: ScreenEffectId) => {
+      send(effect, draft);
       setDraft('');
     },
-    [send, sheet]
+    [draft, send]
   );
 
   const onTargetFor = useCallback(
@@ -134,7 +105,6 @@ export default function IMessageScreen() {
       />
     ) : null;
 
-  const lastMine = [...messages].reverse().find((m) => m.from === 'me');
   const usedEffects = new Set(
     messages.filter((m) => m.from === 'me').map((m) => m.effect)
   );
@@ -151,19 +121,11 @@ export default function IMessageScreen() {
         style={styles.thread}
         contentContainerStyle={[
           styles.threadContent,
-          { paddingTop: insets.top + HEADER_H + 12 },
+          { paddingTop: insets.top + HEADER_H + 16 },
         ]}
         showsVerticalScrollIndicator={false}
         keyboardDismissMode="interactive"
       >
-        <View style={styles.intro}>
-          <Text style={styles.introText}>iMessage</Text>
-          <View style={styles.introRow}>
-            <Lock color={IM_MUTED} />
-            <Text style={styles.introText}>Encrypted</Text>
-          </View>
-          <Text style={styles.introDate}>{STARTED}</Text>
-        </View>
         {messages.map((m, i) => {
           const next = messages[i + 1];
           const tail = !next || next.from !== m.from;
@@ -178,11 +140,7 @@ export default function IMessageScreen() {
                 onTarget={
                   isScreenEffect(m.effect) ? onTargetFor(m.id) : undefined
                 }
-                wantSnapshot={m.effect === 'echo'}
               />
-              {lastMine?.id === m.id && (
-                <Text style={styles.delivered}>Delivered</Text>
-              )}
             </View>
           );
         })}
@@ -191,28 +149,16 @@ export default function IMessageScreen() {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <Pressable
           onPress={() => navigation.goBack()}
-          style={styles.circle}
+          style={styles.backButton}
           accessibilityRole="button"
           accessibilityLabel="Back"
         >
           <Chevron />
         </Pressable>
-        <View style={styles.contact}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{CONTACT[0]}</Text>
-          </View>
-          <View style={styles.namePill}>
-            <Text style={styles.contactName}>{CONTACT}</Text>
-            <Chevron color="#8E8E93" size={7} direction="right" />
-          </View>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>{CONTACT[0]}</Text>
         </View>
-        <View
-          style={styles.circle}
-          accessibilityRole="button"
-          accessibilityLabel="FaceTime"
-        >
-          <VideoCamera />
-        </View>
+        <Text style={styles.contactName}>{CONTACT}</Text>
       </View>
 
       <View
@@ -227,7 +173,7 @@ export default function IMessageScreen() {
             return (
               <Pressable
                 key={e}
-                onPress={() => send(e)}
+                onPress={() => sendWithEffect(e)}
                 disabled={busy}
                 style={({ pressed }) => [
                   styles.effectChip,
@@ -256,15 +202,12 @@ export default function IMessageScreen() {
           })}
         </View>
         <View style={styles.composer}>
-          <View style={styles.plus}>
-            <Plus />
-          </View>
           <View style={styles.inputWrap}>
             <TextInput
               value={draft}
               onChangeText={setDraft}
-              placeholder="iMessage"
-              placeholderTextColor="#6E6E73"
+              placeholder="Write something"
+              placeholderTextColor="#8FA6A0"
               style={styles.input}
               multiline
               keyboardAppearance="dark"
@@ -273,33 +216,18 @@ export default function IMessageScreen() {
             {draft.trim() ? (
               <Pressable
                 onPress={sendPlain}
-                onLongPress={openSheet}
-                delayLongPress={350}
                 style={styles.send}
                 accessibilityRole="button"
                 accessibilityLabel="Send"
-                accessibilityHint="Hold to send with an effect"
               >
                 <Text style={styles.sendArrow}>↑</Text>
               </Pressable>
-            ) : (
-              <View style={styles.micWrap}>
-                <Microphone color="#8E8E93" />
-              </View>
-            )}
+            ) : null}
           </View>
         </View>
       </View>
 
       {player}
-
-      {sheet !== null && (
-        <EffectsSheet
-          text={sheet}
-          onClose={() => setSheet(null)}
-          onSend={sendWith}
-        />
-      )}
     </KeyboardAvoidingView>
   );
 }
@@ -317,36 +245,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     paddingBottom: 8,
   },
-  intro: {
-    alignItems: 'center',
-    gap: 2,
-    marginBottom: 14,
-  },
-  introRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  introText: {
-    color: IM_MUTED,
-    fontSize: 14,
-  },
-  introDate: {
-    color: IM_MUTED,
-    fontSize: 12,
-    fontWeight: '600',
-    marginTop: 18,
-  },
   runGap: {
     marginBottom: 4,
-  },
-  delivered: {
-    alignSelf: 'flex-end',
-    color: IM_MUTED,
-    fontSize: 11,
-    fontWeight: '600',
-    marginRight: 18,
-    marginTop: 3,
   },
 
   header: {
@@ -355,47 +255,30 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-    backgroundColor: IM_BG,
-  },
-  circle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 8,
+    paddingBottom: 8,
     backgroundColor: IM_CHROME,
+  },
+  backButton: {
+    width: 40,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
-  },
-  contact: {
-    alignItems: 'center',
-    gap: 6,
-    paddingBottom: 6,
   },
   avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#4A465D',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: IM_BLUE,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
     color: '#fff',
-    fontSize: 27,
+    fontSize: 16,
     fontWeight: '700',
-  },
-  namePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    height: 30,
-    paddingLeft: 14,
-    paddingRight: 12,
-    borderRadius: 15,
-    backgroundColor: IM_CHROME,
   },
   contactName: {
     color: '#fff',
@@ -406,7 +289,6 @@ const styles = StyleSheet.create({
   bottom: {
     backgroundColor: IM_BG,
   },
-  // One row, in the order the demo means them to be pressed.
   effectRow: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -424,15 +306,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)',
   },
   effectChipUsed: {
-    borderColor: 'rgba(76,149,247,0.45)',
-    backgroundColor: 'rgba(76,149,247,0.12)',
+    borderColor: 'rgba(45,125,106,0.6)',
+    backgroundColor: 'rgba(45,125,106,0.2)',
   },
   effectChipPressed: {
     borderColor: IM_BLUE,
     backgroundColor: IM_BLUE,
     transform: [{ scale: 0.94 }],
   },
-  // Kacper is typing: hold the row until his reply lands.
+  // Noa is typing: hold the row until the reply lands.
   effectChipBusy: {
     opacity: 0.4,
   },
@@ -442,7 +324,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   effectChipTextUsed: {
-    color: IM_BLUE,
+    color: '#8FD3C1',
   },
   effectChipTextPressed: {
     color: '#fff',
@@ -456,24 +338,14 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     paddingTop: 6,
   },
-  plus: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: IM_CHROME,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   inputWrap: {
     flex: 1,
     minHeight: 40,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 10,
+    backgroundColor: IM_CHROME,
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingLeft: 18,
+    paddingLeft: 12,
     paddingRight: 6,
     paddingVertical: 3,
   },
@@ -485,17 +357,10 @@ const styles = StyleSheet.create({
     paddingTop: 7,
     paddingBottom: 7,
   },
-  micWrap: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 1,
-  },
   send: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: 8,
     backgroundColor: IM_BLUE,
     alignItems: 'center',
     justifyContent: 'center',

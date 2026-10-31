@@ -4,29 +4,29 @@ import { Aurora, LiquidChrome, Iridescence } from 'react-native-effects';
 
 const CARDS = [
   {
-    id: 'revolut',
-    name: 'REVOLUT',
-    number: '•••• •••• •••• 7291',
-    holder: 'ALEX MORGAN',
-    expiry: '09/28',
+    id: 'moss-ember',
+    name: 'MOSS & EMBER',
+    number: '0000 0000 0000 0000',
+    holder: 'SAMPLE CARD',
+    expiry: '00/00',
     effect: 'aurora' as const,
     darkText: false,
   },
   {
-    id: 'monzo',
-    name: 'MONZO',
-    number: '•••• •••• •••• 4242',
-    holder: 'JAMIE CHEN',
-    expiry: '03/27',
+    id: 'tidewater',
+    name: 'TIDEWATER MINT',
+    number: '1234 5678 9012 3456',
+    holder: 'SAMPLE CARD',
+    expiry: '00/00',
     effect: 'iridescence' as const,
     darkText: false,
   },
   {
-    id: 'neobank',
-    name: 'NEOBANK',
-    number: '•••• •••• •••• 1834',
-    holder: 'SAM TAYLOR',
-    expiry: '12/29',
+    id: 'quill',
+    name: 'QUILL RESERVE',
+    number: '0123 4567 8901 2345',
+    holder: 'SAMPLE CARD',
+    expiry: '00/00',
     effect: 'chrome' as const,
     darkText: true,
   },
@@ -101,11 +101,6 @@ export default function HoloCardScreen() {
                     <View
                       style={[styles.chipInner, dark && styles.chipInnerDark]}
                     />
-                  </View>
-                  <View style={styles.contactless}>
-                    <View style={[styles.arc1, dark && styles.arcDark]} />
-                    <View style={[styles.arc2, dark && styles.arcDark]} />
-                    <View style={[styles.arc3, dark && styles.arcDark]} />
                   </View>
                 </View>
                 <Text style={[styles.cardName, dark && styles.textDark]}>
@@ -201,45 +196,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(180, 140, 20, 0.6)',
   },
-  contactless: {
-    width: 28,
-    height: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  arc1: {
-    position: 'absolute',
-    width: 10,
-    height: 10,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.6)',
-    borderLeftColor: 'transparent',
-    borderBottomColor: 'transparent',
-    transform: [{ rotate: '45deg' }],
-  },
-  arc2: {
-    position: 'absolute',
-    width: 17,
-    height: 17,
-    borderRadius: 17,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.6)',
-    borderLeftColor: 'transparent',
-    borderBottomColor: 'transparent',
-    transform: [{ rotate: '45deg' }],
-  },
-  arc3: {
-    position: 'absolute',
-    width: 24,
-    height: 24,
-    borderRadius: 24,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.6)',
-    borderLeftColor: 'transparent',
-    borderBottomColor: 'transparent',
-    transform: [{ rotate: '45deg' }],
-  },
   cardName: {
     fontSize: 18,
     fontWeight: '700',
@@ -288,10 +244,5 @@ const styles = StyleSheet.create({
   },
   chipInnerDark: {
     borderColor: 'rgba(140, 110, 10, 0.7)',
-  },
-  arcDark: {
-    borderColor: 'rgba(0, 0, 0, 0.5)',
-    borderLeftColor: 'transparent',
-    borderBottomColor: 'transparent',
   },
 });

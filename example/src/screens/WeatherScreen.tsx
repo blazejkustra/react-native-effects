@@ -284,42 +284,6 @@ function getTempRange(daily: DailyItem[]) {
   return { overallLow: low, overallHigh: high, tempRange: high - low };
 }
 
-// Full temperature color stops (cold → hot)
-const TEMP_COLORS = [
-  { pos: 0, r: 90, g: 200, b: 250 }, // #5AC8FA  — coldest
-  { pos: 0.33, r: 52, g: 199, b: 89 }, // #34C759  — cool
-  { pos: 0.66, r: 255, g: 204, b: 0 }, // #FFCC00  — warm
-  { pos: 1, r: 255, g: 149, b: 0 }, // #FF9500  — hot
-];
-
-function lerpColor(t: number): string {
-  const clamped = Math.max(0, Math.min(1, t));
-  let i = 0;
-  while (i < TEMP_COLORS.length - 2 && TEMP_COLORS[i + 1]!.pos < clamped) {
-    i++;
-  }
-  const a = TEMP_COLORS[i]!;
-  const b = TEMP_COLORS[i + 1]!;
-  const local = (clamped - a.pos) / (b.pos - a.pos);
-  const r = Math.round(a.r + (b.r - a.r) * local);
-  const g = Math.round(a.g + (b.g - a.g) * local);
-  const bl = Math.round(a.b + (b.b - a.b) * local);
-  return `rgb(${r}, ${g}, ${bl})`;
-}
-
-function barGradient(
-  low: number,
-  high: number,
-  overallLow: number,
-  tempRange: number
-): string {
-  const tLow = (low - overallLow) / tempRange;
-  const tHigh = (high - overallLow) / tempRange;
-  return `linear-gradient(to right, ${lerpColor(tLow)}, ${lerpColor(
-    (tLow + tHigh) / 2
-  )}, ${lerpColor(tHigh)})`;
-}
-
 export default function WeatherScreen() {
   const [scenario, setScenario] = useState<WeatherScenario>('night');
   const theme = WEATHER_THEMES[scenario];
@@ -560,7 +524,7 @@ export default function WeatherScreen() {
       {/* ═══ Fixed header — outside scroll view ═══ */}
       <View style={styles.fixedHeader} pointerEvents="box-none">
         <Animated.View style={cityAnim}>
-          <Text style={styles.cityName}>Kraków</Text>
+          <Text style={styles.cityName}>Sample forecast</Text>
           <Animated.View style={[styles.compactInfoWrap, compactInfoAnim]}>
             <Text style={styles.compactInfo}>
               {forecast.currentTemp}° | {forecast.condition}
@@ -590,7 +554,7 @@ export default function WeatherScreen() {
               {forecast.condition}
             </Animated.Text>
             <Animated.Text style={[styles.highLow, hlAnim]}>
-              H:{forecast.high}° L:{forecast.low}°
+              High {forecast.high}° · Low {forecast.low}°
             </Animated.Text>
           </Animated.View>
 
@@ -611,9 +575,7 @@ export default function WeatherScreen() {
                 >
                   <View style={styles.sectionHeader}>
                     <ClockIcon size={14} />
-                    <Text style={styles.sectionHeaderText}>
-                      HOURLY FORECAST
-                    </Text>
+                    <Text style={styles.sectionHeaderText}>Hourly</Text>
                   </View>
                 </Animated.View>
               </Animated.View>
@@ -654,7 +616,7 @@ export default function WeatherScreen() {
             >
               <View style={styles.sectionHeader}>
                 <CalendarIcon size={14} />
-                <Text style={styles.sectionHeaderText}>10-DAY FORECAST</Text>
+                <Text style={styles.sectionHeaderText}>Next 10 days</Text>
               </View>
             </Animated.View>
 
@@ -692,12 +654,7 @@ export default function WeatherScreen() {
                               {
                                 left: `${barLeft}%`,
                                 width: `${Math.max(barWidth, 8)}%`,
-                                experimental_backgroundImage: barGradient(
-                                  item.low,
-                                  item.high,
-                                  overallLow,
-                                  tempRange
-                                ),
+                                backgroundColor: colors.accentColor,
                               },
                             ]}
                           />
@@ -770,14 +727,11 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   cityName: {
-    fontSize: 36,
-    fontWeight: '400',
+    fontSize: 22,
+    fontWeight: '600',
     color: '#fff',
-    letterSpacing: 0.3,
-    textAlign: 'center',
   },
   compactInfoWrap: {
-    alignItems: 'center',
     marginTop: 2,
     overflow: 'hidden',
   },
@@ -811,36 +765,35 @@ const styles = StyleSheet.create({
 
   // --- Expanded header (collapses on scroll) ---
   expandedHeader: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    paddingLeft: 4,
     paddingBottom: 28,
     overflow: 'hidden',
   },
   tempWrap: {
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   temperature: {
-    fontSize: 96,
-    fontWeight: '100',
+    fontSize: 84,
+    fontWeight: '700',
     color: '#fff',
-    lineHeight: 104,
+    lineHeight: 96,
   },
   degreeSymbol: {
-    fontSize: 96,
-    fontWeight: '100',
+    fontSize: 84,
+    fontWeight: '300',
   },
   condition: {
     fontSize: 20,
     fontWeight: '500',
     color: 'rgba(255,255,255,0.85)',
     marginTop: 0,
-    textAlign: 'center',
   },
   highLow: {
     fontSize: 20,
     fontWeight: '500',
     color: '#fff',
     marginTop: 2,
-    textAlign: 'center',
   },
 
   // ═══ Cards ═══

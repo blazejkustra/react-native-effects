@@ -1,0 +1,14 @@
+steps:
+  - launch: com.blazejkustra.rneffects
+  - await: { visible: { text: Search effects } }
+  - tap: { text: Search effects }
+  - wait: 1000
+  - tool: keyboard
+    args: { text: "dandelion" }
+  - wait: 500
+  - tap: { text: "Dandelion" }
+  - wait: 2000
+  - echo: Allow on the microphone prompt when it shows. Without a prompt this tap lands on the intact head and does nothing
+  - tool: gesture-tap
+    args: { x: 0.668, y: 0.652 }
+  - wait: 2000

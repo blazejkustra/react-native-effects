@@ -1,25 +1,22 @@
-// Instagram glyphs cropped from a screen recording and converted to white
-// alpha masks — tint them with `tintColor`.
+// White alpha masks drawn by assets/tools/generate-assets.py. Tint them with
+// `tintColor`.
 export const IG_ICONS = {
-  back: require('../../../assets/instagram/back.png'),
-  phone: require('../../../assets/instagram/phone.png'),
-  video: require('../../../assets/instagram/video.png'),
-  share: require('../../../assets/instagram/share.png'),
-  bookmark: require('../../../assets/instagram/bookmark.png'),
-  info: require('../../../assets/instagram/info.png'),
-  play: require('../../../assets/instagram/play.png'),
-  camera: require('../../../assets/instagram/camera.png'),
-  mic: require('../../../assets/instagram/mic.png'),
-  image: require('../../../assets/instagram/image.png'),
-  sticker: require('../../../assets/instagram/sticker.png'),
-  plus: require('../../../assets/instagram/plus.png'),
-  trash: require('../../../assets/instagram/trash.png'),
-  send: require('../../../assets/instagram/send.png'),
+  back: require('../../../assets/chat/back.png'),
+  play: require('../../../assets/chat/play.png'),
+  mic: require('../../../assets/chat/mic.png'),
+  plus: require('../../../assets/chat/plus.png'),
+  trash: require('../../../assets/chat/trash.png'),
+  send: require('../../../assets/chat/send.png'),
 };
 
-export const IG_BLUE = '#4C49FA';
-export const IG_RED = '#FE5971';
-export const IG_BG = '#0E1115';
-export const IG_SURFACE = '#21242A';
-export const IG_BAR = '#16191F';
-export const IG_MUTED = '#8B8F96';
+export const IG_AVATAR = require('../../../assets/chat/avatar-rings.png');
+export const IG_CARD_AVATAR = require('../../../assets/chat/avatar-bars.png');
+export const IG_POST_PHOTO = require('../../../assets/chat/photo-post.jpg');
+export const IG_CARD_PHOTO = require('../../../assets/chat/photo-reel.jpg');
+
+export const IG_BLUE = '#C98A1B';
+export const IG_RED = '#E5484D';
+export const IG_BG = '#131311';
+export const IG_SURFACE = '#23221E';
+export const IG_BAR = '#1C1B18';
+export const IG_MUTED = '#9A968B';

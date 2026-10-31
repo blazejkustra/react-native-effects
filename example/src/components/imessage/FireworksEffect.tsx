@@ -13,7 +13,7 @@ type Props = {
 };
 
 /**
- * iMessage's Fireworks: glitter-dust shells popping over the chat. The
+ * Fireworks: glitter-dust shells popping over the chat. The
  * bursts are the birthday banner's (components/BirthdayFireworks.tsx) —
  * hollow polar shells of twinkling stars with an ignition flash — drawn as
  * a transparent overlay in front of the bubbles instead of on the banner's

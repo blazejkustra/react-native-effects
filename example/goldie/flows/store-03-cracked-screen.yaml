@@ -1,0 +1,19 @@
+steps:
+  - launch: com.blazejkustra.rneffects
+  - await: { visible: { text: Search effects } }
+  - tap: { text: Search effects }
+  - wait: 1000
+  - tool: keyboard
+    args: { text: "cracked" }
+  - wait: 500
+  - tap: { text: "Cracked Screen" }
+  - wait: 2000
+  - tool: gesture-tap
+    args: { x: 0.3, y: 0.3 }
+  - wait: 600
+  - tool: gesture-tap
+    args: { x: 0.7, y: 0.5 }
+  - wait: 600
+  - tool: gesture-tap
+    args: { x: 0.3, y: 0.62 }
+  - wait: 1500

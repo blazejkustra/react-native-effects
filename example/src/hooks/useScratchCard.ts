@@ -135,9 +135,7 @@ export function useScratchCard() {
       if (through >= cells.length * AUTO_REVEAL_AT) {
         revealing.current[i] = true;
         Vibration.vibrate(20);
-        if (i < 3) {
-          setRevealed((n) => n + 1);
-        }
+        setRevealed((n) => n + 1);
       }
     });
   }, []);

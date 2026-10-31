@@ -18,14 +18,11 @@ import ScratchCoating, {
 } from '../components/scratchoff/ScratchCoating';
 import { useScratchCard } from '../hooks/useScratchCard';
 
-const PRIZES = ['$5', '$20', '$50', '$500'];
+const SYMBOL_NAMES = ['stars', 'clovers', 'diamonds', 'hearts'] as const;
 
 type Ticket = {
-  symbols: readonly [PrizeSymbol, PrizeSymbol, PrizeSymbol, PrizeSymbol];
-  amounts: string[];
-  bonus: string;
+  symbols: readonly [PrizeSymbol, PrizeSymbol, PrizeSymbol];
   serial: string;
-  win: boolean;
 };
 
 function pick<T>(list: readonly T[]): T {
@@ -33,22 +30,13 @@ function pick<T>(list: readonly T[]): T {
 }
 
 function makeTicket(): Ticket {
-  const win = Math.random() < 0.6;
   const main = pick<PrizeSymbol>([0, 1, 2, 3]);
-  const others = ([0, 1, 2, 3] as PrizeSymbol[]).filter((s) => s !== main);
-  const row: PrizeSymbol[] = win
-    ? [main, main, main]
-    : [main, main, pick(others)].sort(() => Math.random() - 0.5);
-  const prize = pick(PRIZES);
   const serial = Array.from({ length: 3 }, () =>
     Math.floor(1000 + Math.random() * 9000)
   ).join(' ');
   return {
-    symbols: [row[0]!, row[1]!, row[2]!, pick<PrizeSymbol>([0, 1, 2, 3])],
-    amounts: win ? [prize, prize, prize] : row.map(() => pick(PRIZES)),
-    bonus: pick(['$2', '$10', '$25']),
+    symbols: [main, main, main],
     serial,
-    win,
   };
 }
 
@@ -91,13 +79,8 @@ export default function ScratchOffScreen() {
         <View style={styles.frame}>
           <View style={styles.head}>
             <View>
-              <Text style={styles.title}>Clover Cash</Text>
-              <Text style={styles.subtitle}>
-                Match three symbols, win that prize.
-              </Text>
-            </View>
-            <View style={styles.price}>
-              <Text style={styles.priceText}>$5</Text>
+              <Text style={styles.title}>Lucky Clover</Text>
+              <Text style={styles.subtitle}>Find three matching symbols.</Text>
             </View>
           </View>
 
@@ -109,13 +92,8 @@ export default function ScratchOffScreen() {
                   style={[
                     styles.panel,
                     { left: a.x, top: a.y, width: a.w, height: a.h },
-                    i === 3 && styles.bonusPanel,
                   ]}
-                >
-                  <Text style={i === 3 ? styles.bonusAmount : styles.amount}>
-                    {i === 3 ? ticket.bonus : ticket.amounts[i]}
-                  </Text>
-                </View>
+                />
               ))}
               <ScratchCoating
                 symbols={ticket.symbols}
@@ -128,13 +106,13 @@ export default function ScratchOffScreen() {
 
           <View style={styles.foot}>
             <Text style={styles.fine}>No. {ticket.serial}</Text>
-            <Text style={styles.fine}>Void if altered</Text>
+            <Text style={styles.fine}>Just for fun</Text>
           </View>
         </View>
       </View>
 
       <Text style={[styles.result, !done && styles.hidden]}>
-        {ticket.win ? `You won ${ticket.amounts[0]}` : 'Not this time'}
+        You found three {SYMBOL_NAMES[ticket.symbols[0]]}
       </Text>
 
       <Pressable
@@ -202,22 +180,6 @@ const styles = StyleSheet.create({
     color: '#55635a',
     marginTop: 4,
   },
-  price: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#b8892b',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#e2c27a',
-  },
-  priceText: {
-    fontFamily: SERIF,
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#fffaf0',
-  },
   play: {
     width: PLAY_W,
     height: PLAY_H,
@@ -228,27 +190,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fbf7ee',
     borderWidth: 1,
     borderColor: 'rgba(29, 74, 55, 0.25)',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingBottom: 8,
-  },
-  bonusPanel: {
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    paddingBottom: 0,
-    paddingRight: 26,
-  },
-  amount: {
-    fontFamily: SERIF,
-    fontSize: 19,
-    fontWeight: '700',
-    color: GREEN,
-  },
-  bonusAmount: {
-    fontFamily: SERIF,
-    fontSize: 28,
-    fontWeight: '700',
-    color: GREEN,
   },
   coating: {
     position: 'absolute',

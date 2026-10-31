@@ -126,10 +126,7 @@ export function useAudioReactive(options: AudioReactiveOptions = {}): {
       // so its return value can't be trusted. Verify the real state instead.
       recorder.start();
       if (!recorder.isRecording()) {
-        setError(
-          'No microphone input. On the iOS Simulator pick a host mic via ' +
-            'Simulator → I/O → Audio Input, or run on a physical device.'
-        );
+        setError('No microphone input found on this device.');
         stop();
         return;
       }

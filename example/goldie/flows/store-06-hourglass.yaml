@@ -1,0 +1,13 @@
+steps:
+  - launch: com.blazejkustra.rneffects
+  - await: { visible: { text: Search effects } }
+  - tap: { text: Search effects }
+  - wait: 1000
+  - tool: keyboard
+    args: { text: "hourglass" }
+  - wait: 500
+  - tap: { text: "Hourglass" }
+  - wait: 1000
+  - tap: { text: 5 minutes }
+  - echo: Let about a quarter of the sand fall
+  - wait: 75000

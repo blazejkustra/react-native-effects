@@ -3,7 +3,7 @@ import { ShaderView, type ShaderViewProps } from 'react-native-effects';
 type Props = Omit<ShaderViewProps, 'fragmentShader' | 'colors' | 'params'>;
 
 /**
- * A Gemini-style "thinking" blob — a soft metaball that gently morphs its shape
+ * A "thinking" blob, a soft metaball that gently morphs its shape
  * with a smooth dark→blue gradient fill, an inner moving highlight and a clean
  * single-colour glow (no plasma spilling outside, no hard rim). Render it
  * `transparent` in a square container. Pure procedural — no texture sampling.

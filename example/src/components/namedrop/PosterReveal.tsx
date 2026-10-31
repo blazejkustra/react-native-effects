@@ -9,15 +9,15 @@ type PosterRevealProps = Omit<
   ShaderViewProps,
   'fragmentShader' | 'paramsSynchronizable' | 'transparent' | 'params'
 > & {
-  /** `u.live.x` = seconds since the phones touched. */
+  /** `u.live.x` = seconds since the wave started. */
   paramsSynchronizable: ParamsSynchronizable;
-  /** A full-screen snapshot of the contact poster. */
+  /** A full-screen snapshot of the poster. */
   snapshotUri: string;
 };
 
 /**
- * The contact poster arriving: a blurred card swells out of the Dynamic
- * Island on one critically damped spring, coming into focus as it grows to
+ * The poster arriving: a blurred card swells out of the top of the screen on
+ * one critically damped spring, coming into focus as it grows to
  * fill the display.
  */
 export default function PosterReveal({

@@ -13,7 +13,7 @@ type Props = ViewProps & {
 // with each burst.
 const ERUPTION_PERIOD_MS = 5200;
 
-// More money, more coins: one coin per $300, within the shader's budget.
+// One shader coin per 300 saved, within the shader's budget.
 const coinsForAmount = (amount: number) =>
   Math.min(64, Math.max(10, Math.round(amount / 300)));
 
@@ -99,10 +99,7 @@ export default function CoinGeyser({
     return () => clearInterval(id);
   }, [scale]);
 
-  const title = `$${display.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
+  const title = `${Math.round(display).toLocaleString('en-US')} coins`;
 
   return (
     <View style={[styles.card, style]} {...rest}>

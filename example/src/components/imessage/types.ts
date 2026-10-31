@@ -17,11 +17,11 @@ export type ScreenEffectId = (typeof SCREEN_EFFECTS)[number];
 
 export const EFFECT_LABEL: Record<EffectId, string> = {
   none: 'None',
-  echo: 'Echo',
-  spotlight: 'Spotlight',
-  confetti: 'Confetti',
-  fireworks: 'Fireworks',
-  lasers: 'Lasers',
+  echo: 'Encore',
+  spotlight: 'Limelight',
+  confetti: 'Flurry',
+  fireworks: 'Skyburst',
+  lasers: 'Beams',
 };
 
 export function isScreenEffect(e: EffectId): e is ScreenEffectId {
@@ -42,6 +42,4 @@ export type Rect = { x: number; y: number; w: number; h: number };
 /** What a screen effect needs to know about the bubble it plays for. */
 export type BubbleTarget = {
   rect: Rect;
-  /** A view-shot of the bubble, present once captured; echo needs it. */
-  snapshotUri: string | null;
 };

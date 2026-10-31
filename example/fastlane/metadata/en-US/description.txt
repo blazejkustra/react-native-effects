@@ -1,0 +1,16 @@
+Effects is a pocket collection of interactive visual effects. Every one renders live on your iPhone's GPU, and many respond to you: touch, tilt, sound and motion.
+
+Things to try:
+
+- Tap and watch the screen glass crack where you hit it
+- Blow on your phone to send dandelion seeds drifting or put out a candle
+- Tilt to stir a lava lamp and slosh a full glass
+- Hold a magnet near your phone and watch ferrofluid reach for it
+- Shake an instant print while it develops
+- Scratch foil, pop bubble wrap, flip an hourglass
+
+There are also fabrics, liquid metal, northern lights, fire, ink and weather skies to play with, plus chat animations that turn messages to dust.
+
+The app has no accounts, no ads and no tracking.
+
+Sensor and microphone readings are used live for the animation and stay on your iPhone. The cracks, chats and cards are visual effects only: nothing happens to your device, and no messages or payments are sent.

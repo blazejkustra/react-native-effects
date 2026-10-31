@@ -6,25 +6,19 @@ import {
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Platform, StyleSheet } from 'react-native';
-import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import HomeScreen from './screens/HomeScreen';
 import SearchScreen from './screens/SearchScreen';
 import AboutScreen from './screens/AboutScreen';
-import LinearGradientListScreen from './screens/LinearGradient/LinearGradientListScreen';
-import LinearGradientAnimatedScreen from './screens/LinearGradient/LinearGradientAnimatedScreen';
-import LinearGradientStaticScreen from './screens/LinearGradient/LinearGradientStaticScreen';
 import IridescenceScreen from './screens/IridescenceScreen';
 import LiquidChromeScreen from './screens/LiquidChromeScreen';
 import SilkScreen from './screens/SilkScreen';
 import CampfireScreen from './screens/CampfireScreen';
 import CalicoSwirlScreen from './screens/CalicoSwirlScreen';
 import AuroraScreen from './screens/AuroraScreen';
-import CircularGradientScreen from './screens/CircularGradientScreen';
 import SiriOrbScreen from './screens/SiriOrbScreen';
 import HoloCardScreen from './screens/HoloCardScreen';
 import WeatherScreen from './screens/WeatherScreen';
-import ScrollReactiveScreen from './screens/ScrollReactiveScreen';
 import TouchFieldScreen from './screens/TouchFieldScreen';
 import ThanosScreen from './screens/ThanosScreen';
 import AiShimmerScreen from './screens/AiShimmerScreen';
@@ -39,7 +33,6 @@ import LighterScreen from './screens/LighterScreen';
 import TelegramDissolveScreen from './screens/TelegramDissolveScreen';
 import BirthdayCandleScreen from './screens/BirthdayCandleScreen';
 import ParticleDispersionScreen from './screens/ParticleDispersionScreen';
-import FoamLabScreen from './screens/FoamLabScreen';
 import VoiceDeleteScreen from './screens/VoiceDeleteScreen';
 import Magic8BallScreen from './screens/Magic8BallScreen';
 import DandelionScreen from './screens/DandelionScreen';
@@ -73,16 +66,6 @@ const navTheme: Theme = {
   },
 };
 
-const listHeader = (title: string): NativeStackNavigationOptions => ({
-  title,
-  headerShown: true,
-  headerTintColor: '#fff',
-  headerShadowVisible: false,
-  headerBackButtonDisplayMode: 'minimal',
-  headerStyle: { backgroundColor: '#000' },
-  headerTitleStyle: { color: '#fff' },
-});
-
 export default function App() {
   return (
     <GestureHandlerRootView style={styles.root}>
@@ -110,20 +93,6 @@ export default function App() {
             }}
           />
           <Stack.Screen
-            name="LinearGradientList"
-            component={LinearGradientListScreen}
-            options={listHeader('Linear Gradient')}
-          />
-          <Stack.Screen
-            name="LinearGradientAnimated"
-            component={LinearGradientAnimatedScreen}
-          />
-          <Stack.Screen
-            name="LinearGradientStatic"
-            component={LinearGradientStaticScreen}
-            options={listHeader('Static')}
-          />
-          <Stack.Screen
             name="IridescenceStatic"
             component={IridescenceScreen}
           />
@@ -138,20 +107,11 @@ export default function App() {
             component={CalicoSwirlScreen}
           />
           <Stack.Screen name="AuroraStatic" component={AuroraScreen} />
-          <Stack.Screen
-            name="CircularGradientList"
-            component={CircularGradientScreen}
-            options={listHeader('Circular Gradient')}
-          />
-          <Stack.Screen name="SiriOrbStatic" component={SiriOrbScreen} />
+          <Stack.Screen name="GlowOrbStatic" component={SiriOrbScreen} />
           <Stack.Screen name="HoloCardExample" component={HoloCardScreen} />
           <Stack.Screen name="WeatherExample" component={WeatherScreen} />
-          <Stack.Screen
-            name="ScrollReactiveExample"
-            component={ScrollReactiveScreen}
-          />
           <Stack.Screen name="TouchFieldExample" component={TouchFieldScreen} />
-          <Stack.Screen name="ThanosExample" component={ThanosScreen} />
+          <Stack.Screen name="DustExample" component={ThanosScreen} />
           <Stack.Screen name="AiShimmerExample" component={AiShimmerScreen} />
           <Stack.Screen name="AiOrbExample" component={AiOrbScreen} />
           <Stack.Screen name="AiVoiceExample" component={AiVoiceScreen} />
@@ -162,7 +122,7 @@ export default function App() {
           <Stack.Screen name="BeerExample" component={BeerScreen} />
           <Stack.Screen name="LighterExample" component={LighterScreen} />
           <Stack.Screen
-            name="TelegramDissolveExample"
+            name="MessageDissolveExample"
             component={TelegramDissolveScreen}
           />
           <Stack.Screen
@@ -173,36 +133,38 @@ export default function App() {
             name="ParticleDispersionExample"
             component={ParticleDispersionScreen}
           />
-          <Stack.Screen name="FoamLabExample" component={FoamLabScreen} />
           <Stack.Screen
             name="VoiceDeleteExample"
             component={VoiceDeleteScreen}
           />
-          <Stack.Screen name="Magic8BallExample" component={Magic8BallScreen} />
+          <Stack.Screen name="MysticBallExample" component={Magic8BallScreen} />
           <Stack.Screen name="DandelionExample" component={DandelionScreen} />
           <Stack.Screen name="HourglassExample" component={HourglassScreen} />
           <Stack.Screen
-            name="TelegramSpoilerExample"
+            name="HiddenTextExample"
             component={TelegramSpoilerScreen}
           />
-          <Stack.Screen name="IMessageExample" component={IMessageScreen} />
+          <Stack.Screen name="SendEffectsExample" component={IMessageScreen} />
           <Stack.Screen
             name="CrackedScreenExample"
             component={CrackedScreenScreen}
           />
           <Stack.Screen
-            name="DuoCrackgateExample"
+            name="HingeCrackExample"
             component={DuoCrackgateScreen}
           />
-          <Stack.Screen name="PolaroidExample" component={PolaroidScreen} />
+          <Stack.Screen
+            name="InstantCameraExample"
+            component={PolaroidScreen}
+          />
           <Stack.Screen name="ScratchOffExample" component={ScratchOffScreen} />
           <Stack.Screen name="BubbleWrapExample" component={BubbleWrapScreen} />
           <Stack.Screen name="LavaLampExample" component={LavaLampScreen} />
           <Stack.Screen name="FerrofluidExample" component={FerrofluidScreen} />
           <Stack.Screen name="CrtOffExample" component={CrtOffScreen} />
           <Stack.Screen name="FlashlightExample" component={FlashlightScreen} />
-          <Stack.Screen name="WalletPayExample" component={WalletPayScreen} />
-          <Stack.Screen name="NameDropExample" component={NameDropScreen} />
+          <Stack.Screen name="MetalCardExample" component={WalletPayScreen} />
+          <Stack.Screen name="WaveRevealExample" component={NameDropScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

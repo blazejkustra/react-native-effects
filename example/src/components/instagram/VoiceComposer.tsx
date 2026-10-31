@@ -23,8 +23,7 @@ import { useParamsSynchronizable } from 'react-native-effects';
 import SmokePoof from './SmokePoof';
 import { IG_BAR, IG_BLUE, IG_ICONS, IG_MUTED, IG_RED } from './icons';
 
-// Timings measured off the Instagram recording (60 fps frames).
-const EXPAND_MS = 320; // mic tap → full blue bar
+const EXPAND_MS = 320; // mic tap → full bar
 const COLLAPSE_MS = 130; // trash tap → bar sucked into the trash button
 const HOLD_MS = 300; // red trash button sits still before it pops
 const POOF_MS = 700; // smoke burst → wisps gone
@@ -57,10 +56,10 @@ function Icon({
 type Phase = 'idle' | 'recording' | 'deleting';
 
 /**
- * Instagram DM composer with the voice-message flow: tap the mic and a blue bar
- * swells out of the camera button and starts drawing a waveform; tap the trash
+ * A chat composer with the voice-message flow: tap the mic and a blue bar
+ * swells out of the left button and starts drawing a waveform; tap the trash
  * and the bar is sucked back into the button, which turns red, holds, and
- * bursts into a puff of smoke that clears to reveal the camera again.
+ * bursts into a puff of smoke that clears to reveal the button again.
  */
 export default function VoiceComposer() {
   const [phase, setPhase] = useState<Phase>('idle');
@@ -69,7 +68,7 @@ export default function VoiceComposer() {
   const [width, setWidth] = useState(0);
   const lastTall = useRef(false);
 
-  // 0 → 1 as the blue bar expands out of the camera button.
+  // 0 → 1 as the bar expands out of the left button.
   const rec = useSharedValue(0);
   // 0 → 1 as the bar collapses back into the (now red) trash button.
   const del = useSharedValue(0);
@@ -172,7 +171,7 @@ export default function VoiceComposer() {
 
   // --- animated styles -----------------------------------------------------
 
-  // The blue pill grows out of the camera circle, then shrinks back into it.
+  // The pill grows out of the left circle, then shrinks back into it.
   const pillStyle = useAnimatedStyle(() => {
     const open = rec.value * (1 - del.value);
     const w = interpolate(open, [0, 1], [BTN + PAD * 2, Math.max(width, 1)]);
@@ -226,9 +225,9 @@ export default function VoiceComposer() {
       {/* Idle composer — always mounted; the pill slides over it. */}
       <View style={styles.composer}>
         <View style={[styles.circle, { backgroundColor: IG_BLUE }]}>
-          <Icon source={IG_ICONS.camera} size={26} />
+          <Icon source={IG_ICONS.plus} size={22} />
         </View>
-        <Text style={styles.placeholder}>Message...</Text>
+        <Text style={styles.placeholder}>Write something</Text>
         <Pressable
           style={styles.composerIcon}
           onPress={startRecording}
@@ -238,15 +237,6 @@ export default function VoiceComposer() {
         >
           <Icon source={IG_ICONS.mic} size={24} />
         </Pressable>
-        <View style={styles.composerIcon}>
-          <Icon source={IG_ICONS.image} size={24} />
-        </View>
-        <View style={styles.composerIcon}>
-          <Icon source={IG_ICONS.sticker} size={24} />
-        </View>
-        <View style={styles.composerIcon}>
-          <Icon source={IG_ICONS.plus} size={24} />
-        </View>
       </View>
 
       {/* Recording pill */}

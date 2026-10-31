@@ -87,3 +87,12 @@ nitrogen/
 
 # argent screen recordings
 .argent/
+
+# App Store release
+.argent/
+example/goldie/out/
+example/fastlane/report.xml
+example/fastlane/README.md
+example/fastlane/metadata/review_information/
+example/build/
+example/.bundle/

@@ -1,0 +1,68 @@
+executionPrerequisite: App freshly restarted by goldie, settled on the catalog home.
+steps:
+  - echo: Lift the finger the ferrofluid screenshot left down
+  - tool: gesture-custom
+    args: { events: [{ type: Up, x: 0.5, y: 0.45 }] }
+  - await: { visible: { text: Search effects } }
+  - tap: { text: Search effects }
+  - wait: 1000
+  - tool: keyboard
+    args: { text: "cracked" }
+  - wait: 300
+  - tap: { text: "Cracked Screen" }
+  - wait: 700
+  - tool: gesture-tap
+    args: { x: 0.3, y: 0.3 }
+  - wait: 500
+  - tool: gesture-tap
+    args: { x: 0.7, y: 0.5 }
+  - wait: 500
+  - tool: gesture-tap
+    args: { x: 0.3, y: 0.62 }
+  - wait: 800
+  - echo: Left edge swipe back to the search results
+  - tool: gesture-swipe
+    args: { fromX: 0.01, fromY: 0.5, toX: 0.95, toY: 0.5, durationMs: 300 }
+  - wait: 400
+  - tap: { text: Clear text }
+  - tool: keyboard
+    args: { text: "ferro" }
+  - wait: 300
+  - tap: { text: "Ferrofluid" }
+  - wait: 900
+  - tool: gesture-custom
+    args:
+      interpolate: 30
+      events:
+        - { type: Down, x: 0.5, y: 0.45 }
+        - { type: Move, x: 0.5, y: 0.45, delayMs: 1500 }
+        - { type: Move, x: 0.62, y: 0.55, delayMs: 700 }
+        - { type: Up, x: 0.62, y: 0.55, delayMs: 300 }
+  - wait: 300
+  - echo: Left edge swipe back to the search results
+  - tool: gesture-swipe
+    args: { fromX: 0.01, fromY: 0.5, toX: 0.95, toY: 0.5, durationMs: 300 }
+  - wait: 400
+  - tap: { text: Clear text }
+  - tool: keyboard
+    args: { text: "bloom" }
+  - wait: 300
+  - tap: { text: "Ink Bloom" }
+  - wait: 800
+  - tool: gesture-tap
+    args: { x: 0.35, y: 0.35 }
+  - wait: 1000
+  - tool: gesture-tap
+    args: { x: 0.65, y: 0.6 }
+  - wait: 1500
+  - echo: Left edge swipe back to the search results
+  - tool: gesture-swipe
+    args: { fromX: 0.01, fromY: 0.5, toX: 0.95, toY: 0.5, durationMs: 300 }
+  - wait: 400
+  - tap: { text: Clear text }
+  - tool: keyboard
+    args: { text: "lava" }
+  - wait: 300
+  - tap: { text: "Lava Lamp" }
+  - echo: End on a screen that keeps animating, because the recording drops a static tail
+  - wait: 2500

@@ -69,13 +69,15 @@
         "react-native-audio-api",
         {
           "iosMicrophonePermission": "Effects listens to the microphone so effects can react to your voice and to you blowing on the screen. Audio is analysed live on your iPhone and is never recorded or sent anywhere.",
-          "iosBackgroundMode": false
+          "iosBackgroundMode": false,
+          "disableFFmpeg": true
         }
       ],
       [
         "expo-camera",
         {
           "cameraPermission": "Effects uses the camera to take a photo for the instant camera effect. The photo stays on your iPhone and is never uploaded.",
+          "barcodeScannerEnabled": false,
           "microphonePermission": "Effects listens to the microphone so effects can react to your voice and to you blowing on the screen. Audio is analysed live on your iPhone and is never recorded or sent anywhere."
         }
       ],

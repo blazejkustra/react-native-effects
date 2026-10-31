@@ -8,7 +8,9 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "prebuild": "expo prebuild",
-    "prebuild:clean": "expo prebuild --clean"
+    "prebuild:clean": "expo prebuild --clean",
+    "beta:ios": "bundle exec fastlane ios beta",
+    "listing:ios": "bundle exec fastlane ios listing"
   },
   "dependencies": {
     "@react-navigation/native": "7.2.5",

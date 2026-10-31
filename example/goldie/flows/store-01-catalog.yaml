@@ -1,0 +1,9 @@
+steps:
+  - launch: com.blazejkustra.rneffects
+  - await: { visible: { text: Search effects } }
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.85, toX: 0.5, toY: 0.1, durationMs: 700, momentum: false }
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.8, toX: 0.5, toY: 0.2, durationMs: 700, momentum: false }
+  - wait: 1500
+  - await: { idle: true }

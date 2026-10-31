@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { StatusBar, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import EffectCaption from '../components/cracks/EffectCaption';
 import HingeFailure from '../components/cracks/HingeFailure';
 import LockScreen from '../components/cracks/LockScreen';
 import { useHingeFailure } from '../components/cracks/useHingeFailure';
@@ -17,11 +18,10 @@ const RESET_HOLD_MS = 600;
 const FOLD_SETTLE_MS = 700;
 
 /**
- * The iPhone Duo "crackgate" inner display failure. The lock screen looks
- * fine for a moment, then the hinge gives out on its own. Folding or
- * unfolding the phone (a window size change) replays it, a tap pushes the
- * damage one stage further or replays a dead panel, and a long press puts a
- * fresh panel in. On phones without a fold the hinge is the centre line.
+ * An imagined folding display failing along its crease. The scene looks fine
+ * for a moment, then the hinge gives out on its own. A window size change
+ * replays it, a tap pushes the damage one stage further or replays a dead
+ * panel, and a long press puts a fresh panel in. The hinge is the centre line.
  */
 export default function DuoCrackgateScreen() {
   const { width, height } = useWindowDimensions();
@@ -59,7 +59,6 @@ export default function DuoCrackgateScreen() {
         <View style={styles.fill} collapsable={false}>
           <LockScreen
             wallpaper={WALLPAPER}
-            landscape={width > height}
             clockColor={CLOCK_ORANGE}
             dim={0.4}
             liveClock
@@ -69,6 +68,7 @@ export default function DuoCrackgateScreen() {
             style={styles.fill}
             pointerEvents="none"
           />
+          <EffectCaption />
         </View>
       </GestureDetector>
     </View>

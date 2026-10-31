@@ -37,8 +37,7 @@ function loadExpoCamera(): ExpoCamera | null {
 
 const expoCamera = loadExpoCamera();
 
-/** The classic stripe, top to bottom. */
-const STRIPE = ['#e2402c', '#f08a24', '#f6c73a', '#4aa564', '#2f7fc1'];
+const STRIPE = ['#d8d4cb', '#8b8880'];
 const WINDOW_SIZE = 164;
 export const CAMERA_BODY_HEIGHT = 216;
 
@@ -56,7 +55,7 @@ function CameraPrompt({
       style={styles.prompt}
     >
       <Text style={styles.promptText}>
-        {canAsk ? 'Use camera' : 'Open Settings'}
+        {canAsk ? 'Continue' : 'Open Settings'}
       </Text>
     </Pressable>
   );

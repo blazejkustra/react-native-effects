@@ -37,7 +37,7 @@ type DandelionProps = Omit<
  * translated by the wind distance since its band let go, drifting up,
  * tumbling slowly and fading out.
  *
- * Same fragment-only particle trick as the Telegram dissolve: the wind is a
+ * Same fragment-only particle trick as the message dissolve: the wind is a
  * smooth field of the origin, inverted per fragment to find the neighbourhood
  * of cells that could land here, then gathered from a 5x5 window.
  */

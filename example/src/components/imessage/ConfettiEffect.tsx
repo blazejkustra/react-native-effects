@@ -9,7 +9,7 @@ type Props = {
 };
 
 /**
- * iMessage's Confetti: a shower of paper pieces dropped from above the
+ * Confetti: a shower of paper pieces dropped from above the
  * screen that fall through the chat in front of the bubbles, tumbling and
  * swaying, and are gone once they clear the bottom. Every piece is a cell
  * in a column grid with its own drop time, so the first second is a dense
