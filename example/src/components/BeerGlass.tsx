@@ -23,10 +23,8 @@ type Props = Omit<
   foamColor?: ColorInput;
 };
 
-// The head is a photograph of foam (iBeer's own trick — every procedural
-// head read as drawn). Foam over beer, its lacy bottom line at 0.615 of the
-// height; the shader keys the photo's beer out. Stock image: clear its
-// licence before shipping.
+// Foam over beer, drawn by assets/tools/generate-assets.py, its lacy bottom
+// line at 0.615 of the height. The shader keys the image's beer out.
 const FOAM_PHOTO = require('../../assets/foam.jpg');
 
 /**

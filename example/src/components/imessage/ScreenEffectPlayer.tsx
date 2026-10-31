@@ -13,7 +13,7 @@ type Props = {
 
 /**
  * One play of a screen effect for a bubble, as a transparent overlay in
- * front of the chat, the way iMessage draws them; unmount it when `onDone`
+ * front of the chat, drawn above everything; unmount it when `onDone`
  * fires.
  */
 export default function ScreenEffectPlayer({ effect, target, onDone }: Props) {

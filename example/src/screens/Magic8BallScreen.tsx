@@ -44,7 +44,7 @@ const TEXT_HEIGHT = 0.44;
 const FONT_SCALE = 0.165;
 
 /**
- * The classic twenty, said short — and broken into lines HERE, by hand.
+ * Twenty answers, said short and broken into lines HERE, by hand.
  *
  * Two constraints, and they fight. The answer is printed on a triangle that
  * narrows as it goes down, so a line has room for about six characters at a
@@ -68,7 +68,7 @@ const ANSWERS = [
   'LIKELY',
   'LOOKS\nGOOD',
   'GOOD\nSIGNS',
-  'REPLY\nHAZY',
+  'ALL\nHAZY',
   'ASK\nLATER',
   'ASK\nAGAIN',
   "CAN'T\nSAY",
@@ -83,7 +83,7 @@ const ANSWERS = [
 ];
 
 /**
- * A Magic 8-ball.
+ * A mystic fortune ball.
  *
  * Shake the phone and the fluid churns, dragging the answer off the window and
  * back into the ink. Once it settles, buoyancy floats a new one up along

@@ -5,26 +5,25 @@ import {
 } from 'react-native-effects';
 
 /**
- * The home screen photo next to two pre-blurred copies of itself, so the
+ * The invented home screen next to two pre-blurred copies of itself, so the
  * shader can blend any blur strength from three samples.
  */
-export const HOME_ATLAS = require('../../../assets/namedrop/home-atlas.jpg');
-/** The Dynamic Island painted into the home screen photo, in uv (y-down). */
+export const HOME_ATLAS = require('../../../assets/wave/home-atlas.jpg');
+/** The cut-out painted into the home screen image, in uv (y-down). */
 export const ISLAND_UV = { x: 0.5, y: 0.0376, w: 0.312, h: 0.0408 };
 
 type NameDropWaveProps = Omit<
   ShaderViewProps,
   'fragmentShader' | 'paramsSynchronizable' | 'transparent' | 'params'
 > & {
-  /** `u.live.x` = seconds since the phones touched. */
+  /** `u.live.x` = seconds since the wave started. */
   paramsSynchronizable: ParamsSynchronizable;
 };
 
 /**
- * The home screen as NameDrop bends it: a coloured band of light climbs from
- * the bottom edge and pools under the Dynamic Island, blurring what it
- * crosses, then a bright liquid wave bursts out of the island and the home
- * screen sinks into a dark blur behind the incoming poster.
+ * A coloured band of light climbs from the bottom edge and pools under the
+ * cut-out, blurring what it crosses, then a bright liquid wave bursts out of
+ * it and the screen sinks into a dark blur behind the incoming poster.
  */
 export default function NameDropWave({
   paramsSynchronizable,

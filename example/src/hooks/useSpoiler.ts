@@ -12,7 +12,7 @@ import {
   type ParamsSynchronizable,
 } from 'react-native-effects';
 
-// Telegram's spoiler timeline: the burst clears the text in about a third of a
+// The spoiler timeline: the burst clears the text in about a third of a
 // second, the text stays readable for a few seconds, then the cloud settles
 // back over it.
 export const BURST_MS = 420;
@@ -116,7 +116,7 @@ export function useSpoiler({ id, order }: { id: string; order: number }): {
     phase.current = 'hiding';
     textOpacity.value = withTiming(0, { duration: TEXT_FADE_MS });
     // The particles come back at their resting places, not by replaying the
-    // burst backwards; that is what Telegram does and it reads as settling.
+    // burst backwards; it reads as settling.
     burst.value = 0;
     cover.value = withTiming(
       1,

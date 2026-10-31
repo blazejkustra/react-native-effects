@@ -18,7 +18,7 @@ export default function SiriEdgeGlow({
 
   return (
     <ShaderView
-      fragmentShader={SIRI_EDGE_GLOW_SHADER}
+      fragmentShader={EDGE_GLOW_SHADER}
       params={params}
       speed={speed}
       isStatic={false}
@@ -28,7 +28,7 @@ export default function SiriEdgeGlow({
   );
 }
 
-const SIRI_EDGE_GLOW_SHADER = /* wgsl */ `
+const EDGE_GLOW_SHADER = /* wgsl */ `
 struct Uniforms {
   resolution: vec4<f32>,
   time:       vec4<f32>,
@@ -68,7 +68,7 @@ fn fbm3(p_in: vec2<f32>) -> f32 {
   return v;
 }
 
-fn siriPalette(t: f32) -> vec3<f32> {
+fn orbPalette(t: f32) -> vec3<f32> {
   let magenta = vec3<f32>(0.95, 0.05, 0.55);
   let purple  = vec3<f32>(0.50, 0.05, 0.95);
   let cyan    = vec3<f32>(0.0, 0.85, 0.95);
@@ -107,7 +107,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   // p goes from (-0.5, -0.5) to (0.5, 0.5)
   let p = vec2<f32>((uv.x - 0.5) * aspect, uv.y - 0.5);
 
-  // Rounded rect matching iPhone shape
+  // Rounded rect matching the screen
   // Half-size of the screen rect, corner radius ~0.06 normalized
   let halfSize = vec2<f32>(aspect * 0.5, 0.5);
   let cornerR = 0.07;
@@ -136,16 +136,16 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let ca = cos(atan2(p.y, p.x));
   let perimT = (sa * 0.5 + ca * 0.3) * 0.5 + 0.5;
   let rot = time * 0.18;
-  let edgeColor = siriPalette(perimT + rot);
+  let edgeColor = orbPalette(perimT + rot);
 
-  // ---- Breathing pulse (synced with SiriOrb) ----
+  // ---- Breathing pulse (synced with the orb) ----
   let pulseSpeed = 2.2 + activity * 1.8;
   let pulse = 0.85 + 0.15 * sin(time * pulseSpeed);
 
   // ---- Secondary inner glow (dimmer, offset inward) ----
   let innerDist = max(0.0, -d - 0.015) + warp * 0.5;
   let innerGlow = exp(-innerDist * innerDist / (0.018 * 0.018)) * 0.25;
-  let innerColor = siriPalette(perimT + rot + 0.12);
+  let innerColor = orbPalette(perimT + rot + 0.12);
 
   // ---- Compose ----
   let intensity = 0.6 + activity * 0.3;

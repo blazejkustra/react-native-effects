@@ -19,7 +19,7 @@ type ParticleDissolveProps = Omit<
 };
 
 /**
- * Telegram-style "message dissolve": the snapshot of a view is cut into a grid
+ * "Message dissolve": the snapshot of a view is cut into a grid
  * of ~1.5pt cells, and a sweep running left→right turns each cell into a
  * particle that drifts up-left on a smooth wind field, jitters, twinkles and
  * fades. Cells the sweep has not reached yet are drawn from the snapshot
@@ -79,7 +79,7 @@ const GATHER: i32 = 3;     // neighbourhood half-width in cells
 const SPREAD: f32 = 2.4;   // per-particle random offset, logical px (< GATHER*CELL)
 const DRIFT: f32 = 140.0;  // wind travel over a life, logical px
 const BODY_DROP: f32 = 0.72; // share of bubble-body cells that never become dust
-const RADIUS: f32 = 17.0;  // bubble corner radius, logical px
+const RADIUS: f32 = 13.0;  // bubble corner radius, logical px
 
 fn hash21(p: vec2<f32>) -> f32 {
   var p3 = fract(vec3<f32>(p.xyx) * 0.1031);

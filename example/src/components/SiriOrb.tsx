@@ -29,7 +29,7 @@ export default function SiriOrb({
 
   return (
     <ShaderView
-      fragmentShader={SIRI_ORB_SHADER}
+      fragmentShader={ORB_SHADER}
       colors={colors}
       params={params}
       speed={speed}
@@ -40,7 +40,7 @@ export default function SiriOrb({
   );
 }
 
-const SIRI_ORB_SHADER = /* wgsl */ `
+const ORB_SHADER = /* wgsl */ `
 struct Uniforms {
   resolution: vec4<f32>,
   time:       vec4<f32>,
@@ -80,8 +80,8 @@ fn fbm3(p_in: vec2<f32>) -> f32 {
   return v;
 }
 
-// Palette: vivid neon Siri colors
-fn siriPalette(t: f32) -> vec3<f32> {
+// Palette: vivid neon colors
+fn orbPalette(t: f32) -> vec3<f32> {
   // Deep magenta -> electric purple -> hot cyan -> warm pink -> back
   let magenta = vec3<f32>(0.95, 0.05, 0.55);
   let purple  = vec3<f32>(0.50, 0.05, 0.95);
@@ -139,7 +139,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let colorIdx = (sa * 0.5 + ca * 0.3) * 0.5 + 0.5 + warp1 * warpAmt * 0.3 + warp2 * warpAmt * 0.2 + time * 0.05;
 
   // Get vivid palette color
-  var orbCol = siriPalette(colorIdx);
+  var orbCol = orbPalette(colorIdx);
 
   // Boost saturation and vibrancy
   let lum = dot(orbCol, vec3<f32>(0.299, 0.587, 0.114));
@@ -161,7 +161,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   // Bright rim at the edge (Fresnel-like)
   let rimStart = radius - edgeWidth * 3.0;
   let rim = smoothstep(rimStart, radius, dist) * (1.0 - smoothstep(radius, radius + edgeWidth, dist));
-  let rimColor = siriPalette(colorIdx + 0.3) * 1.5;
+  let rimColor = orbPalette(colorIdx + 0.3) * 1.5;
 
   // ---- Specular highlights ----
   let sp1 = vec2<f32>(cos(time * 0.6) * 0.1, sin(time * 0.8) * 0.08);
@@ -182,12 +182,12 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   let glowMask = exp(-gd * gd * glowFalloff) * bloomIntensity;
 
   // Chromatic glow: different colors in different directions (seamless)
-  let glowCol = siriPalette((sa * 0.5 + ca * 0.3) * 0.5 + 0.5 + time * 0.03);
+  let glowCol = orbPalette((sa * 0.5 + ca * 0.3) * 0.5 + 0.5 + time * 0.03);
   col += glowCol * glowMask * 0.7;
 
   // Wide subtle ambient glow
   let ambientGlow = exp(-dist * dist * 12.0) * 0.08 * bloomIntensity;
-  let ambientCol = siriPalette(time * 0.02 + 0.5);
+  let ambientCol = orbPalette(time * 0.02 + 0.5);
   col += ambientCol * ambientGlow;
 
   // ---- Chromatic aberration at edges ----

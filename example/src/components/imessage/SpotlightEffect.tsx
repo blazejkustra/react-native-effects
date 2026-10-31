@@ -12,7 +12,7 @@ type Props = {
 };
 
 /**
- * iMessage's Spotlight: the room goes dark and a soft beam sweeps down from
+ * Spotlight: the room goes dark and a soft beam sweeps down from
  * the top onto the new bubble, holds, and lifts. The overlay only ever
  * darkens, so the bubble itself is the real view seen through a hole in the
  * dim: nothing here redraws it.

@@ -18,7 +18,7 @@ type PolaroidPrintProps = Omit<
 };
 
 /**
- * A Polaroid print developing.
+ * An instant print developing.
  *
  * The frame is paper: off-white, fibrous, with the image window pressed
  * slightly into it. Inside the window the photo comes up out of the milky

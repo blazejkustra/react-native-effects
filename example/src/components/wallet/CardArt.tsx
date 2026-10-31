@@ -1,7 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { CARD_RADIUS } from './CardSurface';
-
 /** EMV chip: a gold pad with its contact segments. */
 function Chip() {
   return (
@@ -14,91 +12,25 @@ function Chip() {
   );
 }
 
-/** The contactless mark: four nested arcs opening to the right. */
-function Contactless() {
-  return (
-    <View style={styles.waves}>
-      {[8, 14, 20, 26].map((size) => (
-        <View
-          key={size}
-          style={[
-            styles.wave,
-            {
-              width: size,
-              height: size,
-              borderRadius: size / 2,
-              marginLeft: -size / 2,
-              marginTop: -size / 2,
-            },
-          ]}
-        />
-      ))}
-    </View>
-  );
-}
-
-/** Two overlapping discs with the orange lens where they meet. */
-function Network() {
-  return (
-    <View style={styles.network}>
-      <View style={[styles.disc, styles.discRed]} />
-      <View style={[styles.disc, styles.discYellow]}>
-        <View style={[styles.disc, styles.lens]} />
-      </View>
-    </View>
-  );
+/** An invented issuer mark: a diamond outline. */
+function IssuerMark() {
+  return <View style={styles.mark} />;
 }
 
 /** Printed and engraved details laid over the metal surface. */
 export function CardArt() {
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
-      <Text style={styles.bank}>Neobank</Text>
+      <Text style={styles.bank}>Quill Reserve</Text>
       <Text style={styles.tier}>Titanium</Text>
       <View style={styles.chipWrap}>
         <Chip />
-        <Contactless />
       </View>
-      <Text style={styles.digits}>•••• 1834</Text>
-      <Network />
+      <Text style={styles.digits}>0000 0000</Text>
+      <IssuerMark />
     </View>
   );
 }
-
-export type StackCardSpec = {
-  name: string;
-  color: string;
-  ink: string;
-  mark: string;
-};
-
-/** A card waiting in the stack: only its top edge and name show. */
-export function StackCard({
-  spec,
-  top,
-  width,
-  height,
-}: {
-  spec: StackCardSpec;
-  top: number;
-  width: number;
-  height: number;
-}) {
-  return (
-    <View
-      style={[
-        styles.stackCard,
-        { top, width, height, backgroundColor: spec.color },
-      ]}
-    >
-      <View style={styles.stackSheen} />
-      <Text style={[styles.stackName, { color: spec.ink }]}>{spec.name}</Text>
-      <Text style={[styles.stackMark, { color: spec.ink }]}>{spec.mark}</Text>
-    </View>
-  );
-}
-
-const LENS = 34 - 13;
 
 const styles = StyleSheet.create({
   bank: {
@@ -170,20 +102,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(110, 88, 40, 0.7)',
     backgroundColor: '#d4bf8c',
   },
-  waves: {
-    width: 20,
-    height: 30,
-    marginLeft: 16,
-    overflow: 'hidden',
-  },
-  wave: {
-    position: 'absolute',
-    left: 0,
-    top: 15,
-    borderWidth: 2,
-    borderColor: 'transparent',
-    borderRightColor: 'rgba(225, 228, 232, 0.7)',
-  },
   digits: {
     position: 'absolute',
     left: 22,
@@ -194,65 +112,14 @@ const styles = StyleSheet.create({
     letterSpacing: 1.2,
     fontVariant: ['tabular-nums'],
   },
-  network: {
+  mark: {
     position: 'absolute',
-    right: 20,
-    bottom: 18,
-    width: 34 * 2 - 13,
-    height: 34,
-  },
-  disc: {
-    position: 'absolute',
-    top: 0,
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    overflow: 'hidden',
-  },
-  discRed: {
-    left: 0,
-    backgroundColor: '#eb001b',
-  },
-  discYellow: {
-    left: LENS,
-    backgroundColor: '#f79e1b',
-  },
-  lens: {
-    left: -LENS,
-    backgroundColor: '#ff5f00',
-  },
-  stackCard: {
-    position: 'absolute',
-    left: 0,
-    borderRadius: CARD_RADIUS,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: -4 },
-  },
-  stackSheen: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
-  },
-  stackName: {
-    position: 'absolute',
-    left: 18,
-    top: 12,
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-  },
-  stackMark: {
-    position: 'absolute',
-    right: 18,
-    top: 11,
-    fontSize: 16,
-    fontWeight: '800',
-    fontStyle: 'italic',
+    right: 28,
+    bottom: 24,
+    width: 24,
+    height: 24,
+    borderWidth: 2.5,
+    borderColor: 'rgba(235, 237, 240, 0.8)',
+    transform: [{ rotate: '45deg' }],
   },
 });

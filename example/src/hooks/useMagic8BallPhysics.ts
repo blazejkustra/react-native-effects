@@ -166,7 +166,7 @@ export type Magic8BallPhysics = {
 };
 
 /**
- * The physics of a Magic 8-ball.
+ * The physics of a mystic ball.
  *
  * One input: the accelerometer. Its in-plane gravity angle says which way is
  * really up, and the die floats up along that axis — tip the phone and the

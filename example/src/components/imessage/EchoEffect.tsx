@@ -14,7 +14,7 @@ type Props = {
 };
 
 /**
- * iMessage's Echo: the bubble is copied a couple of dozen times and the
+ * Echo: the bubble is copied a couple of dozen times and the
  * copies swirl out of it across the whole screen, shrinking a little and
  * fading at the end of their flight, while the real bubble stays put. The copies are the bubble's own
  * pixels: for every fragment each copy's transform is undone and the
@@ -87,7 +87,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
     }
     let ease = 1.0 - pow(1.0 - ti, 2.4);
     // Each copy owns a slot in a sunflower laid over the whole screen, so
-    // the swarm fills it evenly the way iMessage does, and swings into its
+    // the swarm fills it evenly, and swings into its
     // slot about the bubble rather than flying straight, so the flight
     // reads as a spiral.
     let slot = vec2<f32>(cos(fi * GOLDEN), sin(fi * GOLDEN))

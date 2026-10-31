@@ -4,13 +4,11 @@ import { captureRef } from 'react-native-view-shot';
 import Animated, { Easing, withTiming } from 'react-native-reanimated';
 import type { BubbleTarget, Message, Rect } from './types';
 
-// Colours sampled from a real Messages thread in the dark appearance.
-export const IM_BLUE = '#4C95F7';
-export const IM_GREY = '#262629';
-export const IM_BG = '#000';
-export const IM_MUTED = '#8E8E93';
-export const IM_CHROME = '#181818';
-const RADIUS = 20;
+export const IM_BLUE = '#2D7D6A';
+export const IM_GREY = '#2A2F36';
+export const IM_BG = '#0E1216';
+export const IM_CHROME = '#181E24';
+const RADIUS = 12;
 
 type ViewHandle = ComponentRef<typeof View>;
 
@@ -20,8 +18,8 @@ type ViewHandle = ComponentRef<typeof View>;
 const ENTER_MS = 260;
 const MEASURE_DELAY_MS = ENTER_MS + 60;
 
-// Bubbles ease in from their tail corner, the way Messages lands them: a
-// short fade with a slight rise and grow, no overshoot.
+// Bubbles ease in from their low corner: a short fade with a slight rise and
+// grow, no overshoot.
 const EASE_OUT = Easing.out(Easing.cubic);
 const popIn = () => {
   'worklet';
@@ -42,7 +40,7 @@ const popIn = () => {
 
 type Props = {
   msg: Message;
-  /** Only the last bubble of a run gets iMessage's tail. */
+  /** The last bubble of a run gets a square corner on the sender's side. */
   tail: boolean;
   /** Report the window rect (and, when asked, a snapshot) once laid out. */
   onTarget?: (target: BubbleTarget) => void;
@@ -50,8 +48,7 @@ type Props = {
 };
 
 /**
- * One iMessage bubble: a real `Text` in a rounded view with the tail drawn
- * under it. A bubble that a screen effect will play for measures itself in
+ * One chat bubble: a real `Text` in a rounded view. A bubble that a screen effect will play for measures itself in
  * the window once laid out, and snapshots itself when the effect (echo)
  * needs its pixels.
  */
@@ -107,25 +104,15 @@ export default function Bubble({
         style={[styles.wrap, mine ? styles.wrapMine : styles.wrapThem]}
         entering={popIn}
       >
-        {tail && (
-          <>
-            <View
-              style={[
-                styles.tailA,
-                mine ? styles.tailAMine : styles.tailAThem,
-                { backgroundColor: bg },
-              ]}
-            />
-            <View
-              style={[styles.tailB, mine ? styles.tailBMine : styles.tailBThem]}
-            />
-          </>
-        )}
         <View
           ref={bubbleRef}
           collapsable={false}
           onLayout={onLayout}
-          style={[styles.bubble, { backgroundColor: bg }]}
+          style={[
+            styles.bubble,
+            { backgroundColor: bg },
+            tail && (mine ? styles.cornerMine : styles.cornerThem),
+          ]}
         >
           <Text style={styles.text}>{msg.text}</Text>
         </View>
@@ -147,8 +134,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   wrap: {
-    // Messages caps a bubble at about two thirds of the screen.
-    maxWidth: '68%',
+    maxWidth: '74%',
   },
   wrapMine: {
     transformOrigin: 'right bottom',
@@ -167,35 +153,10 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 21,
   },
-  // The tail is the CSS two-shape trick: a filled corner under the bubble,
-  // cut by a ground-coloured shape beside it.
-  tailA: {
-    position: 'absolute',
-    bottom: 0,
-    width: 20,
-    height: 24,
+  cornerMine: {
+    borderBottomRightRadius: 2,
   },
-  tailAMine: {
-    right: -8,
-    borderBottomLeftRadius: 16,
-  },
-  tailAThem: {
-    left: -8,
-    borderBottomRightRadius: 16,
-  },
-  tailB: {
-    position: 'absolute',
-    bottom: 0,
-    width: 26,
-    height: 24,
-    backgroundColor: IM_BG,
-  },
-  tailBMine: {
-    right: -26,
-    borderBottomLeftRadius: 10,
-  },
-  tailBThem: {
-    left: -26,
-    borderBottomRightRadius: 10,
+  cornerThem: {
+    borderBottomLeftRadius: 2,
   },
 });

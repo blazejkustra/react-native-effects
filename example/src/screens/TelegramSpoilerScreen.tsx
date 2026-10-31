@@ -32,13 +32,12 @@ import {
 } from '../components/telegram/icons';
 import { useSpoiler, useSpoilerDebugHooks } from '../hooks/useSpoiler';
 
-// Telegram group chat clone (dark theme, purple accent) with hidden text:
-// a spoiler span is covered by a cloud of drifting sparks, a tap blows the
+// A made-up group chat with hidden text: a spoiler span is covered by a cloud of drifting sparks, a tap blows the
 // cloud open and shows the real text, and after a few seconds it hides again.
 
-const BUBBLE_RADIUS = 17;
-const TG_INCOMING = '#232323';
-const SENDER_COLORS = ['#5BC8FA', '#F5A54A'];
+const BUBBLE_RADIUS = 13;
+const TG_INCOMING = '#232C2A';
+const SENDER_COLORS = ['#8FD3C1', '#E9C46A'];
 
 type Part = string | { spoiler: string };
 type Message = {
@@ -51,53 +50,47 @@ type Message = {
 const MESSAGES: Message[] = [
   {
     id: 'm1',
-    from: { name: 'Mike', color: SENDER_COLORS[1]! },
-    parts: ['big news. ', { spoiler: 'callstack just bought margelo' }],
+    from: { name: 'Ines', color: SENDER_COLORS[1]! },
+    parts: ['finished the book. ', { spoiler: 'the lighthouse keeper did it' }],
     time: '10:41',
   },
   {
     id: 'm2',
-    from: { name: 'Marc', color: SENDER_COLORS[0]! },
-    parts: ['can confirm. ', { spoiler: 'i work for mike now' }],
+    from: { name: 'Theo', color: SENDER_COLORS[0]! },
+    parts: ['same here. ', { spoiler: 'i cried on the train' }],
     time: '10:41',
   },
   {
     id: 'm3',
     from: 'me',
-    parts: ['congrats lol. so who is next'],
+    parts: ['careful, i am only on chapter nine'],
     time: '10:42',
   },
   {
     id: 'm4',
-    from: { name: 'Mike', color: SENDER_COLORS[1]! },
-    parts: ['software mansion?'],
+    from: { name: 'Ines', color: SENDER_COLORS[1]! },
+    parts: ['tap at your own risk then'],
     time: '10:42',
   },
   {
     id: 'm5',
     from: 'me',
     parts: [
-      'not for sale. ',
-      {
-        spoiler:
-          'someone tried once. we laughed and shipped another reanimated release instead',
-      },
+      'just tell me one thing. ',
+      { spoiler: 'does the dog make it to the last page' },
     ],
     time: '10:43',
   },
   {
     id: 'm6',
-    from: { name: 'Marc', color: SENDER_COLORS[0]! },
-    parts: ['marc, marcin, mike. anyone else noticed'],
+    from: { name: 'Theo', color: SENDER_COLORS[0]! },
+    parts: ['the dog is fine'],
     time: '10:44',
   },
   {
     id: 'm7',
     from: 'me',
-    parts: [
-      'yep. want to found an rn agency? ',
-      { spoiler: 'your name has to start with M. no exceptions' },
-    ],
+    parts: ['good. ', { spoiler: 'now i can sleep tonight, thank you both' }],
     time: '10:44',
   },
 ];
@@ -180,7 +173,7 @@ function Body({
       <View style={[styles.meta, metaInvisible && styles.invisible]}>
         <Text style={styles.time}>{msg.time}</Text>
         {msg.from === 'me' && (
-          <Icon source={ICONS.checks} size={16} color="#fff" />
+          <Icon source={ICONS.check} size={13} color="#fff" />
         )}
       </View>
     </View>
@@ -342,32 +335,27 @@ export default function TelegramSpoilerScreen() {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <View style={styles.headerRow}>
           <Pressable
-            style={styles.circle}
+            style={styles.backButton}
             onPress={() => navigation.goBack()}
             accessibilityRole="button"
             accessibilityLabel="Back"
           >
             <Icon source={ICONS.back} size={22} />
           </Pressable>
-          <View style={styles.titlePill}>
-            <Text style={styles.title}>RN Agencies (unofficial)</Text>
-            <Text style={styles.subtitle}>3 members</Text>
-          </View>
           <Image source={TG_AVATAR_PHOTO} style={styles.avatar} />
+          <View>
+            <Text style={styles.title}>Book Club</Text>
+            <Text style={styles.subtitle}>3 people</Text>
+          </View>
         </View>
       </View>
 
       <View style={[styles.composer, { paddingBottom: insets.bottom + 6 }]}>
-        <View style={styles.circle}>
-          <Icon source={ICONS.paperclip} size={26} color="#8e8e93" />
-        </View>
+        <Icon source={ICONS.plus} size={24} color={TG_MUTED} />
         <View style={styles.input}>
-          <Text style={styles.placeholder}>Message</Text>
-          <Icon source={ICONS.sticker} size={26} color="#8e8e93" />
+          <Text style={styles.placeholder}>Write something</Text>
         </View>
-        <View style={styles.circle}>
-          <Icon source={ICONS.mic} size={26} color="#fff" />
-        </View>
+        <Icon source={ICONS.mic} size={24} color={TG_MUTED} />
       </View>
     </View>
   );
@@ -385,16 +373,13 @@ const styles = StyleSheet.create({
   },
   chip: {
     alignSelf: 'center',
-    backgroundColor: 'rgba(32,24,30,0.85)',
-    borderRadius: 14,
-    paddingHorizontal: 10,
     paddingVertical: 5,
   },
   chipGap: {
     marginTop: 10,
   },
   chipText: {
-    color: '#fff',
+    color: TG_MUTED,
     fontSize: 13,
     fontWeight: '500',
   },
@@ -409,26 +394,26 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   // The canvas fills the bubble and is clipped by it, so the burst never
-  // spills sparks onto the wallpaper; Telegram keeps them inside the bubble.
+  // spills sparks onto the wallpaper.
   bubble: {
     maxWidth: '78%',
     borderRadius: BUBBLE_RADIUS,
-    borderBottomRightRadius: 4,
+    borderTopRightRadius: 3,
     overflow: 'hidden',
   },
   bubbleIn: {
-    borderBottomRightRadius: BUBBLE_RADIUS,
-    borderBottomLeftRadius: 4,
+    borderTopRightRadius: BUBBLE_RADIUS,
+    borderTopLeftRadius: 3,
   },
   bubbleBg: {
     ...StyleSheet.absoluteFill,
     borderRadius: BUBBLE_RADIUS,
-    borderBottomRightRadius: 4,
+    borderTopRightRadius: 3,
     backgroundColor: TG_BUBBLE,
   },
   bubbleBgIn: {
-    borderBottomRightRadius: BUBBLE_RADIUS,
-    borderBottomLeftRadius: 4,
+    borderTopRightRadius: BUBBLE_RADIUS,
+    borderTopLeftRadius: 3,
     backgroundColor: TG_INCOMING,
   },
   bubbleContent: {
@@ -479,27 +464,18 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
+    backgroundColor: TG_PILL,
   },
   headerRow: {
     height: 52,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    gap: 10,
+    paddingHorizontal: 8,
   },
-  circle: {
-    width: 44,
+  backButton: {
+    width: 36,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: TG_PILL,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titlePill: {
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: TG_PILL,
-    paddingHorizontal: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -514,9 +490,9 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
   },
 
   // Composer
@@ -526,29 +502,22 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     paddingTop: 6,
-    paddingHorizontal: 8,
+    paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(255,255,255,0.12)',
+    gap: 12,
+    backgroundColor: TG_PILL,
   },
   input: {
     flex: 1,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#181818',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: 14,
-    paddingRight: 10,
-    justifyContent: 'space-between',
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: '#1B2422',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
   },
   placeholder: {
-    color: '#7c7c7c',
-    fontSize: 17,
+    color: TG_MUTED,
+    fontSize: 16,
   },
 });

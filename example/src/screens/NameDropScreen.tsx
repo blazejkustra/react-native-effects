@@ -21,17 +21,15 @@ import { useParamsSynchronizable } from 'react-native-effects';
 import NameDropWave, { HOME_ATLAS } from '../components/namedrop/NameDropWave';
 import PosterReveal from '../components/namedrop/PosterReveal';
 import ContactPoster, {
-  type ExchangeChoice,
   type PosterHandle,
 } from '../components/namedrop/ContactPoster';
 
-/** Downward drag (pt) that counts as bringing the other phone close. */
+/** Downward drag (pt) that starts the wave. */
 const TRIGGER_DRAG = 70;
-/** Seconds from contact until the poster is fully on screen. */
+/** Seconds from the start until the poster is fully on screen. */
 const REVEAL_SECONDS = 2.42;
-const RESET_AFTER_CHOICE_MS = 1600;
 
-type Phase = 'home' | 'exchanging' | 'poster';
+type Phase = 'home' | 'wave' | 'poster';
 
 type NameDropDevHooks = {
   __nameDrop?: () => void;
@@ -51,19 +49,16 @@ async function snapshotPoster(view: PosterHandle) {
 }
 
 /**
- * NameDrop: drag down from the top of the home screen (or tap it) to bring
- * the other iPhone close. A coloured glow climbs the screen and pools under
- * the Dynamic Island, a liquid wave of light bursts out of it, and the other
- * person's "Share Your Contact" poster swells into focus. Tap it to go back.
+ * An animation on an invented home screen: drag down from the top (or tap) and
+ * a coloured glow climbs the screen and pools under the cut-out, a liquid wave
+ * of light bursts out of it, and a poster swells into focus. Tap it to go back.
  */
 export default function NameDropScreen() {
   const { width, height } = useWindowDimensions();
   const [phase, setPhase] = useState<Phase>('home');
-  const [choice, setChoice] = useState<ExchangeChoice>(null);
   const [snapshot, setSnapshot] = useState<string | null>(null);
   const { paramsSynchronizable } = useParamsSynchronizable([0, 0, 0, 0]);
   const posterRef = useRef<PosterHandle>(null);
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isPlaying = useRef(false);
   const clock = useSharedValue(0);
   const cover = useSharedValue(1);
@@ -78,8 +73,6 @@ export default function NameDropScreen() {
   const stopClock = useCallback(() => {
     cancelAnimation(clock);
     isPlaying.current = false;
-    if (resetTimer.current !== null) clearTimeout(resetTimer.current);
-    resetTimer.current = null;
   }, [clock]);
 
   useEffect(() => stopClock, [stopClock]);
@@ -92,8 +85,7 @@ export default function NameDropScreen() {
   const play = useCallback(() => {
     stopClock();
     isPlaying.current = true;
-    setChoice(null);
-    setPhase('exchanging');
+    setPhase('wave');
     cover.value = 1;
     clock.value = 0;
     clock.value = withTiming(
@@ -117,22 +109,14 @@ export default function NameDropScreen() {
     cover.value = withTiming(1, { duration: 320 });
   }, [stopClock, cover, clock]);
 
-  const choose = useCallback(
-    (picked: 'share' | 'receive') => {
-      setChoice(picked);
-      resetTimer.current = setTimeout(goHome, RESET_AFTER_CHOICE_MS);
-    },
-    [goHome]
-  );
-
   const captureSnapshot = useCallback(() => {
     if (!posterRef.current) return;
     snapshotPoster(posterRef.current)
       .then(setSnapshot)
-      .catch((e) => console.warn('[NameDrop] poster snapshot failed:', e));
+      .catch((e) => console.warn('[Wave Reveal] poster snapshot failed:', e));
   }, []);
 
-  // `__nameDrop()` plays the exchange, `__nameDropWaveAt(seconds)` freezes
+  // `__nameDrop()` plays the wave, `__nameDropWaveAt(seconds)` freezes
   // it at one moment and `__nameDropSpeed(factor | null)` slows it down.
   useEffect(() => {
     if (!__DEV__) return;
@@ -142,7 +126,7 @@ export default function NameDropScreen() {
       stopClock();
       clock.value = seconds;
       const done = seconds >= REVEAL_SECONDS;
-      setPhase(done ? 'poster' : 'exchanging');
+      setPhase(done ? 'poster' : 'wave');
       cover.value = done ? 0 : 1;
     };
     g.__nameDropSpeed = (factor) => {
@@ -181,8 +165,6 @@ export default function NameDropScreen() {
           ref={posterRef}
           width={width}
           height={height}
-          choice={choice}
-          onChoose={choose}
           onAvatarLoad={captureSnapshot}
         />
       </Pressable>

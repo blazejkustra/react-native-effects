@@ -16,17 +16,20 @@ import { useCandlePhysics } from '../hooks/useCandlePhysics';
 const CAKE = require('../../assets/candle/cake.jpg');
 
 /**
+ * "3rd birthday cake" from Unsplash, CC0, via Wikimedia Commons, extended and
+ * retouched by `assets/tools/generate-assets.py`.
+ *
  * The cake photo, in its own pixels. The flame and wick in the original have
  * been painted out; the shader puts them back at `WICK_TIP`, which is where the
  * photographed wick ended. `CANDLE_TOP` is where the wax starts.
  */
 const IMG_W = 730;
 const IMG_H = 1043;
-const WICK_TIP = { x: 378, y: 290 };
-const CANDLE_TOP_Y = 313;
+const WICK_TIP = { x: 365, y: 488 };
+const CANDLE_TOP_Y = 522;
 /** Flame size in image pixels, matched to the flame that was painted out. */
-const FLAME_H = 124;
-const FLAME_W = 26;
+const FLAME_H = 110;
+const FLAME_W = 24;
 const WICK_R = 1.8;
 
 /**

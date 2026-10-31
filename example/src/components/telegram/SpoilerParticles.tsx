@@ -19,12 +19,12 @@ type SpoilerParticlesProps = Omit<
    * its alpha is the exact per-line band the cloud has to cover.
    */
   maskRect: SpoilerRect;
-  /** Particle colour; near-white on Telegram's dark theme. */
+  /** Particle colour. */
   color?: ColorInput;
 };
 
 /**
- * Telegram's hidden-text cloud: a dense field of tiny sparks drifting over the
+ * The hidden-text cloud: a dense field of tiny sparks drifting over the
  * lines of a spoiler span, blown outward from the tap when it is revealed.
  *
  * One particle per ~1.9 pt cell; each wanders on two slow sines and pulses in

@@ -18,7 +18,8 @@ import ScratchCoating, {
 } from '../components/scratchoff/ScratchCoating';
 import { useScratchCard } from '../hooks/useScratchCard';
 
-const PRIZES = ['$5', '$20', '$50', '$500'];
+const POINTS = ['10 pts', '20 pts', '50 pts', '100 pts'];
+const SYMBOL_NAMES = ['stars', 'clovers', 'diamonds', 'hearts'] as const;
 
 type Ticket = {
   symbols: readonly [PrizeSymbol, PrizeSymbol, PrizeSymbol, PrizeSymbol];
@@ -39,14 +40,14 @@ function makeTicket(): Ticket {
   const row: PrizeSymbol[] = win
     ? [main, main, main]
     : [main, main, pick(others)].sort(() => Math.random() - 0.5);
-  const prize = pick(PRIZES);
+  const prize = pick(POINTS);
   const serial = Array.from({ length: 3 }, () =>
     Math.floor(1000 + Math.random() * 9000)
   ).join(' ');
   return {
     symbols: [row[0]!, row[1]!, row[2]!, pick<PrizeSymbol>([0, 1, 2, 3])],
-    amounts: win ? [prize, prize, prize] : row.map(() => pick(PRIZES)),
-    bonus: pick(['$2', '$10', '$25']),
+    amounts: win ? [prize, prize, prize] : row.map(() => pick(POINTS)),
+    bonus: pick(['+5 pts', '+10 pts', '+25 pts']),
     serial,
     win,
   };
@@ -91,13 +92,8 @@ export default function ScratchOffScreen() {
         <View style={styles.frame}>
           <View style={styles.head}>
             <View>
-              <Text style={styles.title}>Clover Cash</Text>
-              <Text style={styles.subtitle}>
-                Match three symbols, win that prize.
-              </Text>
-            </View>
-            <View style={styles.price}>
-              <Text style={styles.priceText}>$5</Text>
+              <Text style={styles.title}>Lucky Clover</Text>
+              <Text style={styles.subtitle}>Find three matching symbols.</Text>
             </View>
           </View>
 
@@ -128,13 +124,15 @@ export default function ScratchOffScreen() {
 
           <View style={styles.foot}>
             <Text style={styles.fine}>No. {ticket.serial}</Text>
-            <Text style={styles.fine}>Void if altered</Text>
+            <Text style={styles.fine}>Just for fun</Text>
           </View>
         </View>
       </View>
 
       <Text style={[styles.result, !done && styles.hidden]}>
-        {ticket.win ? `You won ${ticket.amounts[0]}` : 'Not this time'}
+        {ticket.win
+          ? `You found three ${SYMBOL_NAMES[ticket.symbols[0]]}`
+          : 'Not this time'}
       </Text>
 
       <Pressable
@@ -201,22 +199,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#55635a',
     marginTop: 4,
-  },
-  price: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#b8892b',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#e2c27a',
-  },
-  priceText: {
-    fontFamily: SERIF,
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#fffaf0',
   },
   play: {
     width: PLAY_W,

@@ -6,7 +6,7 @@ export default function SiriOrbScreen() {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/iphone-background.png')}
+        source={require('../../assets/home/home-screen.jpg')}
         style={styles.backgroundImage}
         resizeMode="contain"
       />

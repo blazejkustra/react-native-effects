@@ -2,6 +2,7 @@ import { type ComponentRef, useMemo, useRef } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import CrackedGlass from '../components/cracks/CrackedGlass';
+import EffectCaption from '../components/cracks/EffectCaption';
 import LockScreen from '../components/cracks/LockScreen';
 import { useCrackedGlass } from '../components/cracks/useCrackedGlass';
 import { useSnapshotTexture } from '../components/cracks/useSnapshotTexture';
@@ -12,14 +13,10 @@ import { useSnapshotTexture } from '../components/cracks/useSnapshotTexture';
  * (https://commons.wikimedia.org/wiki/File:Seaside_swing_at_dusk_(Unsplash).jpg).
  */
 const WALLPAPER = require('../../assets/cracks/swing.jpg');
-const NOTIFICATION = {
-  title: 'Mom',
-  body: 'Did you drop your phone again? Your screen looked weird on FaceTime',
-};
 
 /**
- * Tap anywhere and the cover glass breaks where you hit it. Long press to put
- * a fresh screen on.
+ * Tap anywhere and the glass breaks where you hit it. Long press to put a
+ * fresh pane on.
  */
 export default function CrackedScreenScreen() {
   const lockRef = useRef<ComponentRef<typeof View>>(null);
@@ -47,12 +44,7 @@ export default function CrackedScreenScreen() {
       <StatusBar hidden />
       <GestureDetector gesture={gesture}>
         <View style={styles.fill} collapsable={false}>
-          <LockScreen
-            ref={lockRef}
-            wallpaper={WALLPAPER}
-            notification={NOTIFICATION}
-            onLayout={schedule}
-          />
+          <LockScreen ref={lockRef} wallpaper={WALLPAPER} onLayout={schedule} />
           {uri ? (
             <CrackedGlass
               textureUri={uri}
@@ -61,6 +53,7 @@ export default function CrackedScreenScreen() {
               pointerEvents="none"
             />
           ) : null}
+          <EffectCaption />
         </View>
       </GestureDetector>
     </View>

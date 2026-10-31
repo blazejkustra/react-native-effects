@@ -9,7 +9,7 @@ type Props = {
 };
 
 /**
- * iMessage's Lasers: coloured beams fan up from below the screen and sweep
+ * Lasers: coloured beams fan up from below the screen and sweep
  * across the chat through a thin haze. Each beam is a soft line with a wide
  * glow; the fan breathes rather than strobes, and the whole thing fades in
  * and out so it reads as a light show, not a flicker.

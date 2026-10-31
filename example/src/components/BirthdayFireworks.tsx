@@ -9,7 +9,7 @@ type Props = ViewProps & {
 };
 
 /**
- * The iOS birthday-notification banner: glitter-dust fireworks popping at
+ * A birthday banner: glitter-dust fireworks popping at
  * random spots in the dark, behind the notification text. Each burst is an
  * expanding sphere of twinkling sparkle cells — no particles, just a hashed
  * glitter field gated by the shell's radius — with a brief white flash at
@@ -17,7 +17,7 @@ type Props = ViewProps & {
  * silver, gold) picked per burst.
  */
 export default function BirthdayFireworks({
-  caption = 'Birthday · Found in Contacts',
+  caption = 'Birthday · From your calendar',
   title = 'Today, Jun 9',
   style,
   ...rest
@@ -76,7 +76,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
   );
 
   // Six launchers on offset clocks → a few distinct balls in flight, with
-  // black space between them like the real notification.
+  // black space between them.
   for (var i = 0; i < 6; i = i + 1) {
     let fi = f32(i);
     let period = 2.9 + 1.7 * fract(fi * 0.6180339);

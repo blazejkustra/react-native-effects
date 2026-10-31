@@ -12,7 +12,7 @@ import { ShaderView, type ParamsSynchronizable } from 'react-native-effects';
 
 const GLYPH = require('../../../assets/flashlight/torch-glyph.png');
 
-/** The hardware Dynamic Island cut-out, measured on the iPhone 18 Pro Max. */
+/** The hardware cut-out, measured on a large phone. */
 export const ISLAND = { width: 95, height: 37, top: 14 };
 /** The expanded torch control, scaled from the iOS 18 screenshots. */
 export const PANEL = { width: 220, height: 318, top: 8, radius: 48 };
@@ -48,7 +48,7 @@ type TorchIslandProps = {
 };
 
 /**
- * The iOS 18 flashlight Dynamic Island: a plain island while the torch is
+ * A flashlight control at the top of the screen: a plain island while the torch is
  * off, a compact pill with the torch glyph once it is on, and the expanded
  * control (a top-down torch whose beam, solid arc and sun mark follow the
  * beam width and intensity). Drag across it to shape the beam, tap it to

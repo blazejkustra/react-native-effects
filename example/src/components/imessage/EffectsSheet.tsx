@@ -28,9 +28,9 @@ type Props = {
 };
 
 /**
- * The "Send with effect" sheet: the pending message shown as a real bubble
- * and the screen effects in a pager, each previewing on the bubble the way
- * iMessage previews before you commit. The arrow sends with the effect.
+ * The effect picker: the pending message shown as a real bubble and the screen
+ * effects in a pager, each previewing on the bubble before you commit. The
+ * arrow sends with the effect.
  */
 export default function EffectsSheet({ text, onClose, onSend }: Props) {
   const insets = useSafeAreaInsets();
@@ -89,7 +89,7 @@ export default function EffectsSheet({ text, onClose, onSend }: Props) {
   return (
     <View style={styles.root}>
       <View style={[styles.top, { paddingTop: insets.top + 8 }]}>
-        <Text style={styles.title}>Send with effect</Text>
+        <Text style={styles.title}>Pick an effect</Text>
         <Pressable
           onPress={onClose}
           style={styles.close}
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   send: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 10,
     backgroundColor: IM_BLUE,
     alignItems: 'center',
     justifyContent: 'center',

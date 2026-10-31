@@ -8,41 +8,40 @@ import {
   type ScreenEffectId,
 } from '../components/imessage/types';
 
-// iMessage starts the screen effect a beat after the bubble lands, so the eye
-// has something to anchor the effect to.
+// The screen effect starts a beat after the bubble lands, so the eye has
+// something to anchor it to.
 export const EFFECT_START_DELAY_MS = 150;
 
-// A scripted demo. It opens with one text from Kacper; each effect has its
-// own line from "me" written to match the effect's energy, and Kacper answers
-// a beat later, except after the spotlight, which needs the last word.
-// Fond, not bitter: the jokes are about the reasoning, not the people.
-const OPENER = 'shopify is going back to native 💀';
+// A scripted demo. It opens with one text from Noa; each effect has its own
+// line from "me" written to match the effect's energy, and Noa answers a beat
+// later, except after the spotlight, which needs the last word.
+const OPENER = 'guess who got the apartment 🔑';
 
 type Step = { effect: ScreenEffectId; me: string; reply: string | null };
 const STEPS: Step[] = [
   {
     effect: 'echo',
-    me: 'back to native? from what, react NATIVE?',
-    reply: 'their whole point is agents can port anything now',
+    me: 'wait, the one with the balcony?',
+    reply: 'the one with the balcony',
   },
   {
     effect: 'lasers',
-    me: 'great. tell the agents to port it back',
-    reply: 'they rebuilt shop in 12 weeks though',
+    me: 'send me the address. i am bringing plants',
+    reply: 'small plants only please',
   },
   {
     effect: 'fireworks',
-    me: '12 weeks and zero pod installs. jealous honestly',
-    reply: 'still shipping flashlist fixes though',
+    me: 'small plants, big party',
+    reply: 'saturday at eight?',
   },
   {
     effect: 'confetti',
-    me: "flashlist does 1M a week. you don't just leave that",
-    reply: 'so what do we do',
+    me: 'saturday at eight. i will bring cake',
+    reply: 'what kind of cake',
   },
   {
     effect: 'spotlight',
-    me: 'keep shipping. react native for the win',
+    me: 'the best kind',
     reply: null,
   },
 ];
@@ -50,19 +49,19 @@ const STEPS: Step[] = [
 /** The effects in the order the demo means them to be used. */
 export const DEMO_ORDER: ScreenEffectId[] = STEPS.map((s) => s.effect);
 
-/** The beat between the effect ending and Kacper's reply landing. */
+/** The beat between the effect ending and Noa's reply landing. */
 export const REPLY_DELAY_MS = 450;
 /** If an effect never reports finishing, reply anyway after this long. */
 const REPLY_FALLBACK_MS = 8000;
 
 /** What a button or the debug hook sends once the script has run out. */
 export const DEFAULT_TEXT: Record<EffectId, string> = {
-  none: 'hello from the new architecture',
-  echo: 'back to native',
-  spotlight: 'read the january post again',
-  confetti: 'skia hit 2M downloads a week 🎉',
-  fireworks: 'new arch is the default now',
-  lasers: 'hermes go brrr',
+  none: 'hello there',
+  echo: 'say that again',
+  spotlight: 'all eyes on this one',
+  confetti: 'we did it 🎉',
+  fireworks: 'happy new year',
+  lasers: 'pew pew',
 };
 
 export type Playing = {
@@ -128,7 +127,7 @@ function stamp() {
  * The conversation and the one screen effect that can play at a time. `send`
  * appends a real bubble; when it carries a screen effect, the effect starts
  * once the bubble has laid out and reported where it is (and, for echo, has
- * been snapshotted), never sooner than the iMessage beat.
+ * been snapshotted), never sooner than the start delay.
  */
 export function useIMessageEffects() {
   const [messages, setMessages] = useState<Message[]>(() => [
@@ -139,7 +138,7 @@ export function useIMessageEffects() {
   // Steps already spoken; a second press of the same effect falls back to
   // the default line and gets no reply.
   const spoken = useRef(new Set<ScreenEffectId>());
-  // Kacper's next line, held until the effect has finished playing. While it
+  // Noa's next line, held until the effect has finished playing. While it
   // is held, presses are ignored so a quick run of taps cannot post three
   // lines before his first answer lands.
   const pendingReply = useRef<{
@@ -210,7 +209,7 @@ export function useIMessageEffects() {
           }, wait);
         });
       }
-      // Kacper waits for the effect to end (finishPlaying schedules the
+      // Noa waits for the effect to end (finishPlaying schedules the
       // delivery), with a fallback in case it never reports back.
       if (reply !== null) {
         setBusy(true);

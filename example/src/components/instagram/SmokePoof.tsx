@@ -14,7 +14,7 @@ type SmokePoofProps = Omit<
 
 /**
  * A single grey smoke puff that bursts out of the centre, billows, drifts
- * up-left and thins into wisps — the "poof" Instagram plays when a voice
+ * up-left and thins into wisps, the "poof" that plays when a voice
  * message is discarded. Progress is pushed through the live channel so a
  * Reanimated timing curve drives it frame-accurately.
  */

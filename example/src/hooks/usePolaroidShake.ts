@@ -26,7 +26,7 @@ type ShakeSim = {
 type DebugGlobal = { __polaroidShake?: (level: number | null) => void };
 
 /**
- * Shaking the phone like a Polaroid picture.
+ * Shaking the phone like an instant print.
  *
  * Reads the accelerometer: anything beyond gravity is shake, run through an
  * envelope into `level` (0..1), which the screen uses to speed development a

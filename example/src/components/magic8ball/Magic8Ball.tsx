@@ -13,10 +13,10 @@ type Props = ViewProps & {
 };
 
 /**
- * A Magic 8-ball you shake for an answer.
+ * A mystic ball you shake for an answer.
  *
  * One opaque full-screen pass: a studio backdrop, the glossy black sphere with
- * its printed 8, the moulded bezel, the domed glass, and the window — murky
+ * its printed 7, the moulded bezel, the domed glass, and the window, murky
  * blue fluid and the answer die floating up through it.
  *
  * Everything shiny is lit by ONE environment (`envColor`): a rectangular
@@ -40,7 +40,7 @@ export default function Magic8Ball({
 }: Props) {
   return (
     <ShaderView
-      fragmentShader={MAGIC_8_BALL_SHADER}
+      fragmentShader={MYSTIC_BALL_SHADER}
       params={params}
       paramsSynchronizable={paramsSynchronizable}
       {...viewProps}
@@ -48,7 +48,7 @@ export default function Magic8Ball({
   );
 }
 
-const MAGIC_8_BALL_SHADER = /* wgsl */ `
+const MYSTIC_BALL_SHADER = /* wgsl */ `
 struct Uniforms {
   resolution: vec4<f32>,
   time:       vec4<f32>,
@@ -172,8 +172,10 @@ fn mirror(n: vec3<f32>) -> vec3<f32> {
 }
 
 /** Circle outline, signed. Positive outside the stroke. */
-fn ringField(q: vec2<f32>, rad: f32, th: f32) -> f32 {
-  return abs(length(q) - rad) - th;
+fn segmentField(p: vec2<f32>, a: vec2<f32>, b: vec2<f32>) -> f32 {
+  let pa = p - a;
+  let ba = b - a;
+  return length(pa - ba * clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0));
 }
 
 /**
@@ -314,7 +316,7 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
     // Bounce off the floor into the shaded underside.
     bc = bc + vec3<f32>(0.030, 0.031, 0.036) * smoothstep(-0.45, -1.0, p.y);
 
-    // ---- The white 8, printed on the pole turned away from us. ----
+    // ---- The white 7, printed on the pole turned away from us. ----
     // Done on the SPHERE, not as a squashed ellipse in screen space: the decal
     // is a cap of directions around a pole, and its coordinates are the
     // normal's components in that pole's tangent frame. Foreshortening then
@@ -335,9 +337,9 @@ fn main(@location(0) ndc: vec2<f32>) -> @location(0) vec4<f32> {
       var dc = vec3<f32>(0.78, 0.785, 0.80) * (0.26 + 0.74 * ndl);
       dc = dc + envColor(mirror(n), 0.16) * fres(n.z) * 0.55;
       bc = mix(bc, dc, disc);
-      let top = ringField(gp - vec2<f32>(0.0, 0.255), 0.215, 0.080);
-      let bot = ringField(gp - vec2<f32>(0.0, -0.275), 0.265, 0.088);
-      let glyph = smoothstep(-ge, ge, -min(top, bot)) * disc;
+      let bar = segmentField(gp, vec2<f32>(-0.34, 0.46), vec2<f32>(0.34, 0.46)) - 0.085;
+      let stem = segmentField(gp, vec2<f32>(0.34, 0.46), vec2<f32>(-0.14, -0.52)) - 0.085;
+      let glyph = smoothstep(-ge, ge, -min(bar, stem)) * disc;
       bc = mix(bc, vec3<f32>(0.055, 0.055, 0.065) * (0.4 + 0.6 * ndl), glyph);
     }
 

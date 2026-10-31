@@ -37,7 +37,7 @@ function approach(current: number, target: number, rate: number, dt: number) {
 
 /**
  * The iOS 18 torch in a dark corridor. The lock-screen button switches it on
- * and the Dynamic Island grows into the flashlight control: drag up/down on
+ * and the top of the screen grows into the flashlight control: drag up/down on
  * it for intensity and left/right for beam width; the spot on the photo
  * follows, and tilting the phone sweeps it across the corridor.
  */

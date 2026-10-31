@@ -37,7 +37,6 @@ import ParticleDissolve, {
 } from '../components/telegram/ParticleDissolve';
 import {
   TG_AVATAR_PHOTO,
-  TG_BLUE,
   TG_BUBBLE,
   TG_ICONS as ICONS,
   TG_MENU,
@@ -47,31 +46,30 @@ import {
   TG_RED,
 } from '../components/telegram/icons';
 
-// Telegram group chat clone (dark theme, purple accent). Long-press a message,
-// Delete → "Delete for everyone", and the bubble is snapshotted into a texture
-// and dissolved into particles by ParticleDissolve.
+// A made-up group chat. Long-press a message, Delete, confirm, and the bubble
+// is snapshotted into a texture and dissolved into particles by
+// ParticleDissolve.
 
 const DISSOLVE_MS = 1150; // sweep + drift, measured off the recording
 const SWAP_MS = 80; // frames for the canvas to draw before the bubble hides
 const REMOVE_AT = 0.45; // list reflows while the dust is still drifting
 // Canvas padding around the bubble so drifting particles are not clipped.
 const PAD = { left: 170, top: 130, right: 30, bottom: 60 };
-const BUBBLE_RADIUS = 17;
-const REACTIONS = ['❤️', '👍', '👎', '🔥', '🥰', '👏', '😁'];
+const BUBBLE_RADIUS = 13;
 const MENU_GAP = 10; // bubble → menu
 const LIFT_MS = 280; // message rises to meet the menu / settles back
 // Rows slide into place when a message leaves the list.
 const LAYOUT = LinearTransition.duration(340).easing(
   Easing.inOut(Easing.cubic)
 );
-const MENU_H = 8 * 44 + 2 * 6;
+const MENU_H = 3 * 44;
 
 type Message = { id: string; text: string; time: string };
 
 const INITIAL_MESSAGES: Message[] = [
-  { id: 'm1', text: 'Expo Go is enough for prod, right?', time: '20:56' },
-  { id: 'm2', text: 'can we just use Flutter', time: '20:56' },
-  { id: 'm3', text: 'wrong chat sorry', time: '20:57' },
+  { id: 'm1', text: 'who is bringing the tent?', time: '20:56' },
+  { id: 'm2', text: 'i thought you had it', time: '20:56' },
+  { id: 'm3', text: 'wrong chat, sorry', time: '20:57' },
 ];
 
 function Icon({
@@ -114,8 +112,7 @@ function measure(view: ViewHandle): Promise<DissolveRect> {
 }
 
 /**
- * An outgoing Telegram bubble. `capture()` snapshots the whole bubble (purple
- * body + text) to a transparent PNG so the particle pass dissolves it as one.
+ * An outgoing bubble. `capture()` snapshots the whole bubble (body + text) to a transparent PNG so the particle pass dissolves it as one.
  */
 const Bubble = forwardRef<
   BubbleHandle,
@@ -171,7 +168,7 @@ const Bubble = forwardRef<
           <Text style={styles.bubbleText}>{msg.text}</Text>
           <View style={styles.meta}>
             <Text style={styles.time}>{msg.time}</Text>
-            <Icon source={ICONS.checks} size={16} color="#fff" />
+            <Icon source={ICONS.check} size={13} color="#fff" />
           </View>
         </View>
       </View>
@@ -253,7 +250,7 @@ export default function TelegramDissolveScreen() {
     }
   );
 
-  // 0 = message at its place in the list, 1 = lifted under the reactions bar.
+  // 0 = message at its place in the list, 1 = lifted above the menu.
   // Also drives the dim, so the whole overlay settles back together.
   const lift = useSharedValue(0);
 
@@ -342,7 +339,7 @@ export default function TelegramDissolveScreen() {
       if (startTimer.current) {
         return;
       }
-      // Let the message settle back into the list first, like Telegram.
+      // Let the message settle back into the list first.
       await closeMenu();
       // The warmed-up canvas now draws the intact snapshot exactly over the
       // real bubble; give it a couple of frames, then hide the real one and run.
@@ -372,8 +369,8 @@ export default function TelegramDissolveScreen() {
 
   const menuMsg = menu ? messages.find((m) => m.id === menu.id) : undefined;
 
-  // Telegram lifts the message so the menu fits under it; mirror that by
-  // shifting the clone, reactions and menu together.
+  // Lift the message so the menu fits under it, moving the clone and the menu
+  // together.
   // The lift is sized for the full menu so the bubble does not jump when the
   // shorter confirm sheet replaces it.
   const menuTop = menu
@@ -404,7 +401,7 @@ export default function TelegramDissolveScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.thread,
-          { paddingTop: headerHeight + 60, paddingBottom: insets.bottom + 70 },
+          { paddingTop: headerHeight + 16, paddingBottom: insets.bottom + 70 },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -414,33 +411,13 @@ export default function TelegramDissolveScreen() {
             style={styles.infoCard}
             onPress={restore}
           >
-            <Text style={styles.infoTitle}>You created a group</Text>
-            <Text style={styles.infoSub}>Groups can have:</Text>
-            {[
-              'Up to 200,000 members',
-              'Persistent chat history',
-              'Public links such as t.me/title',
-              'Admins with different rights',
-            ].map((line) => (
-              <Text key={line} style={styles.infoLine}>
-                ✓ {line}
-              </Text>
-            ))}
+            <Text style={styles.infoTitle}>All clear</Text>
             <Text style={styles.infoHint}>Tap to bring the messages back</Text>
           </AnimatedPressable>
         ) : (
           <>
             <Animated.View layout={LAYOUT} style={styles.chip}>
               <Text style={styles.chipText}>Today</Text>
-            </Animated.View>
-            <Animated.View
-              layout={LAYOUT}
-              style={[styles.chip, styles.chipGap]}
-            >
-              <Text style={styles.chipText}>
-                <Text style={styles.chipBold}>Blazej Kustra</Text> created the
-                group "Expo Enjoyers"
-              </Text>
             </Animated.View>
             {messages.map((m) => (
               <Animated.View key={m.id} layout={LAYOUT}>
@@ -467,39 +444,28 @@ export default function TelegramDissolveScreen() {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <View style={styles.headerRow}>
           <Pressable
-            style={styles.circle}
+            style={styles.backButton}
             onPress={() => navigation.goBack()}
             accessibilityRole="button"
             accessibilityLabel="Back"
           >
             <Icon source={ICONS.back} size={22} />
           </Pressable>
-          <View style={styles.titlePill}>
-            <Text style={styles.title}>Expo Enjoyers</Text>
-            <Text style={styles.subtitle}>2137 members</Text>
-          </View>
           <Image source={TG_AVATAR_PHOTO} style={styles.avatar} />
-        </View>
-        <View style={styles.addMembers}>
-          <Text style={styles.addMembersText}>Add Members</Text>
-          <View style={styles.addMembersClose}>
-            <Icon source={ICONS.close} size={22} color={TG_BLUE} />
+          <View>
+            <Text style={styles.title}>Weekend Trip</Text>
+            <Text style={styles.subtitle}>4 people</Text>
           </View>
         </View>
       </View>
 
       {/* Composer */}
       <View style={[styles.composer, { paddingBottom: insets.bottom + 6 }]}>
-        <View style={styles.circle}>
-          <Icon source={ICONS.paperclip} size={26} color="#8e8e93" />
-        </View>
+        <Icon source={ICONS.plus} size={24} color={TG_MUTED} />
         <View style={styles.input}>
-          <Text style={styles.placeholder}>Message</Text>
-          <Icon source={ICONS.sticker} size={26} color="#8e8e93" />
+          <Text style={styles.placeholder}>Write something</Text>
         </View>
-        <View style={styles.circle}>
-          <Icon source={ICONS.mic} size={26} color="#fff" />
-        </View>
+        <Icon source={ICONS.mic} size={24} color={TG_MUTED} />
       </View>
 
       {/* Long-press context menu */}
@@ -519,54 +485,26 @@ export default function TelegramDissolveScreen() {
             <Bubble msg={menuMsg} cloneWidth={menu.rect.w} />
           </Animated.View>
           {menu.stage === 'menu' ? (
-            <>
-              <Animated.View
-                entering={ZoomIn.duration(220)}
-                style={[styles.absolute, styles.right, { top: menuTop - 62 }]}
-              >
-                <Animated.View style={[styles.reactions, dimStyle]}>
-                  {REACTIONS.map((e) => (
-                    <Text key={e} style={styles.reaction}>
-                      {e}
-                    </Text>
-                  ))}
-                  <View style={styles.reactionMore}>
-                    <Icon source={ICONS.chevron} size={16} />
-                  </View>
-                </Animated.View>
+            <Animated.View
+              entering={ZoomIn.duration(220)}
+              style={[
+                styles.absolute,
+                styles.right,
+                { top: menuTop + menu.rect.h + MENU_GAP },
+              ]}
+            >
+              <Animated.View style={[styles.menu, dimStyle]}>
+                <MenuItem icon={ICONS.reply} label="Reply" />
+                <MenuItem icon={ICONS.copy} label="Copy" />
+                <MenuItem
+                  icon={ICONS.delete}
+                  label="Delete"
+                  color={TG_RED}
+                  last
+                  onPress={() => setMenu({ ...menu, stage: 'confirm' })}
+                />
               </Animated.View>
-              <Animated.View
-                entering={ZoomIn.duration(220)}
-                style={[
-                  styles.absolute,
-                  styles.right,
-                  { top: menuTop + menu.rect.h + MENU_GAP },
-                ]}
-              >
-                <Animated.View style={[styles.menu, dimStyle]}>
-                  <MenuItem
-                    icon={ICONS.viewed}
-                    label="Nobody Viewed"
-                    color={TG_MUTED}
-                  />
-                  <View style={styles.menuGap} />
-                  <MenuItem icon={ICONS.reply} label="Reply" />
-                  <MenuItem icon={ICONS.copy} label="Copy" />
-                  <MenuItem icon={ICONS.edit} label="Edit" />
-                  <MenuItem icon={ICONS.pin} label="Pin" />
-                  <MenuItem icon={ICONS.forward} label="Forward" />
-                  <MenuItem
-                    icon={ICONS.delete}
-                    label="Delete"
-                    color={TG_RED}
-                    last
-                    onPress={() => setMenu({ ...menu, stage: 'confirm' })}
-                  />
-                  <View style={styles.menuGap} />
-                  <MenuItem icon={ICONS.select} label="Select" last />
-                </Animated.View>
-              </Animated.View>
-            </>
+            </Animated.View>
           ) : (
             <Animated.View
               entering={ZoomIn.duration(200)}
@@ -581,13 +519,10 @@ export default function TelegramDissolveScreen() {
                   style={[styles.confirmItem, styles.menuItemBorder]}
                   onPress={() => startDissolve(menu.id)}
                 >
-                  <Text style={styles.confirmText}>Delete for everyone</Text>
+                  <Text style={styles.confirmText}>Delete message</Text>
                 </Pressable>
-                <Pressable
-                  style={styles.confirmItem}
-                  onPress={() => startDissolve(menu.id)}
-                >
-                  <Text style={styles.confirmText}>Delete for me</Text>
+                <Pressable style={styles.confirmItem} onPress={dismissMenu}>
+                  <Text style={styles.keepText}>Keep it</Text>
                 </Pressable>
               </Animated.View>
             </Animated.View>
@@ -647,21 +582,12 @@ const styles = StyleSheet.create({
   },
   chip: {
     alignSelf: 'center',
-    backgroundColor: 'rgba(32,24,30,0.85)',
-    borderRadius: 14,
-    paddingHorizontal: 10,
     paddingVertical: 5,
   },
   chipText: {
-    color: '#fff',
+    color: TG_MUTED,
     fontSize: 13,
     fontWeight: '500',
-  },
-  chipBold: {
-    fontWeight: '700',
-  },
-  chipGap: {
-    marginTop: 6,
   },
 
   // Bubble
@@ -673,13 +599,13 @@ const styles = StyleSheet.create({
   bubble: {
     maxWidth: '78%',
     borderRadius: BUBBLE_RADIUS,
-    borderBottomRightRadius: 4,
+    borderTopRightRadius: 3,
     overflow: 'visible',
   },
   bubbleBg: {
     ...StyleSheet.absoluteFill,
     borderRadius: BUBBLE_RADIUS,
-    borderBottomRightRadius: 4,
+    borderTopRightRadius: 3,
     backgroundColor: TG_BUBBLE,
   },
   bubbleContent: {
@@ -716,8 +642,8 @@ const styles = StyleSheet.create({
     marginBottom: 'auto',
     marginTop: 40,
     width: 300,
-    backgroundColor: 'rgba(28,22,28,0.92)',
-    borderRadius: 18,
+    backgroundColor: TG_MENU,
+    borderRadius: 13,
     paddingHorizontal: 18,
     paddingVertical: 16,
   },
@@ -728,21 +654,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 8,
   },
-  infoSub: {
-    color: '#fff',
-    fontSize: 15,
-    marginBottom: 6,
-  },
-  infoLine: {
-    color: '#fff',
-    fontSize: 15,
-    lineHeight: 26,
-  },
   infoHint: {
     color: TG_MUTED,
     fontSize: 12,
     textAlign: 'center',
-    marginTop: 12,
   },
 
   // Header
@@ -751,27 +666,18 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
+    backgroundColor: TG_PILL,
   },
   headerRow: {
     height: 52,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    gap: 10,
+    paddingHorizontal: 8,
   },
-  circle: {
-    width: 44,
+  backButton: {
+    width: 36,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: TG_PILL,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titlePill: {
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: TG_PILL,
-    paddingHorizontal: 30,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -786,27 +692,9 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-  },
-  addMembers: {
-    marginTop: 6,
-    marginHorizontal: 12,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: TG_PILL,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  addMembersText: {
-    color: TG_BLUE,
-    fontSize: 17,
-  },
-  addMembersClose: {
-    position: 'absolute',
-    right: 12,
-    top: 11,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
   },
 
   // Composer
@@ -816,30 +704,23 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     paddingTop: 6,
-    paddingHorizontal: 8,
+    paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(255,255,255,0.12)',
+    gap: 12,
+    backgroundColor: TG_PILL,
   },
   input: {
     flex: 1,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#181818',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.14)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: 14,
-    paddingRight: 10,
-    justifyContent: 'space-between',
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: TG_MENU,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
   },
   placeholder: {
-    color: '#7c7c7c',
-    fontSize: 17,
+    color: TG_MUTED,
+    fontSize: 16,
   },
 
   // Context menu
@@ -850,39 +731,11 @@ const styles = StyleSheet.create({
   right: {
     right: 10,
   },
-  reactions: {
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: '#1d191d',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: 10,
-    paddingRight: 6,
-    gap: 4,
-  },
-  reaction: {
-    fontSize: 26,
-    width: 38,
-    textAlign: 'center',
-  },
-  reactionMore: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: '#2c282c',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 2,
-  },
   menu: {
-    width: 236,
-    borderRadius: 16,
+    width: 220,
+    borderRadius: 13,
     backgroundColor: TG_MENU,
     overflow: 'hidden',
-  },
-  menuGap: {
-    height: 6,
-    backgroundColor: '#0b090b',
   },
   menuItem: {
     height: 44,
@@ -908,6 +761,10 @@ const styles = StyleSheet.create({
   },
   confirmText: {
     color: TG_RED,
+    fontSize: 17,
+  },
+  keepText: {
+    color: '#fff',
     fontSize: 17,
   },
 });
