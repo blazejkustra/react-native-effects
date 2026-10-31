@@ -40,7 +40,7 @@ Effects is a pocket collection of interactive visual effects. Every one is a rea
 
 Things to try:
 
-- Tap hard and watch the screen glass crack where you hit it
+- Tap and watch the screen glass crack where you hit it
 - Blow on your phone to send dandelion seeds drifting or put out a candle
 - Tilt to stir a lava lamp and slosh a full glass
 - Hold a magnet near your phone and watch ferrofluid reach for it
@@ -83,7 +83,7 @@ Apple's current questionnaire. Answers reflect the catalog as of 2026-10-30.
 | Realistic violence | None | |
 | Guns or other weapons | None | |
 | Gambling | No | No real money |
-| Simulated gambling | None | Scratch-off uses points and symbols, with no money or wagering |
+| Simulated gambling | None | Scratch-off uses symbols only, with no points, money or wagering |
 | Contests | None | |
 | Loot boxes | No | |
 
