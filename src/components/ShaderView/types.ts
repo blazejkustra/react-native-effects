@@ -45,4 +45,14 @@ export type ShaderViewProps = ViewProps & {
    * uv, 0.0)` (no mipmaps). Rendering waits for the image to load.
    */
   texture?: ImageSourcePropType;
+  /**
+   * Called on the JS thread once the first frame has been presented. It fires
+   * again each time the render loop starts over: on mount, when the app
+   * returns from the background, and when a prop that rebuilds the pipeline
+   * (such as `fragmentShader`) changes. Use it to fade the view in or to
+   * delay other work until the effect has drawn; WebGPU setup takes a moment,
+   * so the canvas is blank before then. The frame has been handed to the
+   * compositor at this point and may appear a frame later.
+   */
+  onFirstFrame?: () => void;
 };
