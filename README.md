@@ -210,7 +210,7 @@ import { ShaderView } from 'react-native-effects';
 | `transparent`          | `boolean`              | `false` | Clear to alpha `0`, for overlays                                     |
 | `texture`              | `ImageSourcePropType`  | none    | Image the shader can sample, for effects on top of real photos       |
 | `paramsSynchronizable` | `ParamsSynchronizable` | none    | Live floats written to `u.live` every frame, independent of `params` |
-| `onFirstFrame`         | `() => void`           | none    | Called once the first frame is on screen, e.g. to fade the view in   |
+| `onFirstFrame`         | `() => void`           | none    | Called once the first frame is presented, e.g. to fade the view in   |
 
 ### Live input
 

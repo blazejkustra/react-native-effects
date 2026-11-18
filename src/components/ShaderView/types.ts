@@ -50,8 +50,9 @@ export type ShaderViewProps = ViewProps & {
    * again each time the render loop starts over: on mount, when the app
    * returns from the background, and when a prop that rebuilds the pipeline
    * (such as `fragmentShader`) changes. Use it to fade the view in or to
-   * delay other work until the effect is actually on screen; WebGPU setup
-   * takes a moment, so the canvas is blank before then.
+   * delay other work until the effect has drawn; WebGPU setup takes a moment,
+   * so the canvas is blank before then. The frame has been handed to the
+   * compositor at this point and may appear a frame later.
    */
   onFirstFrame?: () => void;
 };
