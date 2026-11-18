@@ -1,7 +1,11 @@
 import { AppState, Image, PixelRatio, StyleSheet } from 'react-native';
 import { Canvas, GPUTextureUsage, installWebGPU } from 'react-native-webgpu';
 import { useEffect, useRef, useState } from 'react';
-import { createSynchronizable, scheduleOnRuntime } from 'react-native-worklets';
+import {
+  createSynchronizable,
+  scheduleOnRN,
+  scheduleOnRuntime,
+} from 'react-native-worklets';
 import { colorToVec4 } from '../../utils/colors';
 import { useWGPUSetup } from '../../hooks/useWGPUSetup';
 import { getSharedGPUDevice } from '../../utils/gpuDevice';
@@ -35,6 +39,7 @@ export default function ShaderView({
   transparent = false,
   paramsSynchronizable,
   texture,
+  onFirstFrame,
   style,
   ...viewProps
 }: ShaderViewProps) {
@@ -117,6 +122,16 @@ export default function ShaderView({
   const propsSync = useRef(
     createSynchronizable<Float64Array>(new Float64Array(SYNC_SIZE))
   ).current;
+
+  // The render loop captures this stable function, not `onFirstFrame` itself,
+  // so passing a new callback on every render never restarts the loop.
+  const onFirstFrameRef = useRef(onFirstFrame);
+  useEffect(() => {
+    onFirstFrameRef.current = onFirstFrame;
+  }, [onFirstFrame]);
+  const [notifyFirstFrame] = useState(() => () => {
+    onFirstFrameRef.current?.();
+  });
 
   // Convert props to flat floats and push to synchronizable
   useEffect(() => {
@@ -237,6 +252,7 @@ export default function ShaderView({
       let lastTimestamp = 0;
       let warned = false;
       let bufferDestroyed = false;
+      let firstFramePresented = false;
 
       // Free this loop's uniform buffer when the loop ends (alive=0 / superseded
       // by Fast Refresh / unmount). On a fragmentShader change the effect
@@ -363,6 +379,10 @@ export default function ShaderView({
 
           device.queue.submit([commandEncoder.finish()]);
           context.present();
+          if (!firstFramePresented) {
+            firstFramePresented = true;
+            scheduleOnRN(notifyFirstFrame);
+          }
         } catch (e) {
           // Warn once to avoid spamming the console every frame on a persistent
           // failure (e.g. a lost device).
@@ -396,6 +416,7 @@ export default function ShaderView({
     transparent,
     textureUri,
     boundTexture,
+    notifyFirstFrame,
   ]);
 
   return (
