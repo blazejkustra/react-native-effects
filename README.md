@@ -147,6 +147,8 @@ Release builds on Expo also need the `require.getModules` polyfill: copy [`metro
 
 The package exports eight ready-made components. Colors are `ColorInput` values: color strings or numbers.
 
+Every effect also accepts the standard view props and `onFirstFrame` (see [Build your own](#build-your-own)).
+
 ### Animated backgrounds
 
 All of these take `color` and `speed` (a multiplier, default `1.0`), plus:
@@ -210,6 +212,7 @@ import { ShaderView } from 'react-native-effects';
 | `transparent`          | `boolean`              | `false` | Clear to alpha `0`, for overlays                                     |
 | `texture`              | `ImageSourcePropType`  | none    | Image the shader can sample, for effects on top of real photos       |
 | `paramsSynchronizable` | `ParamsSynchronizable` | none    | Live floats written to `u.live` every frame, independent of `params` |
+| `onFirstFrame`         | `() => void`           | none    | Called once the first frame is presented, e.g. to fade the view in   |
 
 ### Live input
 

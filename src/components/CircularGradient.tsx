@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
-import type { ViewProps } from 'react-native';
+import type { EffectViewProps } from './ShaderView/types';
 import type { ColorInput } from '../utils/colors';
 import ShaderView from './ShaderView';
 
-type Props = ViewProps & {
+type Props = EffectViewProps & {
   /** The color at the center of the gradient. */
   centerColor: ColorInput;
   /** The color at the edge of the gradient. Default: transparent */

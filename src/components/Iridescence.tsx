@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
-import type { ViewProps } from 'react-native';
+import type { EffectViewProps } from './ShaderView/types';
 import type { ColorInput } from '../utils/colors';
 import ShaderView from './ShaderView';
 
-type Props = ViewProps & {
+type Props = EffectViewProps & {
   /** The color tint for the iridescence effect. */
   color?: ColorInput;
   /** Animation speed multiplier. Default: 1.0 */
