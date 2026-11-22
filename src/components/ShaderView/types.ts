@@ -56,3 +56,6 @@ export type ShaderViewProps = ViewProps & {
    */
   onFirstFrame?: () => void;
 };
+
+/** Props shared by the built-in effects: view props plus `onFirstFrame`. */
+export type EffectViewProps = ViewProps & Pick<ShaderViewProps, 'onFirstFrame'>;
